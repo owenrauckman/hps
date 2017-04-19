@@ -1,0 +1,101 @@
+{
+  "users": [
+    {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "username": "janedoe88",
+      "password": "hiddenFromApiAndHashed",
+      "emailAddress": "jane.doe@example.com",
+      "profilePicture": "base64ImageMakeMaxUploadSize",
+      "subscriptionActive": true,
+      "profileViews": 17,
+      "payment": {
+        "temp": "will contain stripe ID, any other payment info needing to be stored in DB to help w/ subscription, WILL BE hidden in API and hashed",
+        "joinDate": "Join Date here so we can display when they will get billed"
+      },
+      "companies": [
+        {
+          "name": "Silpada",
+          "industry": "Jewelry",
+          "aboutCompany": "Info about the seller and the company that they input (Make Textarea formattable for links, video etc)",
+          "aboutMe": "Info about me (Formattable like above)",
+          "areasServed": [
+            {
+              "state": "KS",
+              "ownsPremium": false,
+              "numberOfFeatures": 17,
+              "zipCodes": [
+                66061,
+                66223
+              ]
+            },
+            {
+              "state": "MO",
+              "ownsPremium": false,
+              "numberOfFeatures": 13,
+              "zipCodes": [
+                64468
+              ]
+            }
+          ],
+          "links": {
+            "website": {
+              "url": "https://www.yourwebsitenamehere.com"
+            },
+            "facebook": {
+              "url": "https://www.facebook.com/username"
+            },
+            "twitter": {
+              "url": "https://www.twitter.com/username"
+            },
+            "instagram": {
+              "url": "https://www.instagram.com/username"
+            },
+            "pinterest": {
+              "url": "https://www.pinterest.com/username"
+            },
+            "youtube": {
+              "url": ""
+            }
+          }
+        },
+        {
+          "name": "Partylite",
+          "industry": "Candles",
+          "aboutCompany": "Info about the seller and the company that they input (Make Textarea formattable for links, video etc)",
+          "aboutMe": "Info about me (Formattable like above)",
+          "areasServed": [
+            {
+              "state": "MO",
+              "ownsPremium": false,
+              "numberOfFeatures": 11,
+              "zipCodes": [
+                64468
+              ]
+            }
+          ],
+          "links": {
+            "website": {
+              "url": "https://www.yourwebsitenamehere.com"
+            },
+            "facebook": {
+              "url": "https://www.facebook.com/username"
+            },
+            "twitter": {
+              "url": "https://www.twitter.com/username"
+            },
+            "instagram": {
+              "url": "https://www.instagram.com/username"
+            },
+            "pinterest": {
+              "url": "https://www.pinterest.com/username"
+            },
+            "youtube": {
+              "url": ""
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
