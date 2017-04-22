@@ -1,9 +1,10 @@
-// Dependencies
-var mongoose = require('mongoose');
-var mongooseHidden = require('mongoose-hidden')({ defaultHidden: { password: true, __v: true } }); //for hiding password, version, etc from api
-var bcrypt = require('bcrypt');
+'use strict';
 
-// User Schema
+// Add Dependencies
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+var mongooseHidden = require('mongoose-hidden')({ defaultHidden: { password: true, __v: true } });
+
 var UserSchema = mongoose.Schema({
   firstName: {
     type: String
@@ -39,6 +40,6 @@ var UserSchema = mongoose.Schema({
   }
 });
 
-// --- Hide Fields Specified Above from public API --- //
+// Hide Fields Specified in mongooseHidden from public API and export module
 UserSchema.plugin(mongooseHidden);
-var User = module.exports = mongoose.model('User', UserSchema);
+let User = module.exports = mongoose.model('User', UserSchema);

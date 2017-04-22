@@ -1,0 +1,29 @@
+{
+	"port": 3000,
+  "db": "mongodb://orauckman:jayhawks@ds023613.mlab.com:23613/hps",
+  "sessionSecret": "omgwutisthisgoingtobelater",
+  "auth": {
+    "loginFailed": "login failed, please try again.",
+    "loginSuccess": "Login Succeeded",
+    "minimumRequirements": "Please enter at minimum a name, username, email, and password to register",
+    "alreadyInUse": "That username or email address is already in use",
+    "generalError": "Whoops! Something didn't work. Please try again",
+    "registerThanks": "Thanks for signing up,",
+    "notAuthenticated": "You can't view this page because you are not logged in",
+    "loggedOut": "You are now logged out",
+		"editNotAuthorized": "You are not authorized to edit that user!",
+		"editSuccess": "Profile Updated Successfully",
+		"editError": "There was an error updating your profile. Please try again",
+		"userDeleted": "Your account has been deleted",
+		"deleteNotAuthorized": "You are not authorized to delete that user!"
+  },
+  "errors": {
+    "userDoesNotExist": "That user does not exist",
+    "invalidPassword": "Invalid password"
+  },
+  "search": {
+    "defineLocation": "Please Define a location",
+    "defineCity": "You must choose a state with your city",
+    "noIndustry": "That industry doesn't exist"
+  }
+}

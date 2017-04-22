@@ -1,8 +1,10 @@
 'use strict';
+
+import config from '../config.json';
+import zipcodes from 'zipcodes';
+import cities from 'cities';
 const User = require('../models/schemas/user');
 const Company = require('../models/schemas/company');
-const zipcodes = require('zipcodes');
-const cities = require('cities');
 
 module.exports = class SearchModel{
   constructor(){
@@ -40,10 +42,10 @@ module.exports = class SearchModel{
           searchParameters.push({ "companies.areasServed.zipCodes" : { $in : zipsInState } });
         }
         else if(params.city){
-          resolve({err: 'You must choose a state with your city'});
+          resolve({err: config.defineCity});
         }
         else{
-          resolve({err: 'Please Define a Location'});
+          resolve({err: config.defineLocation});
         }
         // If they search for city, state AND zip. This is needed at the bottom to guarantee the specificity
         if(params.zipCode){
@@ -93,7 +95,7 @@ module.exports = class SearchModel{
           reject({err: err.message});
         }
         else if(companies == null){
-          resolve({message: "That industry doesn't exist"});
+          resolve({message: config.search.noIndustry});
         }
         else{
           let companyNames = [];
