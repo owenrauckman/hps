@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 import passport from 'passport';
 import config from '../config.json';
 const User = new user();
+const stripe = require("stripe")(config.stripeTestKey);
 
 module.exports = class Auth{
   constructor(){
@@ -41,7 +42,8 @@ module.exports = class Auth{
   }
 
   /*
-    Register a user. Check to make sure their username/email doesn't already exist and write to DB
+    Register a user. Check to make sure their username/email doesn't already exist and write to DB.
+    Additionally, create a stripe account (at minimum a free/basic) and add additional charges
     @params {req, res, next} - Request Data contains user info
   */
   registerUser(req, res, err){
@@ -54,25 +56,65 @@ module.exports = class Auth{
         return res.json({success: false, message: config.auth.alreadyInUse})
       }
       else{
-        let newUser = new UserModel({
-          username: req.body.username.replace(/ /g,''),
-          password: req.body.password,
-          firstName: req.body.firstName,
-          lastName: req.body.lastName,
-          emailAddress: req.body.emailAddress,
-        });
+        /* Create Stripe account, subscription, and user account */
+        let newUser = '';
+        let customer = stripe.customers.create({
+          /* use email to create unique stripe user */
+          email: req.body.emailAddress,
+        }).then( (customer, err) =>{
+          if(err){
+            return res.json({message: config.errors.stripeError});
+          }
+          newUser = new UserModel({
+            username: req.body.username.replace(/ /g,''),
+            password: req.body.password,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            emailAddress: req.body.emailAddress,
+            stripeId: customer.id
+            /* todo: all additional User Info Here */
+          });
+          return customer;
+        }).then((customer) =>{
+          stripe.subscriptions.create({
+            customer: customer.id,
+            /* This is Generated from the stripe.js form */
+            source: req.body.stripeToken,
 
-        User.createUser(newUser, (err, user) =>{
-          //1100 handles duplicate keys
-          if ( err && err.code !== 11000 ) {
-            return res.json({message: config.auth.generalrror});
-          }
-          else if ( err && err.code === 11000 ) {
-            return res.json({message: config.auth.alreadyInUse});
-          }
-          else{
-            return res.json({message: `${config.auth.registerThanks} ${newUser.firstName}`, user: newUser});
-          }
+            /* By default sign them up for all plans (quantity 0) */
+            items: [
+              { plan: "basic", quantity: 9 },
+              { plan: "pro", quantity: 2,},
+              { plan: "premium", quantity: 1}
+            ]
+          }).then((subscription, err) =>{
+            if(err){
+              return res.json({message: config.errors.stripeError});
+            }
+
+            let subscriptionItems = [];
+            for (let item of subscription.items.data){
+              tempArr.push(item);
+            }
+
+            newUser.subscriptionItems = subscriptionItems;
+            /* real quick add the subscription ID before creating the user */
+            newUser.subscriptionId = subscription.id;
+            newUser.save();
+
+            User.createUser(newUser, (err, user) =>{
+              /* 1100 handles duplicate keys */
+              if ( err && err.code !== 11000 ) {
+                return res.json({message: config.auth.generalrror});
+              }
+              else if ( err && err.code === 11000 ) {
+                return res.json({message: config.auth.alreadyInUse});
+              }
+              else{
+                return res.json({message: `${config.auth.registerThanks} ${newUser.firstName}`, user: newUser});
+              }
+            });
+          });
         });
       }
     });

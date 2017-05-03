@@ -8,7 +8,7 @@ let router = express.Router();
 const User= new user();
 const Auth= new auth();
 
-// /u is to avoid wildcard issues with other routes
+/* /u is to avoid wildcard issues with other routes */
 router.get('/u/:username', (req, res) =>{
   User.getProfile(req.params.username).then( res.send.bind(res) );
 });
@@ -33,7 +33,7 @@ router.delete('/delete/:username', User.deleteUser, (req, res) =>{
 
 })
 
-// Secret Route -- Base Auth Routes off of this
+/* Secret Route -- Base Auth Routes off of this */
 router.get('/secret', Auth.checkAuth, (req, res, next) =>{
   res.json('YOU ARE IN MY MAN');   // add returned data here specific to what route to hit
 });

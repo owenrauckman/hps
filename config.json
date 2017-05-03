@@ -2,6 +2,7 @@
 	"port": 3000,
   "db": "mongodb://orauckman:jayhawks@ds023613.mlab.com:23613/hps",
   "sessionSecret": "omgwutisthisgoingtobelater",
+	"stripeTestKey": "sk_test_zsassPMquDTMHFtrVv4Id1dd",
   "auth": {
     "loginFailed": "login failed, please try again.",
     "loginSuccess": "Login Succeeded",
@@ -15,11 +16,13 @@
 		"editSuccess": "Profile Updated Successfully",
 		"editError": "There was an error updating your profile. Please try again",
 		"userDeleted": "Your account has been deleted",
+		"deleteError": "There was an error deleting your account.",
 		"deleteNotAuthorized": "You are not authorized to delete that user!"
   },
   "errors": {
     "userDoesNotExist": "That user does not exist",
-    "invalidPassword": "Invalid password"
+    "invalidPassword": "Invalid password",
+		"stripeError": "Something went wrong when processing your payment. Please try again."
   },
   "search": {
     "defineLocation": "Please Define a location",

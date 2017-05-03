@@ -3,6 +3,7 @@
 import bcrypt from 'bcrypt';
 import config from '../config.json';
 const UserSchema = require('../models/schemas/user');
+const stripe = require("stripe")(config.stripeTestKey);
 
 module.exports = class User{
   constructor(){
@@ -76,26 +77,49 @@ module.exports = class User{
   /*
     Edit a user. Test against the API with the user session info
     @param {req, res, next} - data to compare user with
+    @param {req} - username, password, profile info, plan to edit, and quantity (for stripe ) -- in request include all 3 plans
   */
   editUser(req, res, next){
+
     if(req.user && req.user.username === req.params.username){
       UserSchema.findOne({username: req.params.username}, (err, user) => {
-        // todo: edit full object
+        /* todo: edit full object */
         user.firstName = req.body.firstName;
         user.lastName = req.body.lastName;
 
-        user.save((err) => {
-          if(err) {
-              return res.json({message: config.auth.editError});
+        /* Only update this section if they are updating their subscriptions */
+        if(req.body.subscriptions){
+          for(let plan of user.subscriptionItems){
+            for(let [index, subscription] of req.body.subscriptions.entries()){
+              if(plan.plan.id == subscription.plan && subscription.update == true){
+                stripe.subscriptionItems.update(
+                  plan.id,
+                  {
+                    quantity: parseInt(subscription.quantity),
+                  },
+                  (err, transfer) => {
+                    if(err){
+                      return res.json({sucess: false, message: config.auth.editError});
+                    }
+                    else{
+                      user.subscriptionItems.set(index, transfer);
+                      user.save((err)=>{
+                        if(err){
+                          return res.json({sucess: false, message: config.auth.editError});
+                        }
+                      });
+                    }
+                  }
+                )
+              }
+            }
           }
-          else{
-            return res.json({message: config.auth.editSuccess});
-          }
-        });
+        }
+        return res.json({sucess: true, message: config.auth.editSuccess});
       });
     }
     else{
-      return res.json({message: config.auth.editNotAuthorized});
+      return res.json({sucess: false, message: config.auth.editNotAuthorized});
     }
   }
 
@@ -104,22 +128,32 @@ module.exports = class User{
     @param {req, res, next} - data to compare user with
   */
   deleteUser(req,res){
-    // make sure the delete route is the logged in user
+
+    /* make sure the delete route is the logged in user */
     if(req.user && req.user.username == req.params.username){
       UserSchema.findOne({username: req.params.username}, (err, user) => {
         user.remove({
-          username: req.user.username
+          username: user.username
         },
         (err,user) =>{
           if(err){
             return res.status(500).json({err: err.message});
           }
-          return res.json({message: config.auth.userDeleted});
+          /* delete the user's stripe info also */
+          stripe.customers.del(
+            user.stripeId,
+            (err, confirmation)=> {
+              if(err){
+                return res.json({sucess: false, message: config.auth.deleteError});
+              }
+            }
+          );
+          return res.json({sucess: true, message: config.auth.userDeleted});
         });
       });
     }
     else{
-      return res.json({message: config.auth.deleteNotAuthorized});
+      return res.json({sucess: false, message: config.auth.deleteNotAuthorized});
     }
   }
 

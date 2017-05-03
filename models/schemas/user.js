@@ -23,6 +23,15 @@ var UserSchema = mongoose.Schema({
   emailAddress: {
     type: String
   },
+  stripeId: {
+    type: String
+  },
+  subscriptionId: {
+    type: String
+  },
+  subscriptionItems: {
+    type: Array
+  },
   profilePicture: {
     type: String
   },
