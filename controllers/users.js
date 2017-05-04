@@ -25,6 +25,10 @@ router.post('/register', (req, res) =>{
   Auth.registerUser(req, res);
 });
 
+router.post('/addCard', (req, res) =>{
+  Auth.addCard(req, res);
+});
+
 router.put('/edit/:username', (req, res, next) =>{
   User.editUser(req, res, next);
 });

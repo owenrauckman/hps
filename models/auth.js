@@ -114,19 +114,36 @@ module.exports = class Auth{
             User.createUser(newUser, (err, user) =>{
               /* 1100 handles duplicate keys */
               if ( err && err.code !== 11000 ) {
-                return res.json({message: config.auth.generalrror});
+                return res.json({success: false, message: config.auth.generalError});
               }
               else if ( err && err.code === 11000 ) {
-                return res.json({message: config.auth.alreadyInUse});
+                return res.json({success: false, message: config.auth.alreadyInUse});
               }
               else{
-                return res.json({message: `${config.auth.registerThanks} ${newUser.firstName}`, user: newUser});
+                return res.json({success: true, message: `${config.auth.registerThanks} ${newUser.firstName}`, user: newUser});
               }
             });
           });
         });
       }
     });
+  }
+
+  /*
+    Add a card to an existing stripe customer
+    @params {req, res, next} - Request Data
+  */
+  addCard(req, res){
+    stripe.customers.createSource(
+      req.user.stripeId,
+      { source: req.body.stripeToken },
+      (err, card) => {
+        if(err){
+          return res.json({success: false, message: config.auth.cardAddFailure});
+        }
+        return res.json({success: false, message: config.auth.cardAddSuccess});
+      }
+    );
   }
 
   /*

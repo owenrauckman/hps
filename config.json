@@ -19,7 +19,9 @@
 		"deleteError": "There was an error deleting your account.",
 		"deleteNotAuthorized": "You are not authorized to delete that user!",
 		"couponSuccess": "Coupon applied successfully",
-		"couponFailure": "Invalid Coupon Code"
+		"couponFailure": "Invalid Coupon Code",
+		"cardAddSuccess": "Card Added Successfully!",
+		"cardAddFailure": "There was an issue adding your card, please try again."
   },
   "errors": {
     "userDoesNotExist": "That user does not exist",
