@@ -58,10 +58,19 @@ module.exports = class Auth{
       else{
         /* Create Stripe account, subscription, and user account */
         let newUser = '';
-        let customer = stripe.customers.create({
-          /* use email to create unique stripe user */
-          email: req.body.emailAddress,
-        }).then( (customer, err) =>{
+        let userObject;
+
+        /* If the customer signed up with a coupon, add to the initial object */
+        /* use email to create unique stripe user */
+        if(req.body.coupon){
+          userObject = {email: req.body.emailAddress, coupon: req.body.coupon};
+        }
+        else{
+          userObject = {email: req.body.emailAddress};
+        }
+
+        let customer = stripe.customers.create(userObject)
+        .then( (customer, err) =>{
           if(err){
             return res.json({message: config.errors.stripeError});
           }
@@ -94,7 +103,7 @@ module.exports = class Auth{
 
             let subscriptionItems = [];
             for (let item of subscription.items.data){
-              tempArr.push(item);
+              subscriptionItems.push(item);
             }
 
             newUser.subscriptionItems = subscriptionItems;

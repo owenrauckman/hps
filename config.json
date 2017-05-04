@@ -17,12 +17,15 @@
 		"editError": "There was an error updating your profile. Please try again",
 		"userDeleted": "Your account has been deleted",
 		"deleteError": "There was an error deleting your account.",
-		"deleteNotAuthorized": "You are not authorized to delete that user!"
+		"deleteNotAuthorized": "You are not authorized to delete that user!",
+		"couponSuccess": "Coupon applied successfully",
+		"couponFailure": "Invalid Coupon Code"
   },
   "errors": {
     "userDoesNotExist": "That user does not exist",
     "invalidPassword": "Invalid password",
-		"stripeError": "Something went wrong when processing your payment. Please try again."
+		"stripeError": "Something went wrong when processing your payment. Please try again.",
+		"general": "Whoops, something went wrong. Please try reloading the page."
   },
   "search": {
     "defineLocation": "Please Define a location",

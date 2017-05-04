@@ -115,7 +115,20 @@ module.exports = class User{
             }
           }
         }
-        return res.json({sucess: true, message: config.auth.editSuccess});
+        /* If The User Applies a discount code, apply it here */
+        if(req.body.coupon){
+          stripe.customers.update(user.stripeId, {
+            coupon: req.body.coupon
+          }, (err, customer) => {
+            if(err){
+              return res.json({success: false, message: config.auth.couponFailure});
+            }
+            return res.json({success: true, message: config.auth.couponSuccess});
+          });
+        }
+        else{
+          return res.json({sucess: true, message: config.auth.editSuccess});
+        }
       });
     }
     else{
@@ -155,6 +168,22 @@ module.exports = class User{
     else{
       return res.json({sucess: false, message: config.auth.deleteNotAuthorized});
     }
+  }
+
+  /*
+    Get a User's Invoices (So they can see past payments)
+    @param {req, res, next} - data to compare user with
+  */
+  getInvoices(req, res){
+    stripe.invoices.list(
+      { customer: req.user.stripeId },
+      (err, invoices) => {
+        if(err){
+          res.json({success: false, message: config.errors.general});
+        }
+        res.json({success: true, message: invoices});
+      }
+    );
   }
 
 }

@@ -38,4 +38,8 @@ router.get('/secret', Auth.checkAuth, (req, res, next) =>{
   res.json('YOU ARE IN MY MAN');   // add returned data here specific to what route to hit
 });
 
+router.get('/invoices', User.getInvoices, (req, res, next) =>{
+  // res.json('YOU ARE IN MY MAN');   // add returned data here specific to what route to hit
+});
+
 module.exports = router;
