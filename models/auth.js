@@ -130,23 +130,6 @@ module.exports = class Auth{
   }
 
   /*
-    Add a card to an existing stripe customer
-    @params {req, res, next} - Request Data
-  */
-  addCard(req, res){
-    stripe.customers.createSource(
-      req.user.stripeId,
-      { source: req.body.stripeToken },
-      (err, card) => {
-        if(err){
-          return res.json({success: false, message: config.auth.cardAddFailure});
-        }
-        return res.json({success: false, message: config.auth.cardAddSuccess});
-      }
-    );
-  }
-
-  /*
     Middleware to make sure a user is authenticated. Will return next if authenticated
     @params {req, res, next} - Request Data
   */

@@ -171,6 +171,72 @@ module.exports = class User{
   }
 
   /*
+    Get a User's Cards (So they can which ones are on file)
+    @param {req, res, next} - data to compare user with
+  */
+  getCreditCards(req, res){
+    stripe.customers.listCards(req.user.stripeId, (err, cards)=> {
+      if(err){
+        return res.json({success: false, message: config.auth.cardRetrieveError});
+      }
+      return res.json({success: true, message: cards});
+    });
+  }
+
+  /*
+    Add a card to an existing stripe customer
+    @params {req, res, next} - Request Data
+  */
+  addCreditCard(req, res){
+    stripe.customers.createSource(
+      req.user.stripeId,
+      { source: req.body.stripeToken },
+      (err, card) => {
+        if(err){
+          return res.json({success: false, message: config.auth.cardAddFailure});
+        }
+        return res.json({success: true, message: card});
+      }
+    );
+  }
+
+  /*
+    Delete a card to an existing stripe customer
+    @params {req, res, next} - Request Data
+  */
+  deleteCreditCard(req, res){
+    stripe.customers.deleteCard(
+      req.user.stripeId,
+      /* this will need to be set on click somehow */
+      req.cardId,
+      (err, confirmation) => {
+        if(err){
+          return res.json({success: false, message: config.auth.cardDeleteFailure});
+        }
+        return res.json({success: true, message: config.auth.cardDeleteSuccess});
+      }
+    );
+  }
+
+  /*
+    Set a new Default card for a user (newest card will already be set by default)
+    @params {req, res, next} - Request Data
+  */
+  setDefaultCreditCard(req, res){
+    stripe.customers.update(req.user.stripeId, {
+      /* this will need to be set on click somehow */
+      default_source: req.cardId
+    },
+    (err, customer) => {
+      if(err){
+        return res.json({success: false, message: config.auth.cardDefaultFailure});
+      }
+      return res.json({success: true, message: config.auth.cardDefaultSuccess});
+    });
+
+  }
+
+  /*
     Get a User's Invoices (So they can see past payments)
     @param {req, res, next} - data to compare user with
   */

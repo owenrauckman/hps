@@ -21,7 +21,12 @@
 		"couponSuccess": "Coupon applied successfully",
 		"couponFailure": "Invalid Coupon Code",
 		"cardAddSuccess": "Card Added Successfully!",
-		"cardAddFailure": "There was an issue adding your card, please try again."
+		"cardAddFailure": "There was an issue adding your card, please try again.",
+		"cardRetrieveError": "There was an error fetching your credit card info. Please try again.",
+		"cardDeleteFailure": "There was an issue removing your card, please try again.",
+		"cardDeleteSuccess": "Card successfully removed!",
+		"cardDefaultFailure": "There was an issue setting your default card, please try again.",
+		"cardDefaultSuccess": "New Default Card Set Successfully!"
   },
   "errors": {
     "userDoesNotExist": "That user does not exist",
