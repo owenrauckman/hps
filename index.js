@@ -27,6 +27,21 @@ let app = module.exports = express();
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({}));
 
+// --- Cors allows for Auth to work across different ports
+// TODO: es6ify this
+app.use(cors({origin: 'http://localhost:8080', credentials: true}, {origin: 'https://localhost:8080', credentials: true}));
+app.use(function(req, res, next) {
+  var allowedOrigins = ['http://localhost:8080', 'https://localhost:8080'];
+   var origin = req.headers.origin;
+   if(allowedOrigins.indexOf(origin) > -1){
+        res.setHeader('Access-Control-Allow-Origin', origin);
+   }
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT');
+  res.header("Access-Control-Allow-Credentials", true);
+  next();
+});
+
 
 //Init Session Data and Passport
 app.use(session({

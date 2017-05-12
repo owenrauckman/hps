@@ -1,0 +1,54 @@
+html, body{
+  height: 100%;
+}
+body{
+  font-size: 16px;
+  font-family: $roboto;
+  margin: 0 auto;
+  background: $white-off;
+  height: 100%;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Disable Scrolling for full screen pop ups */
+.no-overflow{
+  overflow: hidden;
+}
+
+/* Toggle Styles for Filters */
+.filter{
+  visibility: hidden;
+  opacity: 0;
+  // margin-left: -1000px;
+  // transition: margin-left 0.5s ease-out;
+  transition: opacity 0.5s ease-out;
+  &--show{
+    visibility: visible;
+    opacity: 1;
+    // margin-left: 0px;
+  }
+}
+
+/* Various Settings */
+$border-radius: 5px;
+$circle-radius: 50%;
+
+/* Resets */
+h1, h2, h3, h4, h5, p{
+  margin: 0;
+  padding:0;
+  font-size: 1rem;
+}
+input{
+  outline: none;
+  border: none;
+}
+ul{
+  padding:0;
+}
+button{
+  outline: none;
+  border: none;
+  background: transparent;
+}
