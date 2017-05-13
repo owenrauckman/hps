@@ -1,57 +1,28 @@
 <template>
   <div class="filters">
 
-    <!-- Filters for Location -->
-    <div v-if="options.searchType === 'location'" class="filters__container">
-      <div class="filters__description">
-        <p class="filters__description__text">{{locationSearch}}</p>
-        <button @click="hideFilters" class="filters__description__close">
-          <img src="../../../static/svg/close.svg"/>
-        </button>
-      </div>
-
-      <div class="filters__section">
-        <div class="filters__section__input-container">
-          <input class="filters__section__input" v-on:blur="scrollTop" :placeholder="stateSearchPlaceholder" v-model="stateQuery">
-        </div>
-        <ul class="filters__section__list">
-          <li class="filters__section__list__item filters__section__list__item--selected">Kansas</li>
-          <li class="filters__section__list__item">Missouri</li>
-          <li class="filters__section__list__item">Nebraska</li>
-        </ul>
-      </div>
-
-      <div class="filters__section">
-        <div class="filters__section__input-container">
-          <input class="filters__section__input" v-on:blur="scrollTop" :placeholder="citySearchPlaceholder" v-model="cityQuery">
-        </div>
-        <ul class="filters__section__list">
-          <li class="filters__section__list__item filters__section__list__item--selected">Kansas</li>
-          <li class="filters__section__list__item">Missouri</li>
-          <li class="filters__section__list__item">Nebraska</li>
-        </ul>
-      </div>
-      <button @click="performSearch" class="filters__search-button">{{search}}</button>
-    </div>
-
-
     <!-- Filters for Company/Industry -->
-    <div v-if="options.searchType === 'company'" class="filters__container">
-      <div class="filters__description">
-        <p class="filters__description__text">{{companySearch}}</p>
-        <button @click="hideFilters" class="filters__description__close">
+    <div class="filters__container">
+      <div class="filters__controls filters--margin">
+        <button @click="hideFilters" class="filters__controls__close">
           <img src="../../../static/svg/close.svg"/>
         </button>
+        <button class="filters__controls__text" @click="clearFilters">Clear All</button>
       </div>
 
-      <div class="filters__section">
-        <div class="filters__section__input-container">
-          <input class="filters__section__input" :placeholder="companySearchPlaceholder" v-model="companyQuery">
-        </div>
-        <ul class="filters__section__list">
-          <li v-for="company in filterBy(companies, companyQuery, 'name')" @click="selectCompany(company)" :class="[{ 'filters__section__list__item--selected': company.active },'filters__section__list__item']">{{company.name}}</li>
+      <!-- todo move this to a new component -->
+      <div class="filter-tabs">
+        <ul class="filter-tabs__list">
+          <li v-for="tab in filterTabs" @click="selectFilter(tab)" :class="[{ 'filter-tabs__list__item--active': tab.active },'filter-tabs__list__item']">{{tab.name}}</li>
         </ul>
       </div>
+      <!-- end new component -->
+
+      <State v-if="filterTabs[0].active"/>
+      <City v-if="filterTabs[1].active"/>
+      <Company v-if="filterTabs[2].active"/>
+      <Industry v-if="filterTabs[3].active"/>
+
       <button @click="performSearch" class="filters__search-button">{{search}}</button>
     </div>
 
@@ -59,76 +30,69 @@
 </template>
 
 <script>
+import State from './State';
+import City from './City';
+import Company from './Company';
+import Industry from './Industry';
+
+const config = require('../../../config/appConfig.json');
+
 export default {
   name: 'filters',
+  components: { State, City, Company, Industry },
   data() {
     return {
       locationSearch: 'Search by state and/or city',
-      companySearch: 'Search by company or industry',
       stateSearchPlaceholder: 'Search By State',
       citySearchPlaceholder: 'Search By City',
-      companySearchPlaceholder: 'Search By Company/Industry',
+      companySearchPlaceholder: 'Search By Company',
       search: 'Search',
       stateQuery: '',
       cityQuery: '',
       companyQuery: '',
       companies: [],
       industries: [],
+      filterTabs: [
+        { name: 'state', active: true },
+        { name: 'city', active: false },
+        { name: 'company', active: false },
+        { name: 'industry', active: false },
+      ],
     };
   },
   mounted() {
     window.onresize = this.onScreenResize();
-    this.getCompanies();
   },
   props: ['options'],
   methods: {
     /*
-      / Hides the filter popup and removes the no-scroll class on the body
+      Hides the filter popup and removes the no-scroll class on the body
     */
     hideFilters() {
       this.$store.commit('toggleFilters', false);
       document.body.classList = '';
     },
     /*
-      / When the window resizes, adjust height of the filters to the window height
-      / This fixes issue with Chrome/other mobile browsers overflowing
+      When the window resizes, adjust height of the filters to the window height
+      This fixes issue with Chrome/other mobile browsers overflowing
     */
     onScreenResize() {
       document.querySelector('.filters').style.height = window.innerHeight;
     },
     /*
-      / scroll back to the top of the page on input blurs to avoid UI issue
+      scroll back to the top of the page on input blurs to avoid UI issue
     */
     scrollTop() {
       document.body.scrollTop = 0;
     },
     /*
-      / Get list of companies that a user can search by
+      Clear Filters for all components and remove selected classes for them
     */
-    getCompanies() {
-      fetch('http://localhost:3000/api/search/companies').then((data) => {
-        data.json().then((companies) => {
-          const newCompanies = [];
-          /* eslint-disable */
-          companies.forEach((company) => {
-            newCompanies.push({name: company, active: false});
-          });
-          /* eslint-enable */
-          this.companies = newCompanies;
-        });
-      });
-    },
-    /*
-      / Get list of companies that a user can search by
-    */
-    selectCompany(item) {
-      /* eslint-disable */
-      this.companies.forEach((company) => {
-        company.active = false;
-      });
-      item.active = !item.active;
-      this.companyQuery = item.name;
-      /* eslint-enable */
+    clearFilters() {
+      this.$store.commit('updateStateQuery', { name: '', abbr: '' });
+      this.$store.commit('updateCityQuery', '');
+      this.$store.commit('updateCompanyQuery', '');
+      this.$store.commit('updateIndustryQuery', '');
     },
     /*
       / TODO FILL THIS OUT
@@ -136,13 +100,27 @@ export default {
     performSearch() {
       this.hideFilters();
       fetch(
-        `http://localhost:3000/api/search?company=${encodeURIComponent(this.companyQuery)}&zipCode=
-        ${encodeURIComponent(this.stateQuery)}`,
+        `${config.api}/search` +
+        `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.$store.state.filterQueries.city)}` +
+        `&company=${encodeURIComponent(this.$store.state.filterQueries.company)}` +
+        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry)}`,
       ).then((data) => {
         data.json().then((users) => {
           this.$store.commit('updateResults', users);
+          // TODO: loading goes here
         });
       });
+    },
+
+    // TODO: FILL THIS OUT
+    selectFilter(tab) {
+      /* eslint-disable */
+      this.filterTabs.forEach((tab) => {
+        tab.active = false;
+      });
+      tab.active = true;
+      /* eslint-enable */
     },
   },
 };
@@ -159,59 +137,67 @@ export default {
   bottom: 0;
   left: 0;
   background: linear-gradient(to bottom right, $blue-grad-top-left, $blue-grad-bottom-right);
-  overflow-y: scroll;
+  // overflow-y: scroll;
   box-sizing:border-box;
   -moz-box-sizing:border-box;
   -webkit-box-sizing:border-box;
+  &--margin{
+    margin-right: 1rem;
+    margin-left: 1rem;
+  }
   &__container{
-    margin: 1rem;
+    margin: 1rem 0;
     position: relative;
     min-height: 100%;
   }
   &__section{
     min-height: 200px;
-    margin-bottom: 4rem;
     position: relative;
     &__input{
       height: 70px;
       width: calc(100% - 5rem);
-      padding:0 4rem 0 1rem;
-      border-radius: $border-radius;
-      box-shadow: $box-shadow;
+      padding:0 1rem 0 4rem;
       font-family: $roboto;
       font-size: 1rem;
+      background: transparent;
+      color: $white;
+      border-bottom: solid 1px $white-50;
       &::placeholder{
+        color: $white-50;
         font-family: $roboto;
+        font-style: italic;
+        font-weight: 400;
+        letter-spacing: 1px;
         font-size: 1rem;
       }
     }
     &__input-container{
       position: relative;
+      width: 100%;
       &:after{
         content: '';
         position: absolute;
-        right: 1rem;
+        left: 2rem;
         height: 20px;
         width: 20px;
         top: 50%;
         transform: translateY(-50%);
-        background: url('../../../static/svg/search.svg');
+        background: url('../../../static/svg/search-white.svg');
       }
     }
     &__list{
       list-style: none;
       &__item{
-        border: solid 1px $white-50;
-        padding: 0.5rem 1rem;
-        margin: 0.5rem 0;
-        border-radius: $border-radius;
+        margin: 0.25rem 0;
+        padding: 1rem;
         color: $white;
         letter-spacing: 1px;
         font-weight: 300;
         transition: background 0.2s ease-in;
         position: relative;
+        border-radius: $border-radius;
         &--selected{
-          background: $white-20;
+          // background: $white-20;
           &:after{
             content: '';
             position: absolute;
@@ -233,51 +219,36 @@ export default {
 
   /* Search Button */
   &__search-button{
-    background: orange;
-    width: 100%;
+    width: 200px;
     position: fixed;
     padding: 1rem 0;
-    left:0;
-    bottom: 0;
+    right:0;
+    bottom: 0px;
     font-size: 0.9rem;
     letter-spacing: 1px;
     font-weight: 300;
     transition: background 0.2s ease-in;
     background: $pink;
-    box-shadow: $box-shadow;
     text-decoration: none;
     color: $white;
-    margin: 0;
     &:hover{
       cursor: pointer;
       background: lighten($pink, 5%);
       text-decoration: none;
-      &:after{
-        transform:translateX(5px) rotate(-90deg);
-      }
-    }
-    &:after{
-      position: absolute;
-      content: '';
-      height: 7px;
-      width: 7px;
-      align-items: center;
-      transform: rotate(-90deg) translateX(0%);
-      margin: 5px 5px 0 2px;
-      background: url('../../../static/svg/arrow-white.svg');
-      transition: transform 0.2s ease-in;
     }
   }
-  &__description{
+  &__controls{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 0 1rem 0;
     &__text{
       font-size: 0.9rem;
+      letter-spacing: 1px;
       color: $white;
-      font-weight: 300;
-      font-style: italic;
+      font-weight: 500;
+      &:hover{
+        cursor: pointer;
+      }
     }
     &__close{
       height: 50px;
@@ -286,6 +257,54 @@ export default {
         cursor: pointer;
       }
     }
+  }
+}
+
+/* FILTER TABS */
+.filter-tabs{
+  display: flex;
+  width: 100%;
+  &__list{
+    display: inline-flex;
+    justify-content: space-between;
+    width: calc(100% - 4rem);
+    margin: 2rem;
+    &__item{
+      list-style: none;
+      text-align: center;
+      font-weight: 500;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      color: $white-50;
+      position: relative;
+      &:hover{
+        cursor: pointer;
+      }
+      &--active{
+        color: $white;
+        &:after{
+          content: '';
+          position: absolute;
+          background: $white;
+          width: 100%;
+          max-width: 80px;
+          left: 0;
+          right: 0;
+          margin: 0 auto;
+          left: 0;
+          bottom: -1rem;
+          height: 2px;
+        }
+      }
+    }
+  }
+}
+/* Active Class For Components */
+.filter-tabs-content{
+  display: none;
+  &--active{
+    display: block;
   }
 }
 </style>

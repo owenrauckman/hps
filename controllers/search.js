@@ -21,6 +21,10 @@ router.get('/cities', function(req, res){
   res.send(Search.getCitiesInState(req.query));
 });
 
+router.get('/states', function(req, res){
+  res.send(Search.getStates());
+});
+
 router.get('/zipCodes', function(req, res){
   res.send(Search.getZipCodesByCity(req.query));
 });

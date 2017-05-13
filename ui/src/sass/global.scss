@@ -20,13 +20,10 @@ body{
 .filter{
   visibility: hidden;
   opacity: 0;
-  // margin-left: -1000px;
-  // transition: margin-left 0.5s ease-out;
-  transition: opacity 0.5s ease-out;
+  transition: opacity 0.25s ease-out;
   &--show{
     visibility: visible;
     opacity: 1;
-    // margin-left: 0px;
   }
 }
 

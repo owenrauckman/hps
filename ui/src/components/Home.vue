@@ -2,7 +2,7 @@
   <div class="home">
     <div class="home__bg"></div>
     <div class="home__container">
-      <p class="home__intro">{{intro}}</p>
+      <p class="home__intro"><span class="home__intro__span">Home Party Shows</span> Find and build your direct sales team today.</p>
       <Search/>
       <Card v-for="card in $store.state.results" :key="card.plan" :options="card"/>
     </div>
@@ -18,7 +18,6 @@ export default {
   components: { Card, Search },
   data() {
     return {
-      intro: 'Build your direct sales team. Get found or find consultants today.',
       results: [
         {
           plan: 'premium',
@@ -56,9 +55,8 @@ export default {
     z-index: -1;
     position: absolute;
     top: 0;
-    min-height: 300px;
+    min-height: 400px;
     width: 100%;
-    background: url('../../static/img/hero.png') no-repeat;
     background-size:cover;
     background-position: top 50%;
     -webkit-clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
@@ -76,13 +74,18 @@ export default {
     margin: 1rem;
   }
   &__intro{
-    margin: 1rem auto 2rem auto;
-    text-align: center;
-    color: $white;
-    font-size: 0.8rem;
+    margin: 2rem 0 3rem 0;
+    text-align: left;
+    color: transparentize($white, 0.2);
+    font-size: 1.25rem;
+    letter-spacing: 1px;
     font-weight: 300;
-    font-style: italic;
-    max-width: 250px;
+    line-height: 2rem;
+    max-width: 350px;
+    &__span{
+      font-weight: 600;
+      color: $white;
+    }
   }
 }
 </style>

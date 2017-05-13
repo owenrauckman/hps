@@ -2,13 +2,12 @@
   <div class="header">
     <div class="header__company">
       <img class="header__company__logo" src="../../static/svg/logo.svg"/>
-      <h1 class="header__company__name">Home Party Shows</h1>
+      <button class="header__content__hamburger">
+        <img class="header__content__hamburger__svg" src="../../static/svg/arrow-white.svg"/>
+      </button>
     </div>
     <div class="header__content">
       <a class="header__content__sign-up" href="">Sign Up</a>
-      <button class="header__content__hamburger">
-        <img class="header__content__hamburger__svg" src="../../static/svg/hamburger.svg"/>
-      </button>
     </div>
   </div>
 </template>
@@ -66,8 +65,6 @@ export default {
       font-weight: 400;
       font-size: 0.8rem;
       letter-spacing: 0.5px;
-      border: solid 1px $white-50;
-      border-radius: $border-radius;
       padding: 0.5rem 0.75rem;
       margin-right: 0.5rem;
       &:link, &:visited, &:active{
@@ -80,12 +77,13 @@ export default {
     &__hamburger{
       background: transparent;
       border: none;
+      margin-left: 0.5rem;
       &:hover{
         cursor: pointer;
       }
       &__svg{
-        height: 30px;
-        width: 30px;
+        height: 15px;
+        width: 15px;
       }
     }
   }
