@@ -41,6 +41,7 @@ module.exports = class SearchModel{
             User.aggregate(
               { $match: { $and : searchParameters } },
               { "$sort": { "companies.areasServed.ownsPremium": -1 } },
+              { "$sort": { "companies.areasServed.cities.ownsPremium": -1 } },
               (err, users)=>{
               if(err){
                 reject({err: err.message});
