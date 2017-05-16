@@ -1,15 +1,24 @@
 <template>
-  <div :class="[{ 'card--purple': options.plan === 'premium' }, { 'card--white': options.plan !== 'premium' }, 'card']">
-    <img class="card__image" :src="options.image"/>
+  <div :class="[{ 'card--purple': ownsPremiumState }, { 'card--white': !ownsPremiumState }, 'card']">
+    <img class="card__image" :src="options.profilePicture"/>
     <div class="card__info">
       <h2 class="card__info__name">{{options.firstName}} {{options.lastName}}</h2>
-      <h3 class="card__info__company">{{options.company}}</h3>
-      <h4 class="card__info__location">{{options.location}}</h4>
+      <h3 class="card__info__company">
+        <span v-for="(company, index) in options.companies">
+          {{company.name}}
+          <span v-if="index+1 < options.companies.length"> / </span>
+        </span>
+      </h3>
+
+      <h4 class="card__info__location">
+        <span v-if="$store.state.filterQueries.city.name.length > 0">{{$store.state.filterQueries.city.name}},</span>
+        {{$store.state.filterQueries.state.name}}
+      </h4>
     </div>
     <div class="card__button-container">
       <a class="card__button" href="">{{viewProfile}}</a>
     </div>
-    <div v-if="options.plan === 'premium' || options.plan === 'pro' " class="card__verified"></div>
+    <div v-if="ownsPremiumState || ownsPremiumCity " class="card__verified"></div>
   </div>
 </template>
 
@@ -19,9 +28,38 @@ export default {
   data() {
     return {
       viewProfile: 'View Profile',
+      ownsPremiumState: false,
+      ownsPremiumCity: false,
     };
   },
   props: ['options'],
+  methods: {
+    /*
+      Checks for premium/premium type before mount and sets accordingly.
+    */
+    checkForPremium() {
+      this.options.companies.forEach((company) => {
+        company.areasServed.forEach((area) => {
+          /* checks for premium states */
+          if (this.$store.state.results.query.state === area.state && area.ownsPremium) {
+            this.ownsPremiumState = true;
+          }
+          /* checks for premium cities */
+          area.cities.forEach((city) => {
+            if (this.$store.state.results.query.city === city.city && city.ownsPremium) {
+              this.ownsPremiumCity = true;
+            } else if (city.ownsPremium && this.$store.state.results.query.city === '' && area.state === this.$store.state.results.query.state) {
+              /* if they only search for state, we at least want the badge ^^ and city in state? */
+              this.ownsPremiumCity = true;
+            }
+          });
+        });
+      });
+    },
+  },
+  beforeMount() {
+    this.checkForPremium();
+  },
 };
 </script>
 

@@ -17,40 +17,18 @@ module.exports = class SearchModel{
   search(params){
     return new Promise( (resolve, reject)=>{
       let searchParameters = []; // add the mongo query to this array
-      if(params.zipCode && (!params.state || !params.city) ){
-        searchParameters.push({ "companies.areasServed.zipCodes" :  parseInt(params.zipCode)  });
+
+      if(params.city && params.state){
+        searchParameters.push({ "companies.areasServed.cities" : { $elemMatch : { city: { $regex : params.city, $options : 'i' } } } });
+      }
+      else if(params.state){
+        searchParameters.push({ "companies.areasServed" : { $elemMatch : { state: { $regex : params.state, $options : 'i' } } } });
+      }
+      else if(params.city){
+        resolve({err: config.defineCity});
       }
       else{
-        if(params.city && params.state){
-          let getZips = zipcodes.lookupByName(params.city, params.state);
-          let zipsInCity = [];
-          for (let city of getZips) {
-            zipsInCity.push(parseInt(city.zip));
-          }
-          searchParameters.push({ "companies.areasServed.zipCodes" : { $in : zipsInCity } });
-        }
-        else if(params.state){
-          let citiesInState = cities.findByState(params.state);
-          let zipsInState = [];
-          for (let city in citiesInState){
-            // make sure string is number first (some results from npm module have letters)
-            let zip = citiesInState[city].zipcode;
-            if(!isNaN(zip)){
-              zipsInState.push(parseInt(zip))
-            }
-          }
-          searchParameters.push({ "companies.areasServed.zipCodes" : { $in : zipsInState } });
-        }
-        else if(params.city){
-          resolve({err: config.defineCity});
-        }
-        else{
-          resolve({err: config.defineLocation});
-        }
-        // If they search for city, state AND zip. This is needed at the bottom to guarantee the specificity
-        if(params.zipCode){
-          searchParameters.push({ "companies.areasServed.zipCodes" :  parseInt(params.zipCode)  });
-        }
+        resolve({err: config.defineLocation});
       }
       if(params.company){ searchParameters.push({ "companies.name" : { $regex : params.company, $options : 'i' } }); }
 
@@ -58,27 +36,46 @@ module.exports = class SearchModel{
       if(params.industry){
         this.getCompaniesByIndustry(params.industry).then( (companies)=> {
           searchParameters.push({ "companies.name" : {$in: companies} });
-          User.find({ $and : searchParameters }, (err, users)=>{
-            if(err){
-              reject({err: err.message});
-            }
-            else{
-              resolve(users);
-            }
+        }).then( ()=>{
+          this.getCompaniesByIndustry(params.industry).then( (companies)=>{
+            User.aggregate(
+              { $match: { $and : searchParameters } },
+              { "$sort": { "companies.areasServed.ownsPremium": -1 } },
+              (err, users)=>{
+              if(err){
+                reject({err: err.message});
+              }
+              resolve({
+                users: users,
+                query: {
+                  state: params.state,
+                  city: params.city,
+                  company: companies,
+                }
+              });
+            });
           });
-        }).catch( (err) => {
-          console.log(err);
         });
       }
+      /* Else, no promise to check for companies, just execute the query, todo: refactor DRY */
       else{
-        // Same code as industry above, not DRY but will work for now.
-        User.find({ $and : searchParameters }, (err, users)=>{
+        User.aggregate(
+          { $match: { $and : searchParameters } },
+          { "$sort": { "companies.areasServed.ownsPremium": -1 } },
+          { "$sort": { "companies.areasServed.cities.ownsPremium": -1 } },
+          (err, users)=>{
           if(err){
             reject({err: err.message});
           }
-          else{
-            resolve(users);
-          }
+
+          resolve({
+            users: users,
+            query: {
+              state: params.state,
+              city: params.city,
+              company: params.company,
+            }
+          });
         });
       }
     });
@@ -159,13 +156,12 @@ module.exports = class SearchModel{
     @params {string} - the URL param of state
   */
   getCitiesInState(params){
-    console.log(params.state);
     let citiesInState = cities.findByState(params.state);
     let citiesList = [];
     for (let city in citiesInState){
       let cityName = citiesInState[city].city;
       // make sure the city has a name (some results from npm module have letters in zip)
-      if(cityName !== ''){
+      if(cityName !== '' && !citiesList.includes(cityName)){
         citiesList.push(cityName)
       }
     }

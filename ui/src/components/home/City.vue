@@ -2,10 +2,12 @@
   <div class="city">
       <div class="filters__section">
         <div class="filters__section__input-container">
-          <input class="filters__section__input" :placeholder="citySearchPlaceholder" v-model="$store.state.filterQueries.city">
+          <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="citySearchPlaceholder" v-model="$store.state.filterQueries.city.name">
         </div>
+
+        <p v-if="needState" class="filter-required">{{needStateMessage}}</p>
         <ul class="filters__section__list filters--margin">
-          <li v-for="city in filterBy(cities, $store.state.filterQueries.city, 'name')" @click="selectCity(city)" :class="[{ 'filters__section__list__item--selected':city.active },'filters__section__list__item']">{{city.name}}</li>
+          <li v-for="city in filterBy(cities, $store.state.filterQueries.city.name, 'name')" @click="selectCity(city)" :class="[{ 'filters__section__list__item--selected':city.active },'filters__section__list__item']">{{city.name}}</li>
         </ul>
       </div>
     </div>
@@ -22,25 +24,40 @@ export default {
     return {
       citySearchPlaceholder: 'Search By City',
       cities: [],
+      needState: false,
+      needStateMessage: '*Please Select a State before continuing your search.',
     };
   },
   mounted() {
-    this.getCities(this.$store.state.filterQueries.state.abbr);
+    if (this.$store.state.filterQueries.state.name.length === 0) {
+      this.needState = true;
+    } else {
+      this.needState = false;
+      this.getCities(this.$store.state.filterQueries.state.abbr).then(() => {
+        this.selectCity(this.$store.state.filterQueries.city);
+      });
+    }
   },
   methods: {
     /*
       Get list of state that a user can search by
     */
     getCities(state) {
-      fetch(`${config.api}/search/cities?state=${state}`).then((data) => {
-        data.json().then((cities) => {
-          const newCities = [];
-          /* eslint-disable */
-          cities.forEach((city) => {
-            newCities.push({name: city, active: false});
+      return new Promise((resolve, reject) => {
+        fetch(`${config.api}/search/cities?state=${state}`).then((data, err) => {
+          if (err) {
+            reject('Something went wrong fetching cities');
+          }
+          data.json().then((cities) => {
+            const newCities = [];
+            /* eslint-disable */
+            cities.forEach((city) => {
+              newCities.push({name: city, active: false});
+            });
+            /* eslint-enable */
+            this.cities = newCities;
+            resolve(this.cities);
           });
-          /* eslint-enable */
-          this.cities = newCities;
         });
       });
     },
@@ -53,7 +70,7 @@ export default {
       this.cities.forEach((city) => {
         /* eslint-disable */
         if (city.name === item.name) {
-          item.active = !item.active;
+          city.active = !city.active;
         } else {
           city.active = false;
         }
@@ -61,9 +78,21 @@ export default {
       });
 
       if (item.active) {
-        this.$store.commit('updateCityQuery', item.name);
+        this.$store.commit('updateCityQuery', { name: item.name, active: true });
       } else {
-        this.$store.commit('updateCityQuery', '');
+        this.$store.commit('updateCityQuery', { name: '', active: false });
+      }
+    },
+    /*
+      Checks if input is empty, if so, sets all cities to inactive class (removes check)
+    */
+    checkForEmptyInput() {
+      if (this.$store.state.filterQueries.city.name.length === 0) {
+        this.cities.forEach((city) => {
+          /* eslint-disable */
+          city.active = false;
+          /* eslint-enable */
+        });
       }
     },
   },

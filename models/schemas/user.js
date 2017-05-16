@@ -26,23 +26,14 @@ var UserSchema = mongoose.Schema({
   stripeId: {
     type: String
   },
-  subscriptionId: {
-    type: String
-  },
   subscriptionItems: {
     type: Array
   },
   profilePicture: {
     type: String
   },
-  subscriptionActive: {
-    type: Boolean
-  },
   profileViews: {
     type: Number
-  },
-  payment: {
-    type: Object
   },
   companies: {
     type: Array

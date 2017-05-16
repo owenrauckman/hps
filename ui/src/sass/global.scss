@@ -27,6 +27,13 @@ body{
   }
 }
 
+/* Filtering Required Message*/
+.filter-required{
+  padding: 2rem;
+  letter-spacing: 0.5px;
+  color: $white-50;
+}
+
 /* Various Settings */
 $border-radius: 5px;
 $circle-radius: 50%;

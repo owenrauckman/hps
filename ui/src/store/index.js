@@ -12,10 +12,20 @@ export default new Vuex.Store({
       state: {
         name: '',
         abbr: '',
+        active: false,
       },
-      city: '',
-      company: '',
-      industry: '',
+      city: {
+        name: '',
+        active: false,
+      },
+      company: {
+        name: '',
+        active: false,
+      },
+      industry: {
+        name: '',
+        active: false,
+      },
     },
   },
   mutations: {

@@ -4,7 +4,7 @@
     <div class="home__container">
       <p class="home__intro"><span class="home__intro__span">Home Party Shows</span> Find and build your direct sales team today.</p>
       <Search/>
-      <Card v-for="card in $store.state.results" :key="card.plan" :options="card"/>
+      <Card v-for="card in $store.state.results.users" :key="card.firstName" :options="card"/>
     </div>
   </div>
 </template>

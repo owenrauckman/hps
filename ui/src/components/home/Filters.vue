@@ -1,7 +1,7 @@
 <template>
   <div class="filters">
 
-    <!-- Filters for Company/Industry -->
+    <!-- Clear and X controls -->
     <div class="filters__container">
       <div class="filters__controls filters--margin">
         <button @click="hideFilters" class="filters__controls__close">
@@ -10,19 +10,20 @@
         <button class="filters__controls__text" @click="clearFilters">Clear All</button>
       </div>
 
-      <!-- todo move this to a new component -->
+      <!-- Tabs -->
       <div class="filter-tabs">
         <ul class="filter-tabs__list">
           <li v-for="tab in filterTabs" @click="selectFilter(tab)" :class="[{ 'filter-tabs__list__item--active': tab.active },'filter-tabs__list__item']">{{tab.name}}</li>
         </ul>
       </div>
-      <!-- end new component -->
 
+      <!-- Filter Components -->
       <State v-if="filterTabs[0].active"/>
       <City v-if="filterTabs[1].active"/>
       <Company v-if="filterTabs[2].active"/>
       <Industry v-if="filterTabs[3].active"/>
 
+      <!-- Search Button -->
       <button @click="performSearch" class="filters__search-button">{{search}}</button>
     </div>
 
@@ -42,16 +43,7 @@ export default {
   components: { State, City, Company, Industry },
   data() {
     return {
-      locationSearch: 'Search by state and/or city',
-      stateSearchPlaceholder: 'Search By State',
-      citySearchPlaceholder: 'Search By City',
-      companySearchPlaceholder: 'Search By Company',
       search: 'Search',
-      stateQuery: '',
-      cityQuery: '',
-      companyQuery: '',
-      companies: [],
-      industries: [],
       filterTabs: [
         { name: 'state', active: true },
         { name: 'city', active: false },
@@ -89,22 +81,24 @@ export default {
       Clear Filters for all components and remove selected classes for them
     */
     clearFilters() {
-      this.$store.commit('updateStateQuery', { name: '', abbr: '' });
-      this.$store.commit('updateCityQuery', '');
-      this.$store.commit('updateCompanyQuery', '');
-      this.$store.commit('updateIndustryQuery', '');
+      this.$store.commit('updateStateQuery', { name: '', abbr: '', active: false });
+      this.$store.commit('updateCityQuery', { name: '', active: false });
+      this.$store.commit('updateCompanyQuery', { name: '', active: false });
+      this.$store.commit('updateIndustryQuery', { name: '', active: false });
     },
     /*
-      / TODO FILL THIS OUT
+      Perform Search, passes all possible queries, empty ones won't affect response
     */
     performSearch() {
+      /* empty these on each search so premium info updates in card */
+      this.$store.state.results = [];
       this.hideFilters();
       fetch(
         `${config.api}/search` +
         `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.filterQueries.city)}` +
-        `&company=${encodeURIComponent(this.$store.state.filterQueries.company)}` +
-        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry)}`,
+        `&city=${encodeURIComponent(this.$store.state.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.$store.state.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
       ).then((data) => {
         data.json().then((users) => {
           this.$store.commit('updateResults', users);
@@ -113,7 +107,9 @@ export default {
       });
     },
 
-    // TODO: FILL THIS OUT
+    /*
+      Makes selected tab active which mounts the component based on v-if
+    */
     selectFilter(tab) {
       /* eslint-disable */
       this.filterTabs.forEach((tab) => {
