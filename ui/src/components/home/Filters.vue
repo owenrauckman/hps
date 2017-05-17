@@ -106,7 +106,6 @@ export default {
         });
       });
     },
-
     /*
       Makes selected tab active which mounts the component based on v-if
     */

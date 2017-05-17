@@ -40,8 +40,8 @@ module.exports = class SearchModel{
           this.getCompaniesByIndustry(params.industry).then( (companies)=>{
             User.aggregate(
               { $match: { $and : searchParameters } },
-              { "$sort": { "companies.areasServed.ownsPremium": -1 } },
-              { "$sort": { "companies.areasServed.cities.ownsPremium": -1 } },
+              { $sort: { "companies.areasServed.ownsPremium": -1 } },
+              { $sort: { "companies.areasServed.cities.ownsPremium": -1 } },
               (err, users)=>{
               if(err){
                 reject({err: err.message});
@@ -59,11 +59,17 @@ module.exports = class SearchModel{
         });
       }
       /* Else, no promise to check for companies, just execute the query, todo: refactor DRY */
+
+
+
+      /* SCREW IT 3 DB queries 3 arrays merge them together later*/
+
+
       else{
         User.aggregate(
           { $match: { $and : searchParameters } },
-          { "$sort": { "companies.areasServed.ownsPremium": -1 } },
-          { "$sort": { "companies.areasServed.cities.ownsPremium": -1 } },
+          // { $sort: { "companies.areasServed.cities.ownsPremium": -1, "companies.areasServed.ownsPremium": -1 } },
+          { $sample: { size: config.numRandomResults } },
           (err, users)=>{
           if(err){
             reject({err: err.message});
@@ -79,6 +85,29 @@ module.exports = class SearchModel{
           });
         });
       }
+    });
+  }
+
+  /*
+    The main search function that builds the MongoDB query
+    @param {string} - The URL params: zipCode, city, state, company, industry
+  */
+  searchPremium(){
+    return new Promise((resolve, reject) => {
+      User.aggregate(
+        { $match: { "companies.areasServed.ownsPremium": true } },
+        { $sample: { size: config.numRandomResults } },
+        (err, users)=>{
+        if(err){
+          reject({err: err.message});
+        }
+
+        resolve({
+          users: users,
+          query: { state: '', city: '', company: '' }
+        });
+
+      });
     });
   }
 

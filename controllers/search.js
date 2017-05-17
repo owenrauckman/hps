@@ -29,4 +29,8 @@ router.get('/zipCodes', function(req, res){
   res.send(Search.getZipCodesByCity(req.query));
 });
 
+router.get('/premium', function(req, res){
+  Search.searchPremium().then(res.send.bind(res));
+});
+
 module.exports = router

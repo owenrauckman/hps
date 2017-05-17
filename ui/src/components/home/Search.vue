@@ -16,6 +16,8 @@
 <script>
 import Filters from './Filters';
 
+const config = require('../../../config/appConfig.json');
+
 export default {
   name: 'search',
   components: { Filters },
@@ -24,6 +26,9 @@ export default {
       startSearch: 'Start Your Search',
       startSearchDescription: 'Location, Company, or Industry',
     };
+  },
+  mounted() {
+    this.performPremiumSearch();
   },
   methods: {
     /*
@@ -34,6 +39,21 @@ export default {
       this.$store.commit('toggleFilters', true);
       this.showFiltersLocation = !this.showFiltersLocation;
       document.body.classList.add('no-overflow');
+    },
+    /*
+      Perform Initial Search - Gets Random Premium Users
+    */
+    performPremiumSearch() {
+      /* empty these on each search so premium info updates in card */
+      this.$store.state.results = [];
+      fetch(
+        `${config.api}/search/premium`,
+      ).then((data) => {
+        data.json().then((users) => {
+          this.$store.commit('updateResults', users);
+          // TODO: loading goes here
+        });
+      });
     },
   },
 };

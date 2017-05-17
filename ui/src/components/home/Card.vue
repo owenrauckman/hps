@@ -40,8 +40,11 @@ export default {
     checkForPremium() {
       this.options.companies.forEach((company) => {
         company.areasServed.forEach((area) => {
-          /* checks for premium states */
-          if (this.$store.state.results.query.state === area.state && area.ownsPremium) {
+          /*
+            checks for premium states
+            (checks for === '' for the home page since only premium shows)
+          */
+          if ((this.$store.state.results.query.state === area.state && area.ownsPremium) || (this.$store.state.results.query.state === '')) {
             this.ownsPremiumState = true;
           }
           /* checks for premium cities */
