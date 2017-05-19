@@ -7,6 +7,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     filtersVisible: false,
+    loadingResults: false,
     results: [],
     filterQueries: {
       state: {
@@ -49,7 +50,10 @@ export default new Vuex.Store({
     },
     updateIndustryQuery(state, industryQuery){
       state.filterQueries.industry = industryQuery;
-    }
+    },
+    updateLoadingResults(state, loadingResults){
+      state.loadingResults = loadingResults;
+    },
     /* -- END HOME PAGE MUTATIONS -- */
 
     /* eslint-enable */

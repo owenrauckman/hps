@@ -92,6 +92,7 @@ export default {
     performSearch() {
       /* empty these on each search so premium info updates in card */
       this.$store.state.results = [];
+      this.$store.state.loadingResults = true;
       this.hideFilters();
       fetch(
         `${config.api}/search` +
@@ -101,15 +102,8 @@ export default {
         `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
       ).then((data) => {
         data.json().then((users) => {
-          /* eslint-disable */
-
-          console.log(users);
-          // let news = states.concat(cities).concat(base);
-          // console.log({users: news, query: users.query});
-
-          /* eslint-enable */
+          this.$store.state.loadingResults = false;
           this.$store.commit('updateResults', users);
-          // TODO: loading goes here
         });
       });
     },

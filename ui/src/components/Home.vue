@@ -4,6 +4,7 @@
     <div class="home__container">
       <p class="home__intro"><span class="home__intro__span">Home Party Shows</span> Find and build your direct sales team today.</p>
       <Search/>
+      <p :class="[{ 'home__loading--active': $store.state.loadingResults }, 'home__loading']">{{loading}}</p>
       <Card v-for="card in $store.state.results.users" :key="card.plan" :options="card"/>
     </div>
   </div>
@@ -18,7 +19,7 @@ export default {
   components: { Card, Search },
   data() {
     return {
-
+      loading: 'Loading...',
     };
   },
 };
@@ -63,6 +64,13 @@ export default {
     &__span{
       font-weight: 600;
       color: $white;
+    }
+  }
+  &__loading{
+    display: none;
+    color: $white;
+    &--active{
+      display: block;
     }
   }
 }

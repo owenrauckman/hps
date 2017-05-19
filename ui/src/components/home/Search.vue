@@ -7,7 +7,7 @@
         <p class="search__wrapper__description">{{startSearchDescription}}</p>
       </div>
     </div>
-    <p class="search__results-text">Showing 4 of 7 results</p>
+    <p class="search__results-text">Showing {{$store.state.results.users.length}} of {{$store.state.results.users.length}} results</p>
 
     <Filters :class="[{ 'filter--show': $store.state.filtersVisible },'filter']"/>
   </div>
@@ -47,12 +47,13 @@ export default {
     performPremiumSearch() {
       /* empty these on each search so premium info updates in card */
       this.$store.state.results = [];
+      this.$store.state.loadingResults = true;
       fetch(
         `${config.api}/search/premium`,
       ).then((data) => {
         data.json().then((users) => {
+          this.$store.state.loadingResults = false;
           this.$store.commit('updateResults', users);
-          // TODO: loading goes here
         });
       });
     },
