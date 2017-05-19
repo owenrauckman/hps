@@ -32,22 +32,31 @@ module.exports = class SearchModel{
       }
       if(params.company){ searchParameters.push({ "companies.name" : { $regex : params.company, $options : 'i' } }); }
 
-      // If the user searches by industry we will need to relate the company back to the industry doc
+      /*
+        If the user searches by industry we will need to relate the company back to the industry doc
+        (aggregate) is a duplicate of the one below, will need to refactor late to be DRY
+      */
       if(params.industry){
         this.getCompaniesByIndustry(params.industry).then( (companies)=> {
           searchParameters.push({ "companies.name" : {$in: companies} });
-        }).then( ()=>{
-          this.getCompaniesByIndustry(params.industry).then( (companies)=>{
+        }).then((companies)=>{
+          /* Set a number of users, and get the count to use in aggregate for random sorting */
+          User.count({ $and : searchParameters }, (err, users, userCount) =>{
+            if(err){
+              reject({err: err.message});
+            }
+          }).then((userCount, companies)=>{
             User.aggregate(
               { $match: { $and : searchParameters } },
-              { $sort: { "companies.areasServed.ownsPremium": -1 } },
-              { $sort: { "companies.areasServed.cities.ownsPremium": -1 } },
+              { $sample: { size: userCount } },
+              { $sort: { "companies.areasServed.ownsPremium": -1} },
+              { $sort: {"companies.areasServed.cities.ownsPremium": -1 } },
               (err, users)=>{
               if(err){
                 reject({err: err.message});
               }
               resolve({
-                users: users,
+                users: this.sortUsers(users, params),
                 query: {
                   state: params.state,
                   city: params.city,
@@ -59,33 +68,84 @@ module.exports = class SearchModel{
         });
       }
       /* Else, no promise to check for companies, just execute the query, todo: refactor DRY */
-
-
-
-      /* SCREW IT 3 DB queries 3 arrays merge them together later*/
-
-
       else{
-        User.aggregate(
-          { $match: { $and : searchParameters } },
-          // { $sort: { "companies.areasServed.cities.ownsPremium": -1, "companies.areasServed.ownsPremium": -1 } },
-          { $sample: { size: config.numRandomResults } },
-          (err, users)=>{
+        /* Set a number of users, and get the count to use in aggregate for random sorting */
+        User.count({ $and : searchParameters }, (err, users, userCount) =>{
           if(err){
             reject({err: err.message});
           }
-
-          resolve({
-            users: users,
-            query: {
-              state: params.state,
-              city: params.city,
-              company: params.company,
+        }).then((userCount)=>{
+          User.aggregate(
+            { $match: { $and : searchParameters } },
+            { $sample: { size: userCount } },
+            { $sort: { "companies.areasServed.ownsPremium": -1} },
+            { $sort: {"companies.areasServed.cities.ownsPremium": -1 } },
+            (err, users)=>{
+            if(err){
+              reject({err: err.message});
             }
+            resolve({
+              users: this.sortUsers(users, params),
+              query: {
+                state: params.state,
+                city: params.city,
+                company: params.company,
+              }
+            });
           });
         });
       }
     });
+  }
+
+  /*
+    Checks to see if a user object exists in array
+    @param {array} - list of users to check against
+    @param {object} - the object that is being checked
+  */
+  userExists(arr, user) {
+    return arr.some((el)=> {
+      return el._id == user._id;
+    });
+  }
+
+  /*
+    Breaks apart the returned data from the mongo query and sorts based on membership type
+    @param {array} - list of users from mongo query
+    @param {array} - the params from the request
+  */
+  sortUsers(users, params){
+    let states = [];
+    let cities =[];
+    let base = [];
+
+    users.forEach((user)=>{
+      user.companies.forEach((company)=>{
+        /* check states first */
+        company.areasServed.forEach((area)=>{
+          if(area.ownsPremium === true && area.state === params.state){
+            if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
+              states.push(user);
+            }
+          }
+          /* check cities next */
+          area.cities.forEach((city)=>{
+            if(city.ownsPremium === true && city.city == params.city){
+              console.log(user.username);
+              if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
+                cities.push(user);
+              }
+            }
+          });
+        });
+        /* otherwise, after the loops finish push into the base array */
+        if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
+          base.push(user);
+        }
+      });
+    });
+
+    return states.concat(cities).concat(base);
   }
 
   /*

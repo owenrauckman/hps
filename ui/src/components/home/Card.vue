@@ -49,7 +49,10 @@ export default {
           }
           /* checks for premium cities */
           area.cities.forEach((city) => {
-            if (this.$store.state.results.query.city === city.city && city.ownsPremium) {
+            console.log(`${this.options.username} : ${city.city} : ${city.ownsPremium}`);
+            if (this.$store.state.results.query.city === city.city
+              && this.$store.state.results.query.state === area.state
+              && city.ownsPremium) {
               this.ownsPremiumCity = true;
             } else if (city.ownsPremium && this.$store.state.results.query.city === '' && area.state === this.$store.state.results.query.state) {
               /* if they only search for state, we at least want the badge ^^ and city in state? */

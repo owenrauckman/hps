@@ -101,6 +101,13 @@ export default {
         `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
       ).then((data) => {
         data.json().then((users) => {
+          /* eslint-disable */
+
+          console.log(users);
+          // let news = states.concat(cities).concat(base);
+          // console.log({users: news, query: users.query});
+
+          /* eslint-enable */
           this.$store.commit('updateResults', users);
           // TODO: loading goes here
         });
