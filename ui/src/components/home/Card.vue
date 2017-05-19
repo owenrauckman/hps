@@ -49,7 +49,6 @@ export default {
           }
           /* checks for premium cities */
           area.cities.forEach((city) => {
-            console.log(`${this.options.username} : ${city.city} : ${city.ownsPremium}`);
             if (this.$store.state.results.query.city === city.city
               && this.$store.state.results.query.state === area.state
               && city.ownsPremium) {

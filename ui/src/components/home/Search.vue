@@ -39,6 +39,7 @@ export default {
       this.$store.commit('toggleFilters', true);
       this.showFiltersLocation = !this.showFiltersLocation;
       document.body.classList.add('no-overflow');
+      document.body.scrollTop = 0; /* scroll to top to avoid cut off issues */
     },
     /*
       Perform Initial Search - Gets Random Premium Users

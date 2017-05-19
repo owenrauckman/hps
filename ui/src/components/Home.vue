@@ -18,29 +18,7 @@ export default {
   components: { Card, Search },
   data() {
     return {
-      results: [
-        {
-          plan: 'premium',
-          name: 'Ladannifer Jadanniston',
-          image: '../../../static/img/face-1.jpg',
-          company: 'Partylite',
-          location: 'Overland Park, KS',
-        },
-        {
-          plan: 'pro',
-          name: 'Hingle Mcringleberry',
-          image: '../../../static/img/face-2.jpg',
-          company: 'Partylite',
-          location: 'Olathe, KS',
-        },
-        {
-          plan: 'basic',
-          name: "D'Squarius Green",
-          image: '../../../static/img/face-1.jpg',
-          company: 'Partylite',
-          location: 'Leawood, KS',
-        },
-      ],
+
     };
   },
 };
