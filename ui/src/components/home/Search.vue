@@ -7,7 +7,7 @@
         <p class="search__wrapper__description">{{startSearchDescription}}</p>
       </div>
     </div>
-    <p class="search__results-text">Showing {{$store.state.results.users.length}} of {{$store.state.results.users.length}} results</p>
+    <p v-if="$store.state.results.users" class="search__results-text">Showing {{$store.state.results.users.length}} of {{$store.state.results.users.length}} results</p>
 
     <Filters :class="[{ 'filter--show': $store.state.filtersVisible },'filter']"/>
   </div>
