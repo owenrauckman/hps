@@ -1,10 +1,11 @@
 <template>
-  <div class="home">
-    <div class="home__bg"></div>
+  <div class="home g__container">
     <div class="home__container">
       <p class="home__intro"><span class="home__intro__span">Home Party Shows</span> Find and build your direct sales team today.</p>
       <Search/>
       <p :class="[{ 'home__loading--active': $store.state.loadingResults }, 'home__loading']">{{loading}}</p>
+    </div>
+    <div class="home__card-container">
       <Card v-for="card in $store.state.results.users" :key="card.plan" :options="card"/>
     </div>
   </div>
@@ -30,45 +31,39 @@ export default {
 @import '../sass/main.scss';
 
 .home{
-  &__bg{
-    z-index: -1;
-    position: absolute;
-    top: 0;
-    min-height: 400px;
-    width: 100%;
-    background-size:cover;
-    background-position: top 50%;
-    -webkit-clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-    &:before{
-      z-index: -1;
-      content: '';
-      position: absolute;
-      top: 0; right: 0; bottom: 0; left: 0;
-      background: linear-gradient(to bottom right, $blue-grad-top-left, $blue-grad-bottom-right);
-      opacity: 0.9;
-    }
-  }
   &__container{
-    margin: 1rem;
+    margin: 1rem 2rem;
   }
   &__intro{
-    margin: 2rem 0 3rem 0;
+    margin: 4rem 0 3rem 0;
     text-align: left;
-    color: transparentize($white, 0.2);
+    color: $gray-dark;
     font-size: 1.25rem;
     letter-spacing: 1px;
     font-weight: 300;
     line-height: 2rem;
     max-width: 350px;
+    @include breakpoint(tablet){
+      font-size: 2rem;
+      line-height: 2.5rem;
+      max-width: 550px;
+    }
     &__span{
       font-weight: 600;
-      color: $white;
+      color: $neon-purple;
+      letter-spacing: none;
     }
+  }
+  &__card-container{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin: 0 1rem;
   }
   &__loading{
     display: none;
-    color: $white;
+    color: $gray-medium;
     &--active{
       display: block;
     }

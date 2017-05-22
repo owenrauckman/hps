@@ -5,10 +5,17 @@ body{
   font-size: 16px;
   font-family: $roboto;
   margin: 0 auto;
-  background: $white-off;
+  background: $white;
   height: 100%;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
+}
+
+/* global container */
+.g__container{
+  position: relative;
+  max-width: 1024px;
+  margin: 0 auto;
 }
 
 /* Disable Scrolling for full screen pop ups */
@@ -37,6 +44,106 @@ body{
 /* Various Settings */
 $border-radius: 5px;
 $circle-radius: 50%;
+
+/* Styles for the Filter pages (state, city, company, industry) */
+.filters{
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  z-index: +1;
+  bottom: 0;
+  left: 0;
+  background: $neon-purple;
+  // overflow-y: scroll;
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  &--margin{
+    margin-right: 1rem;
+    margin-left: 1rem;
+  }
+  &__container{
+    position: relative;
+    min-height: 100%;
+    max-width: 768px;
+    margin: 2rem auto 0 auto;
+  }
+  &__section{
+    min-height: 200px;
+    position: relative;
+    &__input{
+      height: 70px;
+      width: calc(100% - 14rem);
+      padding:0 1rem 0 4rem;
+      font-family: $roboto;
+      font-size: 1rem;
+      background: transparent;
+      color: $white;
+      &::placeholder{
+        color: $white-50;
+        font-family: $roboto;
+        font-style: italic;
+        font-weight: 400;
+        letter-spacing: 1px;
+        font-size: 1rem;
+      }
+    }
+    &__input-wrapper{
+      width: 100%;
+      position: relative;
+    }
+    &__input-container{
+      position: relative;
+      border-bottom: solid 1px $white-50;
+      width: 100%;
+      &:after{
+        content: '';
+        position: absolute;
+        left: 2rem;
+        height: 20px;
+        width: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
+    &__list{
+      list-style: none;
+      overflow-y: auto;
+      max-height: 100vh;
+      margin-top: 2rem;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      &__item{
+        margin: 0.25rem 0;
+        padding: 1rem;
+        color: $white;
+        letter-spacing: 1px;
+        font-weight: 300;
+        transition: background 0.2s ease-in;
+        position: relative;
+        border-radius: $border-radius;
+        &--selected{
+          // background: $white-20;
+          &:after{
+            content: '';
+            position: absolute;
+            right: 1rem;
+            height: 15px;
+            width: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+        }
+        &:hover{
+          cursor: pointer;
+          background: $white-20;
+        }
+      }
+    }
+  }
+}
+
 
 /* Resets */
 h1, h2, h3, h4, h5, p{

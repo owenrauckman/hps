@@ -15,9 +15,7 @@
         {{$store.state.filterQueries.state.name}}
       </h4>
     </div>
-    <div class="card__button-container">
-      <a class="card__button" href="">{{viewProfile}}</a>
-    </div>
+    <a class="card__button" href=""></a>
     <div v-if="ownsPremiumState || ownsPremiumCity " class="card__verified"></div>
   </div>
 </template>
@@ -27,7 +25,6 @@ export default {
   name: 'card',
   data() {
     return {
-      viewProfile: 'View Profile',
       ownsPremiumState: false,
       ownsPremiumCity: false,
     };
@@ -79,11 +76,37 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    padding: 1rem;
-    margin: 1rem 0;
+    padding: 2rem 1rem;
+    margin: 1rem;
     box-shadow: $box-shadow;
     border-radius: $border-radius;
     position: relative;
+    transform: scale(1);
+    transition: transform 0.2s ease-in-out;
+    /* flex info for card. 4rem is extra padding, must have max-width and flex */
+    flex: 1 0 calc(100% - 4rem);
+    max-width: calc(100% - 4rem);
+    transition: flex 0.25s ease-in, max-width 0.25s ease-out;
+    @include breakpoint(phone){
+       flex: 1 0 calc((100% / 2) - 4rem);
+       max-width: calc((100% / 2) - 4rem);
+     }
+    @include breakpoint(desktop){
+       flex: 1 0 calc((100% / 3) - 4rem);
+       max-width: calc((100% / 3) - 4rem);
+     }
+     /* end flex info for card */
+    &:link, &:active, &:visited{
+      text-decoration: none;
+    }
+    &:hover{
+      cursor: pointer;
+      text-decoration: none;
+      transform: scale(1.01);
+      // .card__button{
+      //   transform:translateX(2px) rotate(-90deg);
+      // }
+    }
     &--white{
       background: $white;
       .card__image{
@@ -146,42 +169,15 @@ export default {
       width: 30px;
     }
     /* Button CTA */
-    &__button-container{
-      display: flex;
-      width: 100%;
-      justify-content: flex-end;
-    }
     &__button{
-      padding: 0.5rem 1rem;
-      font-size: 0.6rem;
-      border-radius: $border-radius;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 300;
-      transition: background 0.2s ease-in;
-      &:link, &:visited, &:active{
-        background: $light-blue;
-        box-shadow: $box-shadow;
-        text-decoration: none;
-        color: $white;
-      }
-      &:hover{
-        background: lighten($light-blue, 5%);
-        text-decoration: none;
-        &:after{
-          transform:translateX(2px) rotate(-90deg);
-        }
-      }
-      &:after{
-        position: absolute;
-        content: '';
-        height: 7px;
-        width: 7px;
-        transform: rotate(-90deg);
-        margin: 2px 5px 0 2px;
-        background: url('../../../static/svg/arrow-white.svg');
-        transition: transform 0.2s ease-in;
-      }
+      position: absolute;
+      right: 1.5rem;
+      content: '';
+      height: 10px;
+      width: 10px;
+      transform: translateX(0px) rotate(-90deg);
+      background: url('../../../static/svg/arrow-white.svg');
+      // transition: transform 0.2s ease-in 0.2s;
     }
   }
 </style>

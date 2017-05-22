@@ -28,6 +28,12 @@ export default new Vuex.Store({
         active: false,
       },
     },
+    filterTabs: [
+      { name: 'state', active: true },
+      { name: 'city', active: false },
+      { name: 'company', active: false },
+      { name: 'industry', active: false },
+    ],
   },
   mutations: {
     /* eslint-disable */
