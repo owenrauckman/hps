@@ -113,6 +113,10 @@ export default {
       }
     }
     &__hamburger{
+      display: block;
+      @include breakpoint(desktop){
+        display: none;
+      }
       background: transparent;
       border: none;
       margin-left: 0.25rem;
