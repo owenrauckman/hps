@@ -1,5 +1,5 @@
 <template>
-  <div :class="[{ 'card--purple': ownsPremiumState }, { 'card--white': !ownsPremiumState }, 'card']">
+  <div :class="[{ 'card--blue': ownsPremiumCity && !ownsPremiumState }, { 'card--purple': ownsPremiumState }, { 'card--white': !ownsPremiumState }, 'card']">
     <img class="card__image" :src="options.profilePicture"/>
     <div class="card__info">
       <h2 class="card__info__name">{{options.firstName}} {{options.lastName}}</h2>
@@ -121,6 +121,18 @@ export default {
     }
     &--purple{
       background: $neon-purple;
+      .card__image{
+        border: solid 1px $white;
+      }
+      .card__info__name{
+        color: $white;
+      }
+      .card__info__company, .card__info__location{
+        color: $white-80;
+      }
+    }
+    &--blue{
+      background: $light-blue;
       .card__image{
         border: solid 1px $white;
       }
