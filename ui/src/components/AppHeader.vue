@@ -70,7 +70,7 @@ export default {
       letter-spacing: 1.5px;
       font-style: italic;
       margin-left: 0.25rem;
-      color: $neon-purple;
+      color: $dark-blue;
     }
   }
   &__content{
@@ -81,12 +81,11 @@ export default {
       list-style: none;
       position: absolute;
       height: auto;
-      padding: 1rem 2rem 2rem 2rem;
+      padding: 2rem;
       width: calc(100% - 4rem);
-      background: white;
+      background: $dark-blue;
       z-index: +999;
-      top:62px; // this val is hard coded for now
-      border-top: solid 1px $gray-light;
+      top:82px; // this val is hard coded for now
       left: 0;
       box-shadow: 0 10px 10px transparentize($black, 0.9);
     }
@@ -104,6 +103,7 @@ export default {
         border: solid 1px $white;
         padding: 0.5rem 1rem;
         border-radius: $round-radius;
+        transition: all 0.25s ease-in-out;
       }
       a{
         &:link, &:active, &:visited{

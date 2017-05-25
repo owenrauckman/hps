@@ -1,17 +1,17 @@
 <template>
-  <!-- <div class="state">
-      <div class="filters__section">
-        <div class="filters__section__input-container">
-          <div class="filters__section__input-wrapper">
-            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="stateSearchPlaceholder" v-model="$store.state.filterQueries.state.name">
-            <SearchButton/>
-          </div>
+  <div class="state">
+    <div class="filters__section">
+      <div class="filters__section__input-container">
+        <div class="filters__section__input-wrapper">
+          <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="stateSearchPlaceholder" v-model="$store.state.filterQueries.state.name">
+          <SearchButton/>
         </div>
-        <ul class="filters__section__list filters--margin">
-          <li v-for="state in filterBy(states, $store.state.filterQueries.state.name, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected': state.active },'filters__section__list__item']">{{state.name}}</li>
-        </ul>
       </div>
-    </div> -->
+      <ul class="filters__section__list filters--margin">
+        <li v-for="state in filterBy(states, $store.state.filterQueries.state.name, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected': state.active },'filters__section__list__item']">{{state.name}}</li>
+      </ul>
+    </div>
+  </div>
 
 </template>
 
@@ -96,5 +96,12 @@ export default {
 
 <style scoped lang="scss">
 @import '../../sass/main.scss';
+
+/* these need to be local in each component for some reason */
+.filters__section__list__item--selected{
+  &:after{
+    background: url('../../../static/svg/verified-black.svg');
+  }
+}
 
 </style>

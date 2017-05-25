@@ -1,8 +1,7 @@
 <template>
   <!-- Search Button -->
-  <!-- <button @click="performSearch" v-scroll-to="{element: '#js__home__results', duration: 3000}" class="filters__search-button">{{search}}</button> -->
-  <button class="search__wrapper__button" id="js__search__wrapper__button" v-scroll-to="{element: '#js__home__results', duration: 3000}" >
-    <img class="search__wrapper__button__image" src="../../../static/svg/search-white.svg" id="js__search__wrapper__button__image" v-scroll-to="{element: '#js__home__results', duration: 3000}" />
+  <button class="filters__button" @click="performSearch" v-scroll-to="{element: '#js__home__results', duration: 3000}">
+    <img class="filters__button__image" src="../../../static/svg/search-white.svg" @click="performSearch" v-scroll-to="{element: '#js__home__results', duration: 3000}"/>
   </button>
 </template>
 
@@ -62,24 +61,26 @@ export default {
 
 .filters{
   /* Search Button */
-  &__search-button{
-    width: 100px;
-    height: 40px;
-    bottom: -20px;
+  &__button{
+    background: $blue;
+    height: 50px;
+    width: 50px;
+    margin-right: 1rem;
+    border-radius: $circle-radius;
+    display: flex;
+    justify-content: center;
+    transition: background 0.25s ease-in-out;
     position: absolute;
-    right: 2rem;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    font-weight: 300;
-    transition: background 0.2s ease-in;
-    background: $pink;
-    text-decoration: none;
-    color: $white;
-    border-radius: $border-radius;
+    right: 0.5rem;
     &:hover{
       cursor: pointer;
-      background: lighten($pink, 5%);
-      text-decoration: none;
+      background: darken($blue, 10%);
+    }
+    &__image{
+      width: 20px;
+      height: 20px;
+      display: block;
+      flex: 1;
     }
   }
   &__controls{

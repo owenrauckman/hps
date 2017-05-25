@@ -14,82 +14,24 @@
       </div>
     </div>
 
-    <!-- results, query and loading state -->
-    <div class="home__results__info g__container">
-      <div class="home__queries">
-        <button class="home__queries__query" @click="removeQuery" id="js__query__state" v-if="$store.state.filterQueries.state.name.length > 0">{{$store.state.filterQueries.state.name}}</button>
-        <button class="home__queries__query" @click="removeQuery" id="js__query__city" v-if="$store.state.filterQueries.city.name.length > 0">{{$store.state.filterQueries.city.name}}</button>
-        <button class="home__queries__query" @click="removeQuery" id="js__query__company" v-if="$store.state.filterQueries.company.name.length > 0">{{$store.state.filterQueries.company.name}}</button>
-        <button class="home__queries__query" @click="removeQuery" id="js__query__industry" v-if="$store.state.filterQueries.industry.name.length > 0">{{$store.state.filterQueries.industry.name}}</button>
-      </div>
-      <p v-if="$store.state.results.users" class="home__results__info__text g__container">Showing {{$store.state.results.users.length}} of {{$store.state.results.users.length}} results</p>
-    </div>
-    <p :class="[{ 'home__loading--active': $store.state.loadingResults }, 'home__loading g__container']">Loading...</p>
-    <div class="home__card-container g__container" id="js__home__results">
-      <Card v-for="card in $store.state.results.users" :key="card.plan" :options="card"/>
-    </div>
-    <!-- end results and loading state -->
+    <Results/>
 
   </div>
 </template>
 
 <script>
-import Card from './home/Card';
 import Search from './home/Search';
-
-const config = require('../../config/appConfig.json');
+import Results from './home/Results';
 
 export default {
   name: 'home',
-  components: { Card, Search },
+  components: { Search, Results },
   data() {
     return {
-      loading: 'Loading...',
     };
   },
   mounted() {
     document.body.classList.add('g__body__gray');
-  },
-  methods: {
-    /*
-      Removes element from query and performs a new search
-    */
-    removeQuery(e) {
-      switch (e.target.id) {
-        case 'js__query__state':
-          this.$store.state.filterQueries.state = { name: '', abbr: '', active: false }; break;
-        case 'js__query__city':
-          this.$store.state.filterQueries.city = { name: '', active: false }; break;
-        case 'js__query__company':
-          this.$store.state.filterQueries.company = { name: '', active: false }; break;
-        case 'js__query__industry':
-          this.$store.state.filterQueries.industry = { name: '', active: false }; break;
-        default:
-          break;
-      }
-      this.performSearch();
-    },
-
-    /*
-      Perform Search, passes all possible queries, empty ones won't affect response
-    */
-    performSearch() {
-      /* empty these on each search so premium info updates in card */
-      this.$store.state.results = [];
-      this.$store.state.loadingResults = true;
-      fetch(
-        `${config.api}/search` +
-        `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.filterQueries.city.name)}` +
-        `&company=${encodeURIComponent(this.$store.state.filterQueries.company.name)}` +
-        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
-      ).then((data) => {
-        data.json().then((users) => {
-          this.$store.state.loadingResults = false;
-          this.$store.commit('updateResults', users);
-        });
-      });
-    },
   },
 };
 </script>
@@ -101,10 +43,13 @@ export default {
 .home{
   width: 100%;
   height: auto;
-  padding: 4rem 0 1.5rem 0;
   position: relative;
   background-image: url('../../static/img/hero.jpg');
   background-position: center;
+  padding: 1.5rem 0 1.5rem 0;
+  @include breakpoint(phone){
+    padding: 3rem 0 1.5rem 0;
+  }
   &:before{
     top: 0;
     position: absolute;
@@ -171,77 +116,6 @@ export default {
       position: relative;
       max-width: calc(768px - 2rem);
       margin: 0 auto;
-    }
-  }
-  &__card-container{
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: flex-start;
-    margin: 0rem auto 1rem auto;
-  }
-  &__loading{
-    display: none;
-    color: $gray-medium;
-    padding: 0 2rem 0 4rem;
-    &--active{
-      display: block;
-    }
-  }
-  &__results__info{
-    margin: 4rem auto 1rem auto;
-    padding: 0 2rem 0 4rem;
-    &__text{
-      font-weight: 300;
-      font-style: italic;
-      font-size: 0.9rem;
-      color: $gray-medium;
-      transition: color 0.5s ease-in-out;
-      margin: 1rem 0;
-      &--active{
-        color: $gray-light;
-      }
-    }
-  }
-  &__queries{
-    max-width: calc(768px - 4rem);
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    text-align: left;
-    &__query{
-      border: solid 1px $gray-light;
-      padding: 0.5rem 2rem 0.5rem 1rem;
-      border-radius: $round-radius;
-      color: $gray-medium;
-      position: relative;
-      transition: all 0.25s ease-in-out;
-      display: none;
-      @include breakpoint(phone){
-        display: block;
-        flex: 0 0 auto;
-      }
-      &:after{
-        position: absolute;
-        content: '';
-        height: 15px;
-        width: 15px;
-        top: 50%;
-        right: 0.5rem;
-        transform: translateY(-50%);
-        background: url('../../static/svg/close-dark.svg');
-        transition: background 0.25s ease-in-out;
-      }
-      &:hover{
-        background: $gray-light;
-        color: $white;
-        border: solid 1px transparent;
-        cursor: pointer;
-        &:after{
-          background: url('../../static/svg/close-light.svg');
-        }
-      }
     }
   }
 }
