@@ -54,6 +54,7 @@ export default {
     hideFilters() {
       this.$store.commit('toggleFilters', false);
       document.body.classList = '';
+      document.body.classList.add('g__body__gray');
     },
     /*
       When the window resizes, adjust height of the filters to the window height
@@ -61,12 +62,6 @@ export default {
     */
     onScreenResize() {
       document.querySelector('.filters').style.height = window.innerHeight;
-    },
-    /*
-      scroll back to the top of the page on input blurs to avoid UI issue
-    */
-    scrollTop() {
-      document.body.scrollTop = 0;
     },
     /*
       Clear Filters for all components and remove selected classes for them
@@ -115,76 +110,79 @@ export default {
 
 <style scoped lang="scss">
 @import '../../sass/main.scss';
-
-.filters{
-  &__controls{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    &__text{
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-      color: $white;
-      font-weight: 500;
-      &:hover{
-        cursor: pointer;
-      }
-    }
-    &__close{
-      height: 50px;
-      width: 50px;
-      &:hover{
-        cursor: pointer;
-      }
-    }
-  }
-}
-
-/* FILTER TABS */
-.filter-tabs{
-  display: flex;
-  width: 100%;
-  &__list{
-    display: inline-flex;
-    justify-content: space-between;
-    width: calc(100% - 4rem);
-    margin: 2rem;
-    &__item{
-      list-style: none;
-      text-align: center;
-      font-weight: 500;
-      text-transform: uppercase;
-      font-size: 0.7rem;
-      letter-spacing: 1px;
-      color: $white-50;
-      position: relative;
-      &:hover{
-        cursor: pointer;
-      }
-      &--active{
-        color: $white;
-        &:after{
-          content: '';
-          position: absolute;
-          background: $white;
-          width: 100%;
-          max-width: 80px;
-          left: 0;
-          right: 0;
-          margin: 0 auto;
-          left: 0;
-          bottom: -1rem;
-          height: 2px;
-        }
-      }
-    }
-  }
-}
-/* Active Class For Components */
-.filter-tabs-content{
-  display: none;
-  &--active{
-    display: block;
-  }
-}
+//
+// .filters{
+//   &__container{
+//     background: red;
+//   }
+//   &__controls{
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     &__text{
+//       font-size: 0.9rem;
+//       letter-spacing: 1px;
+//       color: $white;
+//       font-weight: 500;
+//       &:hover{
+//         cursor: pointer;
+//       }
+//     }
+//     &__close{
+//       height: 50px;
+//       width: 50px;
+//       &:hover{
+//         cursor: pointer;
+//       }
+//     }
+//   }
+// }
+//
+// /* FILTER TABS */
+// .filter-tabs{
+//   display: flex;
+//   width: 100%;
+//   &__list{
+//     display: inline-flex;
+//     justify-content: space-between;
+//     width: calc(100% - 4rem);
+//     margin: 2rem;
+//     &__item{
+//       list-style: none;
+//       text-align: center;
+//       font-weight: 500;
+//       text-transform: uppercase;
+//       font-size: 0.7rem;
+//       letter-spacing: 1px;
+//       color: $white-50;
+//       position: relative;
+//       &:hover{
+//         cursor: pointer;
+//       }
+//       &--active{
+//         color: $white;
+//         &:after{
+//           content: '';
+//           position: absolute;
+//           background: $white;
+//           width: 100%;
+//           max-width: 80px;
+//           left: 0;
+//           right: 0;
+//           margin: 0 auto;
+//           left: 0;
+//           bottom: -1rem;
+//           height: 2px;
+//         }
+//       }
+//     }
+//   }
+// }
+// /* Active Class For Components */
+// .filter-tabs-content{
+//   display: none;
+//   &--active{
+//     display: block;
+//   }
+// }
 </style>

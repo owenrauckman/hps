@@ -1,5 +1,5 @@
 <template>
-  <div :class="[{ 'card--blue': ownsPremiumCity && !ownsPremiumState }, { 'card--purple': ownsPremiumState }, { 'card--white': !ownsPremiumState }, 'card']">
+  <div :class="[{ 'card--white': ownsPremiumCity && !ownsPremiumState }, { 'card--blue': ownsPremiumState }, { 'card--white': !ownsPremiumState }, 'card']">
     <img class="card__image" :src="options.profilePicture"/>
     <div class="card__info">
       <h2 class="card__info__name">{{options.firstName}} {{options.lastName}}</h2>
@@ -16,7 +16,8 @@
       </h4>
     </div>
     <a class="card__button" href=""></a>
-    <div v-if="ownsPremiumState || ownsPremiumCity " class="card__verified"></div>
+    <div v-if="ownsPremiumState" class="card__verified--light"></div>
+    <div v-else-if="ownsPremiumCity" class="card__verified--dark"></div>
   </div>
 </template>
 
@@ -82,11 +83,10 @@ export default {
     border-radius: $border-radius;
     position: relative;
     transform: scale(1);
-    transition: transform 0.2s ease-in-out;
     /* flex info for card. 4rem is extra padding, must have max-width and flex */
     flex: 1 0 calc(100% - 4rem);
     max-width: calc(100% - 4rem);
-    transition: flex 0.25s ease-in, max-width 0.25s ease-out;
+    transition: flex 0.25s ease-in, max-width 0.25s ease-out, transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
     @include breakpoint(phone){
        flex: 1 0 calc((100% / 2) - 4rem);
        max-width: calc((100% / 2) - 4rem);
@@ -103,9 +103,8 @@ export default {
       cursor: pointer;
       text-decoration: none;
       transform: scale(1.01);
-      // .card__button{
-      //   transform:translateX(2px) rotate(-90deg);
-      // }
+      box-shadow: 0px 5px 20px transparentize($black, 0.9);
+
     }
     &--white{
       background: $white;
@@ -119,20 +118,8 @@ export default {
         color: $gray-light;
       }
     }
-    &--purple{
-      background: $neon-purple;
-      .card__image{
-        border: solid 1px $white;
-      }
-      .card__info__name{
-        color: $white;
-      }
-      .card__info__company, .card__info__location{
-        color: $white-80;
-      }
-    }
     &--blue{
-      background: $light-blue;
+      background: $blue;
       .card__image{
         border: solid 1px $white;
       }
@@ -172,13 +159,21 @@ export default {
         font-size: 0.75rem;
       }
     }
-    &__verified{
+    &__verified--dark{
       position: absolute;
       top: 0.5rem;
       right: 1rem;
-      background: url('../../../static/svg/verified.svg');
-      height: 30px;
-      width: 30px;
+      background: url('../../../static/svg/verified-dark.svg');
+      height: 25px;
+      width: 25px;
+    }
+    &__verified--light{
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      background: url('../../../static/svg/verified-light.svg');
+      height: 25px;
+      width: 25px;
     }
     /* Button CTA */
     &__button{
@@ -187,9 +182,9 @@ export default {
       content: '';
       height: 10px;
       width: 10px;
+      top: 50%;
       transform: translateX(0px) rotate(-90deg);
       background: url('../../../static/svg/arrow-white.svg');
-      // transition: transform 0.2s ease-in 0.2s;
     }
   }
 </style>

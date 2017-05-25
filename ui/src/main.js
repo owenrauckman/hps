@@ -6,7 +6,10 @@ import App from './App';
 import router from './router';
 import store from './store';
 
+const VueScrollTo = require('vue-scrollto');
+
 Vue.use(Vue2Filters);
+Vue.use(VueScrollTo);
 
 Vue.config.productionTip = false;
 

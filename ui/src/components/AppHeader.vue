@@ -1,9 +1,9 @@
 <template>
-  <div class="header">
+  <div class="header header--fixed">
     <div class="header__company">
-      <img class="header__company__logo" src="../../static/svg/logo.svg"/>
+      <img class="header__company__logo" src="../../static/svg/logo-white.svg"/>
       <button @click="toggleMenu" :class="[{ 'header__content__hamburger--active': menuActive },'header__content__hamburger']">
-        <img class="header__content__hamburger__svg" src="../../static/svg/arrow-gray.svg"/>
+        <img class="header__content__hamburger__svg" src="../../static/svg/arrow-white.svg"/>
       </button>
     </div>
     <ul :class="[{ 'header__content--active': menuActive },'header__content']">
@@ -48,7 +48,15 @@ export default {
 .header{
   display: flex;
   justify-content: space-between;
-  padding: 1rem 2rem;
+  padding: 0 2rem;
+  background: transparentize($dark-blue, 0.9);
+  z-index: +1;
+  &--fixed{
+    position: absolute;
+    top:0;
+    width: calc(100% - 4rem);
+    height: 100px;
+  }
   &__company{
     display: flex;
     align-items: center;
@@ -69,7 +77,7 @@ export default {
     display: none;
     &--active{
       display: block;
-      align-items: center;
+      align-items: flex-top;
       list-style: none;
       position: absolute;
       height: auto;
@@ -89,20 +97,22 @@ export default {
       list-style: none;
     }
     &__item{
-      font-size: 0.9rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       &:last-child{
-        border: solid 1px $gray-medium;
+        border: solid 1px $white;
         padding: 0.5rem 1rem;
-        border-radius: $border-radius;
+        border-radius: $round-radius;
       }
       a{
         &:link, &:active, &:visited{
-          color: $gray-medium;
+          color: $white;
           text-decoration: none;
           transition: all 0.25s ease-in;
         }
         &:hover{
-          color: $gray-dark;
+          color: $white;
           text-decoration: none;
         }
       }

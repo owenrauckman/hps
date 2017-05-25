@@ -109,15 +109,4 @@ export default {
 <style scoped lang="scss">
 @import '../../sass/main.scss';
 
-/* these need to be local in each component for some reason */
-.filters__section__input-container{
-  &:after{
-    background: url('../../../static/svg/search-white.svg');
-  }
-}
-.filters__section__list__item--selected{
-  &:after{
-    background: url('../../../static/svg/check.svg');
-  }
-}
 </style>

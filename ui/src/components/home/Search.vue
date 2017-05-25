@@ -1,7 +1,6 @@
 <template>
   <div class="search">
     <div class="search__wrapper" @click="toggleFilters">
-      <img class="search__wrapper__image" src="../../../static/svg/search.svg"/>
       <div class="search__wrapper__content">
         <p class="search__wrapper__heading">
           <span class="search__wrapper__heading__mobile">{{startSearch}}</span>
@@ -13,9 +12,10 @@
           </div>
         </p>
       </div>
+      <button class="search__wrapper__button" id="js__search__wrapper__button" v-scroll-to="{element: '#js__home__results', duration: 3000}" >
+        <img class="search__wrapper__button__image" src="../../../static/svg/search-white.svg" id="js__search__wrapper__button__image" v-scroll-to="{element: '#js__home__results', duration: 3000}" />
+      </button>
     </div>
-    <p v-if="$store.state.results.users" class="search__results-text">Showing {{$store.state.results.users.length}} of {{$store.state.results.users.length}} results</p>
-
     <Filters :class="[{ 'filter--show': $store.state.filtersVisible },'filter']"/>
   </div>
 </template>
@@ -49,12 +49,19 @@ export default {
       @param {e} - the event object
     */
     toggleFilters(e) {
-      /* set the active filter based on click */
-      this.activateChosenFilter(e);
-      this.$store.commit('toggleFilters', true);
-      this.showFiltersLocation = !this.showFiltersLocation;
-      document.body.classList.add('no-overflow');
-      document.body.scrollTop = 0; /* scroll to top to avoid cut off issues */
+      /* ignore this if user clicks the search button */
+      if (e.target.id === 'js__search__wrapper__button' ||
+          e.target.id === 'js__search__wrapper__button__image') {
+        this.performSearch();
+      } else {
+        /* set the active filter based on click */
+        this.activateChosenFilter(e);
+        this.$store.commit('toggleFilters', true);
+        this.showFiltersLocation = !this.showFiltersLocation;
+        document.body.classList.add('no-overflow');
+        document.documentElement.scrollTop = 0; /* firefox */
+        document.body.scrollTop = 0;
+      }
     },
 
     /*
@@ -79,6 +86,27 @@ export default {
         default:
           this.$store.state.filterTabs[0].active = true;
       }
+    },
+
+    /*
+      Perform Search, passes all possible queries, empty ones won't affect response
+    */
+    performSearch() {
+      /* empty these on each search so premium info updates in card */
+      this.$store.state.results = [];
+      this.$store.state.loadingResults = true;
+      fetch(
+        `${config.api}/search` +
+        `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.$store.state.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.$store.state.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
+      ).then((data) => {
+        data.json().then((users) => {
+          this.$store.state.loadingResults = false;
+          this.$store.commit('updateResults', users);
+        });
+      });
     },
 
     /*
@@ -107,27 +135,36 @@ export default {
 .search{
   &__wrapper{
     background: $white;
-    border-radius: $border-radius;
-    border: solid 1px $gray-light;
+    border-radius: $round-radius;
+    box-shadow: $box-shadow;
     margin: 0 0 1rem 0;
-    padding: 1rem;
+    padding: 1rem 0;
     position: relative;
     display: flex;
     align-items: center;
-    max-width: 768px;
+    width: calc(100% - 2rem);
     align-self: flex-start;
-    @include breakpoint(tablet){
-      padding: 0;
-    }
     &:hover{
       cursor: pointer;
     }
-    &__image{
-      width: 20px;
-      height: 20px;
+    &__button{
+      background: $blue;
+      height: 50px;
+      width: 50px;
       margin-right: 1rem;
-      @include breakpoint(tablet){
-        margin: 0 1rem;
+      border-radius: $circle-radius;
+      display: flex;
+      justify-content: center;
+      transition: background 0.25s ease-in-out;
+      &:hover{
+        cursor: pointer;
+        background: darken($blue, 10%);
+      }
+      &__image{
+        width: 20px;
+        height: 20px;
+        display: block;
+        flex: 1;
       }
     }
     &__content{
@@ -140,6 +177,7 @@ export default {
       margin-bottom: 0rem;
       &__mobile{
         display: block;
+        margin-left: 2rem;
         @include breakpoint(tablet){
           display: none;
         }
@@ -152,7 +190,6 @@ export default {
         }
         &__item{
           flex: 1;
-          padding: 1rem 0;
           text-align: center;
           border-left: solid 1px $gray-light;
           &:first-child{
@@ -160,17 +197,6 @@ export default {
           }
         }
       }
-    }
-  }
-  &__results-text{
-    font-weight: 300;
-    font-style: italic;
-    font-size: 0.9rem;
-    color: $gray-medium;
-    transition: color 0.5s ease-in-out;
-    margin: 1.5rem 0;
-    &--active{
-      color: $gray-light;
     }
   }
 }

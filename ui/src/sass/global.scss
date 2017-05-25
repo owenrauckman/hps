@@ -11,6 +11,10 @@ body{
   -webkit-overflow-scrolling: touch;
 }
 
+.g__body__gray{
+  background: transparentize($dark-blue, 0.9);
+}
+
 /* global container */
 .g__container{
   position: relative;
@@ -43,6 +47,7 @@ body{
 
 /* Various Settings */
 $border-radius: 5px;
+$round-radius: 100px;
 $circle-radius: 50%;
 
 /* Styles for the Filter pages (state, city, company, industry) */
@@ -53,7 +58,7 @@ $circle-radius: 50%;
   z-index: +1;
   bottom: 0;
   left: 0;
-  background: $neon-purple;
+  background: linear-gradient(to bottom right, $orange, $red-orange);
   // overflow-y: scroll;
   box-sizing:border-box;
   -moz-box-sizing:border-box;
@@ -65,22 +70,22 @@ $circle-radius: 50%;
   &__container{
     position: relative;
     min-height: 100%;
-    max-width: 768px;
+    // max-width: 768px;
     margin: 2rem auto 0 auto;
   }
   &__section{
     min-height: 200px;
     position: relative;
     &__input{
-      height: 70px;
-      width: calc(100% - 14rem);
-      padding:0 1rem 0 4rem;
+      width: 100%;
+      padding:0 5rem 0 4rem;
       font-family: $roboto;
       font-size: 1rem;
       background: transparent;
-      color: $white;
+      color: $gray-medium;
+      background: red;
       &::placeholder{
-        color: $white-50;
+        color: $gray-light;
         font-family: $roboto;
         font-style: italic;
         font-weight: 400;
@@ -89,8 +94,17 @@ $circle-radius: 50%;
       }
     }
     &__input-wrapper{
-      width: 100%;
+      width: calc(100% - 2rem);
       position: relative;
+      background: $white;
+      border-radius: $round-radius;
+      box-shadow: $box-shadow;
+      margin: 0 auto 1rem auto;
+      padding: 1rem 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      align-self: flex-start;
     }
     &__input-container{
       position: relative;

@@ -1,5 +1,5 @@
 <template>
-  <div class="state">
+  <!-- <div class="state">
       <div class="filters__section">
         <div class="filters__section__input-container">
           <div class="filters__section__input-wrapper">
@@ -11,9 +11,8 @@
           <li v-for="state in filterBy(states, $store.state.filterQueries.state.name, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected': state.active },'filters__section__list__item']">{{state.name}}</li>
         </ul>
       </div>
-    </div>
+    </div> -->
 
-  </div>
 </template>
 
 <script>
@@ -97,17 +96,5 @@ export default {
 
 <style scoped lang="scss">
 @import '../../sass/main.scss';
-
-/* these need to be local in each component for some reason */
-.filters__section__input-container{
-  &:after{
-    background: url('../../../static/svg/search-white.svg');
-  }
-}
-.filters__section__list__item--selected{
-  &:after{
-    background: url('../../../static/svg/check.svg');
-  }
-}
 
 </style>

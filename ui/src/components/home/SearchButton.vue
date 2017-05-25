@@ -1,6 +1,9 @@
 <template>
   <!-- Search Button -->
-  <button @click="performSearch" class="filters__search-button">{{search}}</button>
+  <!-- <button @click="performSearch" v-scroll-to="{element: '#js__home__results', duration: 3000}" class="filters__search-button">{{search}}</button> -->
+  <button class="search__wrapper__button" id="js__search__wrapper__button" v-scroll-to="{element: '#js__home__results', duration: 3000}" >
+    <img class="search__wrapper__button__image" src="../../../static/svg/search-white.svg" id="js__search__wrapper__button__image" v-scroll-to="{element: '#js__home__results', duration: 3000}" />
+  </button>
 </template>
 
 <script>
@@ -20,6 +23,7 @@ export default {
     hideFilters() {
       this.$store.commit('toggleFilters', false);
       document.body.classList = '';
+      document.body.classList.add('g__body__gray');
     },
     /*
       When the window resizes, adjust height of the filters to the window height
@@ -27,12 +31,6 @@ export default {
     */
     onScreenResize() {
       document.querySelector('.filters').style.height = window.innerHeight;
-    },
-    /*
-      scroll back to the top of the page on input blurs to avoid UI issue
-    */
-    scrollTop() {
-      document.body.scrollTop = 0;
     },
     /*
       Perform Search, passes all possible queries, empty ones won't affect response
