@@ -8,7 +8,7 @@
     "babel-node": "babel-node --presets=/*a*/ --ignore='foo|bar|baz'",
     "dev": "nodemon --exec babel-node --presets=es2015 -- ./server.js",
     "build": "babel --presets es2015 src -d dist --copy-files",
-    "start": "node ./dist/server.js"
+    "start": "./server/dist/server.js"
   },
   "author": "Owen Rauckman",
   "license": "ISC",
