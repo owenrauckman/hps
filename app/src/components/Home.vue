@@ -6,7 +6,7 @@
         <h2 class="home__subheading">Find and build your direct sales team today.</h2>
         <div class="home__cta">
           <button class="home__cta__item home__cta__item--border">Sign Up Now</button>
-          <button class="home__cta__item" v-scroll-to="{element: '#js__home__search', duration: 3000}">Start Your Search</button>
+          <button class="home__cta__item" v-scroll-to="{element: '#js__home__search', duration: 1000}">Start Your Search</button>
         </div>
         <div class="home__search__container">
           <Search class="home__search" id="js__home__search"/>

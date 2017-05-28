@@ -9,9 +9,9 @@
       </button>
     </div>
     <ul :class="[{ 'header__content--active': menuActive },'header__content']">
-      <li @click="toggleMenu" class="header__content__item" v-for="item in menu">
-        <router-link :to="item.href">{{item.name}}</router-link>
-      </li>
+      <router-link :to="item.href" v-for="item in menu" :key="item.name" class="header__content__item">
+        <li @click="toggleMenu">{{item.name}}</li>
+      </router-link>
     </ul>
   </div>
 </template>
@@ -121,16 +121,15 @@ export default {
         border-radius: $round-radius;
         transition: all 0.25s ease-in-out;
       }
-      a{
-        &:link, &:active, &:visited{
-          color: $white;
-          text-decoration: none;
-          transition: all 0.25s ease-in;
-        }
-        &:hover{
-          color: $white;
-          text-decoration: none;
-        }
+      &:link, &:active, &:visited{
+        color: $white;
+        text-decoration: none;
+        transition: all 0.25s ease-in;
+      }
+      &:hover{
+        color: $white;
+        text-decoration: none;
+        position: relative;
       }
       margin: 1rem 0;
       text-align: center;

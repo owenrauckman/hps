@@ -12,7 +12,7 @@
           </div>
         </p>
       </div>
-      <button class="search__wrapper__button" id="js__search__wrapper__button" v-scroll-to="{element: '#js__home__results', duration: 3000}" >
+      <button class="search__wrapper__button" id="js__search__wrapper__button" v-scroll-to="{element: '#js__home__results', duration: 1000}" >
         <img class="search__wrapper__button__image" src="../../../static/svg/search-white.svg" id="js__search__wrapper__button__image" />
       </button>
     </div>

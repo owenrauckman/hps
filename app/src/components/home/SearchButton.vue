@@ -1,6 +1,6 @@
 <template>
   <!-- Search Button -->
-  <button class="filters__button" @click="performSearch" v-scroll-to="{element: '#js__home__results', duration: 3000}">
+  <button class="filters__button" @click="performSearch" v-scroll-to="{element: '#js__home__results', duration: 1000}">
     <img class="filters__button__image" src="../../../static/svg/search-white.svg" @click="performSearch" />
   </button>
 </template>
