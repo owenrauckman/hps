@@ -131,7 +131,6 @@ module.exports = class SearchModel{
           /* check cities next */
           area.cities.forEach((city)=>{
             if(city.ownsPremium === true && city.city == params.city){
-              console.log(user.username);
               if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
                 cities.push(user);
               }
