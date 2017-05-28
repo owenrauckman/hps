@@ -35,8 +35,6 @@ import City from './City';
 import Company from './Company';
 import Industry from './Industry';
 
-const config = require('../../../config/appConfig.json');
-
 export default {
   name: 'filters',
   components: { State, City, Company, Industry },
@@ -73,27 +71,6 @@ export default {
       this.$store.commit('updateCityQuery', { name: '', active: false });
       this.$store.commit('updateCompanyQuery', { name: '', active: false });
       this.$store.commit('updateIndustryQuery', { name: '', active: false });
-    },
-    /*
-      Perform Search, passes all possible queries, empty ones won't affect response
-    */
-    performSearch() {
-      /* empty these on each search so premium info updates in card */
-      this.$store.state.results = [];
-      this.$store.state.loadingResults = true;
-      this.hideFilters();
-      fetch(
-        `${config.api}/search` +
-        `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.filterQueries.city.name)}` +
-        `&company=${encodeURIComponent(this.$store.state.filterQueries.company.name)}` +
-        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
-      ).then((data) => {
-        data.json().then((users) => {
-          this.$store.state.loadingResults = false;
-          this.$store.commit('updateResults', users);
-        });
-      });
     },
     /*
       Makes selected tab active which mounts the component based on v-if

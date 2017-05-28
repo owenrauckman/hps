@@ -95,6 +95,7 @@ export default {
       /* empty these on each search so premium info updates in card */
       this.$store.state.results = [];
       this.$store.state.loadingResults = true;
+      this.$store.state.isResults = false;
       fetch(
         `${config.api}/search` +
         `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
@@ -103,6 +104,10 @@ export default {
         `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
       ).then((data) => {
         data.json().then((users) => {
+          /* check if there are users returned*/
+          if (users.users && users.users.length > 0) {
+            this.$store.state.isResults = true;
+          }
           this.$store.state.loadingResults = false;
           this.$store.commit('updateResults', users);
         });
@@ -113,11 +118,20 @@ export default {
       Perform Initial Search - Gets Random Premium Users
     */
     performPremiumSearch() {
+      let url = `${config.api}/search/premium`;
+      /* normally premium is searched, unless query already exists, we go back */
+      if (this.$store.state.filterQueries.state.name !== '') {
+        url = `${config.api}/search` +
+        `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.$store.state.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.$store.state.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`;
+      }
       /* empty these on each search so premium info updates in card */
       this.$store.state.results = [];
       this.$store.state.loadingResults = true;
       fetch(
-        `${config.api}/search/premium`,
+        url,
       ).then((data) => {
         data.json().then((users) => {
           this.$store.state.loadingResults = false;

@@ -9,6 +9,8 @@ export default new Vuex.Store({
     filtersVisible: false,
     loadingResults: false,
     results: [],
+    isResults: true,
+    isResultsError: false,
     filterQueries: {
       state: {
         name: '',

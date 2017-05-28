@@ -8,7 +8,7 @@
         <button class="results__queries__query" @click="removeQuery" id="js__query__company" v-if="$store.state.filterQueries.company.name.length > 0">{{$store.state.filterQueries.company.name}}</button>
         <button class="results__queries__query" @click="removeQuery" id="js__query__industry" v-if="$store.state.filterQueries.industry.name.length > 0">{{$store.state.filterQueries.industry.name}}</button>
       </div>
-      <p v-if="$store.state.results.users" class="results__results__info__text g__container">Showing {{$store.state.results.users.length}} of {{$store.state.results.users.length}} results</p>
+      <p v-if="$store.state.results.users && $store.state.isResults" class="results__results__info__text g__container">Showing {{$store.state.results.users.length}} of {{$store.state.results.users.length}} results</p>
     </div>
     <div :class="[{ 'results__loading--active': $store.state.loadingResults }, 'results__loading g__container']">
       <div class='results__loading__dot results__loading__dot__1'></div>
@@ -16,8 +16,14 @@
       <div class='results__loading__dot results__loading__dot__3'></div>
       <div class='results__loading__dot results__loading__dot__4'></div>
     </div>
-    <div class="results__card-container g__container" id="js__results__results">
+    <div v-if="$store.state.isResults" class="results__card-container g__container" id="js__results__results">
       <Card v-for="card in $store.state.results.users" :key="card.plan" :options="card"/>
+    </div>
+    <div v-else class="results__no-results-container g__container">
+      <div>
+        <p class="results__no-results-container__text">It looks like there are no consultants in this area. Want to secure your spot?</p>
+        <router-link to="signup" class="results__no-results-container__link">Sign up today</router-link>
+      </div>
     </div>
     <!-- end results and loading state -->
 
@@ -64,14 +70,20 @@ export default {
       /* empty these on each search so premium info updates in card */
       this.$store.state.results = [];
       this.$store.state.loadingResults = true;
+      this.$store.state.isResults = false;
       fetch(
         `${config.api}/search` +
         `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
         `&city=${encodeURIComponent(this.$store.state.filterQueries.city.name)}` +
         `&company=${encodeURIComponent(this.$store.state.filterQueries.company.name)}` +
         `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
-      ).then((data) => {
+      )
+      .then((data) => {
         data.json().then((users) => {
+          /* check if there are users returned*/
+          if (users.users && users.users.length > 0) {
+            this.$store.state.isResults = true;
+          }
           this.$store.state.loadingResults = false;
           this.$store.commit('updateResults', users);
         });
@@ -92,6 +104,31 @@ export default {
     flex-direction: row;
     justify-content: flex-start;
     margin: 0rem auto 1rem auto;
+  }
+  &__no-results-container{
+    padding: 0 1rem 1rem 1rem;
+    display: block;
+    margin: 0rem auto 1rem auto;
+    width: calc(100% - 2rem);
+    text-align: center;
+    &__text{
+      display: block;
+      margin-bottom: 1rem;
+    }
+    &__link{
+      display: inline-block;
+      color: $blue;
+      width: auto;
+      border-radius: $round-radius;
+      padding: 0.5rem 1rem;
+      border: solid 1px $blue;
+      text-decoration: none;
+      transition: all 0.25s ease-in-out;
+      &:hover{
+        background: $blue;
+        color: $white;
+      }
+    }
   }
   &__loading{
     display: none;
