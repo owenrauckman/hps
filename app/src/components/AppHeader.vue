@@ -7,8 +7,8 @@
       </button>
     </div>
     <ul :class="[{ 'header__content--active': menuActive },'header__content']">
-      <li class="header__content__item" v-for="item in menu">
-        <a href="#">{{item}}</a>
+      <li @click="toggleMenu" class="header__content__item" v-for="item in menu">
+        <router-link :to="item.href">{{item.name}}</router-link>
       </li>
     </ul>
   </div>
@@ -22,10 +22,22 @@ export default {
       title: 'Home Party Shows',
       signUp: 'Sign Up',
       menu: [
-        'About',
-        'Pricing',
-        'Log In',
-        'Sign Up',
+        {
+          name: 'About',
+          href: 'about',
+        },
+        {
+          name: 'Pricing',
+          href: 'pricing',
+        },
+        {
+          name: 'Log In',
+          href: 'login',
+        },
+        {
+          name: 'Sign Up',
+          href: 'signup',
+        },
       ],
       menuActive: false,
     };
@@ -35,7 +47,9 @@ export default {
       Toggles the menu on mobile devices
     */
     toggleMenu() {
-      this.menuActive = !this.menuActive;
+      if (window.outerWidth < 1024) {
+        this.menuActive = !this.menuActive;
+      }
     },
   },
 };
