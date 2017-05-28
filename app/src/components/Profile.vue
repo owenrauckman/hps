@@ -127,7 +127,8 @@ export default {
               /* set this by default, but change the active class as needed */
               company.name = { name: company.name, active: false };
 
-              if(this.$store.state.results.length !== 0 && this.$store.state.results.query.company !== ''){
+              if(this.$store.state.results.length !== 0 && this.$store.state.results.query.company !== ''&& this.$store.state.results.query.company !== undefined){
+                alert('still here');
                 if(this.$store.state.results.query.company === company.name.name){
                   company.name = { name: company.name.name, active: true };
                   this.activeCompany = company.name.name;
