@@ -20,10 +20,10 @@ module.exports = class User{
           reject({err: err.message});
         }
         else if(user == null){
-          resolve({message: config.errors.userDoesNotExist});
+          resolve({status: false, message: config.errors.userDoesNotExist});
         }
         else{
-          resolve(user);
+          resolve({status: true, user: user});
         }
       });
     });

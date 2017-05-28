@@ -23,6 +23,9 @@ var UserSchema = mongoose.Schema({
   emailAddress: {
     type: String
   },
+  phoneNumber: {
+    type: String
+  },
   stripeId: {
     type: String
   },

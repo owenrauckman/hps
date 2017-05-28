@@ -1,5 +1,5 @@
 <template>
-  <div :class="[{ 'card--white': ownsPremiumCity && !ownsPremiumState }, { 'card--blue': ownsPremiumState }, { 'card--white': !ownsPremiumState }, 'card']">
+  <router-link :to="options.username" :class="[{ 'card--white': ownsPremiumCity && !ownsPremiumState }, { 'card--blue': ownsPremiumState }, { 'card--white': !ownsPremiumState }, 'card']">
     <img class="card__image" :src="options.profilePicture"/>
     <div class="card__info">
       <h2 class="card__info__name">{{options.firstName}} {{options.lastName}}</h2>
@@ -18,7 +18,7 @@
     <a class="card__button" href=""></a>
     <div v-if="ownsPremiumState" class="card__verified--light"></div>
     <div v-else-if="ownsPremiumCity" class="card__verified--dark"></div>
-  </div>
+  </router-link>
 </template>
 
 <script>

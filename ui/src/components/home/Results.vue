@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- results, query and loading state -->
-    <div class="results__results__info g__container">
+    <div class="results__results__info g__container" id="js__home__results">
       <div class="results__queries">
         <button class="results__queries__query" @click="removeQuery" id="js__query__state" v-if="$store.state.filterQueries.state.name.length > 0">{{$store.state.filterQueries.state.name}}</button>
         <button class="results__queries__query" @click="removeQuery" id="js__query__city" v-if="$store.state.filterQueries.city.name.length > 0">{{$store.state.filterQueries.city.name}}</button>

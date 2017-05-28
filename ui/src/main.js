@@ -6,6 +6,10 @@ import App from './App';
 import router from './router';
 import store from './store';
 
+/* allows for use of fetch in IE and Safari */
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
+
 const VueScrollTo = require('vue-scrollto');
 
 Vue.use(Vue2Filters);
