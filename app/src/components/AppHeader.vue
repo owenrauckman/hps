@@ -1,7 +1,9 @@
 <template>
   <div class="header header--fixed">
     <div class="header__company">
-      <img class="header__company__logo" src="../../static/svg/logo-white.svg"/>
+      <router-link to="/">
+        <img class="header__company__logo" src="../../static/svg/logo-white.svg"/>
+      </router-link>
       <button @click="toggleMenu" :class="[{ 'header__content__hamburger--active': menuActive },'header__content__hamburger']">
         <img class="header__content__hamburger__svg" src="../../static/svg/arrow-white.svg"/>
       </button>
