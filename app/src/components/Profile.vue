@@ -108,6 +108,10 @@ export default {
             window.location.href = '/';
           } else {
             this.user = userInfo.user;
+
+            /* set the title of the page to the user's name */
+            document.title = `Home Party Shows | ${this.user.firstName} ${this.user.lastName}`;
+
             /*
               pull out each company name and add an active class
               by default, make first instance active unless it

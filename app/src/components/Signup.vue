@@ -12,6 +12,10 @@ export default {
     return {
     };
   },
+  mounted() {
+    /* set the title of the page */
+    document.title = 'Home Party Shows | Sign Up Today';
+  },
 };
 </script>
 

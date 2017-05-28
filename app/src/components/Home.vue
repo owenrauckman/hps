@@ -32,6 +32,9 @@ export default {
   },
   mounted() {
     document.body.classList.add('g__body__gray');
+
+    /* set the title of the page */
+    document.title = 'Home Party Shows | Find and build your direct sales team.';
   },
 };
 </script>
