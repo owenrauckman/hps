@@ -29,9 +29,9 @@ app.use(bodyParser.json({}));
 
 // --- Cors allows for Auth to work across different ports
 // TODO: es6ify this
-app.use(cors({origin: 'http://localhost:8080', credentials: true}, {origin: '192.168.1.66:3000', credentials: true}));
+app.use(cors({origin: 'http://localhost:8080', credentials: true}, {origin: 'http://owenrauckman.com', credentials: true}));
 app.use(function(req, res, next) {
-  var allowedOrigins = ['http://localhost:8080', '192.168.1.66:3000'];
+  var allowedOrigins = ['http://localhost:8080', 'http://owenrauckman.com'];
    var origin = req.headers.origin;
    if(allowedOrigins.indexOf(origin) > -1){
         res.setHeader('Access-Control-Allow-Origin', origin);
