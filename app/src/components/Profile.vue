@@ -23,12 +23,17 @@
           <!-- details -->
           <div class="profile__main__details">
             <div class="profile__main__details__box profile__main__details__box--blue" v-for="company in user.companies" v-if="company.name.name === activeCompany">
-              <h2 class="profile__main__details__heading profile__main__details__heading--light">Connect With {{user.firstName}}</h2>
+              <h2 class="profile__main__details__heading profile__main__details__heading--light">Contact {{user.firstName}}</h2>
 
               <div class="profile__main__details__link-container">
                 <a class="profile__main__details__link" v-if="user.phoneNumber" :href="'tel:'+user.phoneNumber">{{user.phoneNumber}}</a>
                 <a class="profile__main__details__link" v-if="user.emailAddress" :href="'mailto:'+user.emailAddress">{{user.emailAddress}}</a>
               </div>
+            </div>
+
+            <div class="profile__main__details__box profile__main__details__box--blue" v-for="company in user.companies" v-if="company.name.name === activeCompany">
+              <h2 class="profile__main__details__heading profile__main__details__heading--light">Connect With {{user.firstName}}</h2>
+
               <div class="profile__main__details__social">
                 <a v-if="company.links.facebook.url.length > 1" class="profile__main__details__social__icon" :href="company.links.facebook.url">
                   <img src="../../static/svg/facebook.svg"/>
