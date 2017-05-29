@@ -37,6 +37,9 @@ export default {
   mounted() {
     /* set the title of the page */
     document.title = 'Home Party Shows | Sign Up Today';
+
+    /* remove gray body */
+    document.body.classList.remove('g__body__gray');
   },
 };
 </script>
@@ -103,7 +106,7 @@ export default {
       }
     }
     &--white{
-      padding: 1rem;
+      padding: 2rem 1rem;
       width: calc(100% - 2rem);
 
     }

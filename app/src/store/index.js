@@ -37,6 +37,9 @@ export default new Vuex.Store({
       { name: 'company', active: false },
       { name: 'industry', active: false },
     ],
+    signUpInfo: {
+      companies: [],
+    },
   },
   mutations: {
     /* eslint-disable */
