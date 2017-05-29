@@ -1,11 +1,11 @@
 <template>
-  <div class="header header--fixed">
+  <div :class="[{ 'header--signup': $store.state.menuType === 'signup' },'header header--fixed']">
     <div class="header__company">
       <router-link to="/">
-        <img class="header__company__logo" src="../../static/svg/logo-white.svg"/>
+        <svg class="header__company__logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.41421"><path d="M92.42033332 83.72434262l-41.91684596 7.62124472L7.32703668 99.1958511l19.3075774-89.63232678 22.86055334-4.15733174L73.1095751 1.1152664l19.31075822 82.60907622zM50.63390098 11.66604634L31.95930676 15.0631621 15.54945638 91.23425864 49.3647538 85.0889144 84.703664 78.663658 68.2906328 8.45659896l-17.65673182 3.20944738z" fill="#fff"/><path d="M75.78464472 27.20753286L25.36228608 36.3746561l-1.13873356-6.25985376 50.42553946-9.16712324 1.13555274 6.25985376z" fill="#fff"/></svg>
       </router-link>
       <button @click="toggleMenu" :class="[{ 'header__content__hamburger--active': menuActive },'header__content__hamburger']">
-        <img class="header__content__hamburger__svg" src="../../static/svg/arrow-white.svg"/>
+        <svg class="header__content__hamburger__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10"><path d="M92.7480535 28.6260075l-42.74805 42.74805-42.74805-42.74805" fill="none" stroke="#fff" stroke-width="12.824414999999998"/></svg>
       </button>
     </div>
     <ul :class="[{ 'header__content--active': menuActive },'header__content']">
@@ -42,6 +42,7 @@ export default {
         },
       ],
       menuActive: false,
+      signUpActive: false,
     };
   },
   methods: {
@@ -72,6 +73,19 @@ export default {
     top:0;
     width: calc(100% - 4rem);
     height: 100px;
+  }
+  &--signup{
+    background: transparent;
+    .header__company__logo{
+      path{
+        fill: $red-orange;
+      }
+    }
+    .header__content__hamburger__svg{
+      path{
+        stroke: $red-orange;
+      }
+    }
   }
   &__company{
     display: flex;

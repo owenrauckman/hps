@@ -6,6 +6,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    menuType: 'transparent',
     filtersVisible: false,
     loadingResults: false,
     results: [],

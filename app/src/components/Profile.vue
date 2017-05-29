@@ -96,6 +96,7 @@ export default {
   },
   beforeMount() {
     this.getUser(this.$route.params.username);
+    this.$store.state.menuType = 'transparent';
   },
   mounted() {
     this.adjustBackground();
