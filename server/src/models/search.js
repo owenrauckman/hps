@@ -19,10 +19,10 @@ module.exports = class SearchModel{
       let searchParameters = []; // add the mongo query to this array
 
       if(params.city && params.state){
-        searchParameters.push({ "companies.areasServed.cities" : { $elemMatch : { city: { $regex : params.city, $options : 'i' } } } });
+        searchParameters.push({ "company.areasServed.cities" : { $elemMatch : { city: { $regex : params.city, $options : 'i' } } } });
       }
       else if(params.state){
-        searchParameters.push({ "companies.areasServed" : { $elemMatch : { state: { $regex : params.state, $options : 'i' } } } });
+        searchParameters.push({ "company.areasServed" : { $elemMatch : { state: { $regex : params.state, $options : 'i' } } } });
       }
       else if(params.city){
         resolve({err: config.defineCity});
@@ -30,7 +30,7 @@ module.exports = class SearchModel{
       else{
         resolve({err: config.defineLocation});
       }
-      if(params.company){ searchParameters.push({ "companies.name" : { $regex : params.company, $options : 'i' } }); }
+      if(params.company){ searchParameters.push({ "company.name" : { $regex : params.company, $options : 'i' } }); }
 
       /*
         If the user searches by industry we will need to relate the company back to the industry doc
@@ -38,7 +38,7 @@ module.exports = class SearchModel{
       */
       if(params.industry){
         this.getCompaniesByIndustry(params.industry).then( (companies)=> {
-          searchParameters.push({ "companies.name" : {$in: companies} });
+          searchParameters.push({ "company.name" : {$in: companies} });
         }).then((companies)=>{
           /* Set a number of users, and get the count to use in aggregate for random sorting */
           User.count({ $and : searchParameters }, (err, users, userCount) =>{
@@ -49,8 +49,8 @@ module.exports = class SearchModel{
             User.aggregate(
               { $match: { $and : searchParameters } },
               { $sample: { size: userCount } },
-              { $sort: { "companies.areasServed.ownsPremium": -1} },
-              { $sort: {"companies.areasServed.cities.ownsPremium": -1 } },
+              { $sort: { "company.areasServed.ownsPremium": -1} },
+              { $sort: {"company.areasServed.cities.ownsPremium": -1 } },
               (err, users)=>{
               if(err){
                 reject({err: err.message});
@@ -78,8 +78,8 @@ module.exports = class SearchModel{
           User.aggregate(
             { $match: { $and : searchParameters } },
             { $sample: { size: userCount } },
-            { $sort: { "companies.areasServed.ownsPremium": -1} },
-            { $sort: {"companies.areasServed.cities.ownsPremium": -1 } },
+            { $sort: { "company.areasServed.ownsPremium": -1} },
+            { $sort: {"company.areasServed.cities.ownsPremium": -1 } },
             (err, users)=>{
             if(err){
               reject({err: err.message});
@@ -120,28 +120,26 @@ module.exports = class SearchModel{
     let base = [];
 
     users.forEach((user)=>{
-      user.companies.forEach((company)=>{
-        /* check states first */
-        company.areasServed.forEach((area)=>{
-          if(area.ownsPremium === true && area.state === params.state){
+      /* check states first */
+      user.company.areasServed.forEach((area)=>{
+        if(area.ownsPremium === true && area.state === params.state){
+          if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
+            states.push(user);
+          }
+        }
+        /* check cities next */
+        area.cities.forEach((city)=>{
+          if(city.ownsPremium === true && city.city == params.city){
             if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
-              states.push(user);
+              cities.push(user);
             }
           }
-          /* check cities next */
-          area.cities.forEach((city)=>{
-            if(city.ownsPremium === true && city.city == params.city){
-              if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
-                cities.push(user);
-              }
-            }
-          });
         });
-        /* otherwise, after the loops finish push into the base array */
-        if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
-          base.push(user);
-        }
       });
+      /* otherwise, after the loops finish push into the base array */
+      if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
+        base.push(user);
+      }
     });
 
     return states.concat(cities).concat(base);
@@ -154,7 +152,7 @@ module.exports = class SearchModel{
   searchPremium(){
     return new Promise((resolve, reject) => {
       User.aggregate(
-        { $match: { "companies.areasServed.ownsPremium": true } },
+        { $match: { "company.areasServed.ownsPremium": true } },
         { $sample: { size: config.numRandomResults } },
         (err, users)=>{
         if(err){

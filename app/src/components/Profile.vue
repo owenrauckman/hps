@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <!-- conditional keeps from console errors from ajax -->
+  <div v-if="user.company">
     <div class="profile__bg" id="js__profile__bg"></div>
     <div class="profile">
       <div class="profile__main">
@@ -9,20 +10,20 @@
             <div class="profile__main__info__image-container">
               <img class="profile__main__info__image" :src="user.profilePicture"/>
             </div>
+            <span v-if="ownsPremiumState" class="profile__main__info__premium profile__main__info__premium--badge">Premium State Owner</span>
+            <span v-else-if="ownsPremiumCity" class="profile__main__info__premium profile__main__info__premium--badge">Premium City Owner</span>
 
             <h1 class="profile__main__info__name">{{user.firstName}} {{user.lastName}}</h1>
             <div class="profile__main__info__companies__container">
               <ul class="profile__main__info__companies">
-                <li v-for="company in user.companies" @click="selectCompany(company)" :class="[{ 'profile__main__info__company--active': company.name.active },'profile__main__info__company']">
-                  {{company.name.name}}
-                </li>
+                <li class="profile__main__info__company profile__main__info__company--active">{{user.company.name}}</li>
               </ul>
             </div>
           </div>
           <!-- end info -->
           <!-- details -->
           <div class="profile__main__details">
-            <div class="profile__main__details__box profile__main__details__box--blue" v-for="company in user.companies" v-if="company.name.name === activeCompany">
+            <div class="profile__main__details__box profile__main__details__box--blue">
               <h2 class="profile__main__details__heading profile__main__details__heading--light">Contact {{user.firstName}}</h2>
 
               <div class="profile__main__details__link-container">
@@ -31,44 +32,44 @@
               </div>
             </div>
 
-            <div class="profile__main__details__box profile__main__details__box--blue" v-for="company in user.companies" v-if="company.name.name === activeCompany">
+            <div class="profile__main__details__box profile__main__details__box--blue">
               <h2 class="profile__main__details__heading profile__main__details__heading--light">Connect With {{user.firstName}}</h2>
 
               <div class="profile__main__details__social">
-                <a v-if="company.links.facebook.url.length > 1" class="profile__main__details__social__icon" :href="company.links.facebook.url">
+                <a v-if="user.company.links.facebook.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.facebook.url">
                   <img src="../../static/svg/facebook.svg"/>
                 </a>
-                <a v-if="company.links.instagram.url.length > 1" class="profile__main__details__social__icon" :href="company.links.instagram.url">
+                <a v-if="user.company.links.instagram.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.instagram.url">
                   <img src="../../static/svg/instagram.svg"/>
                 </a>
-                <a v-if="company.links.twitter.url.length > 1" class="profile__main__details__social__icon" :href="company.links.twitter.url">
+                <a v-if="user.company.links.twitter.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.twitter.url">
                   <img src="../../static/svg/twitter.svg"/>
                 </a>
-                <a v-if="company.links.pinterest.url.length > 1" class="profile__main__details__social__icon" :href="company.links.pinterest.url">
+                <a v-if="user.company.links.pinterest.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.pinterest.url">
                   <img src="../../static/svg/pinterest.svg"/>
                 </a>
-                <a v-if="company.links.youtube.url.length > 1" class="profile__main__details__social__icon" :href="company.links.youtube.url">
+                <a v-if="user.company.links.youtube.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.youtube.url">
                   <img src="../../static/svg/youtube.svg"/>
                 </a>
-                <a v-if="company.links.website.url.length > 1" class="profile__main__details__social__icon" :href="company.links.website.url">
+                <a v-if="user.company.links.website.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.website.url">
                   <img src="../../static/svg/website.svg"/>
                 </a>
               </div>
             </div>
 
-            <div class="profile__main__details__box" v-for="company in user.companies" v-if="company.name.name === activeCompany">
+            <div class="profile__main__details__box">
               <h2 class="profile__main__details__heading">About {{user.firstName}}</h2>
-              <p class="profile__main__details__copy">{{company.aboutMe}}</p>
+              <p class="profile__main__details__copy">{{user.company.aboutMe}}</p>
             </div>
 
-            <div class="profile__main__details__box" v-for="company in user.companies" v-if="company.name.name === activeCompany">
-              <h2 class="profile__main__details__heading">About {{activeCompany}}</h2>
-              <p class="profile__main__details__copy">{{company.aboutCompany}}</p>
+            <div class="profile__main__details__box">
+              <h2 class="profile__main__details__heading">About {{user.company.name}}</h2>
+              <p class="profile__main__details__copy">{{user.company.aboutCompany}}</p>
             </div>
 
-            <div class="profile__main__details__box" v-for="company in user.companies" v-if="company.name.name === activeCompany">
+            <div class="profile__main__details__box">
               <h2 class="profile__main__details__heading">Areas Served</h2>
-              <div v-for="area in company.areasServed">
+              <div v-for="area in user.company.areasServed">
                 <p class="profile__main__details__copy profile__main__details__copy--dark">{{area.state}}</p>
                 <p class="profile__main__details__copy--italic" v-for="city in area.cities">{{city.city}}</p>
               </div>
@@ -91,7 +92,8 @@ export default {
   data() {
     return {
       user: {},
-      activeCompany: '',
+      ownsPremiumCity: false,
+      ownsPremiumState: false,
     };
   },
   beforeMount() {
@@ -99,9 +101,7 @@ export default {
     this.$store.state.menuType = 'transparent';
   },
   mounted() {
-    this.adjustBackground();
     document.body.classList.add('g__body__gray');
-    window.onresize = this.adjustBackground;
   },
   methods: {
     getUser(username) {
@@ -115,55 +115,35 @@ export default {
           } else {
             this.user = userInfo.user;
 
+            /* check to see if user owns premium city or state */
+            this.user.company.areasServed.forEach((area) => {
+              let isStateQuery = true;
+              let isCityQuery = true;
+              if (this.$store.state.filterQueries.state.name === '') {
+                isStateQuery = false;
+              }
+              if (this.$store.state.filterQueries.city.name === '') {
+                isCityQuery = false;
+              }
+              if (area.ownsPremium === true &&
+                (this.$store.state.filterQueries.state.abbr === area.state
+                || isStateQuery === false)) {
+                this.ownsPremiumState = true;
+              }
+              area.cities.forEach((city) => {
+                if (city.ownsPremium === true &&
+                  (this.$store.state.filterQueries.city.name === city.city
+                  || isCityQuery === false)) {
+                  this.ownsPremiumCity = true;
+                }
+              });
+            });
+
             /* set the title of the page to the user's name */
             document.title = `Home Party Shows | ${this.user.firstName} ${this.user.lastName}`;
-
-            /*
-              pull out each company name and add an active class
-              by default, make first instance active unless it
-              has been selected in the query
-            */
-            this.user.companies.forEach((company, index) => {
-              /* eslint-disable */
-              /* set this by default, but change the active class as needed */
-              company.name = { name: company.name, active: false };
-
-              if(this.$store.state.results.length !== 0 && this.$store.state.results.query.company !== ''&& this.$store.state.results.query.company !== undefined){
-                alert('still here');
-                if(this.$store.state.results.query.company === company.name.name){
-                  company.name = { name: company.name.name, active: true };
-                  this.activeCompany = company.name.name;
-                }
-              } else if(index === 0){
-                company.name = { name: company.name.name, active: true };
-                this.activeCompany = company.name.name;
-              }
-              /* eslint-enable */
-            });
           }
         });
       });
-    },
-    /*
-      Selects a company from the user's company list
-      @param {object} - the selected company
-    */
-    selectCompany(company) {
-      /* eslint-disable */
-      this.user.companies.forEach((company) => {
-        company.name.active = false;
-      });
-      company.name.active = true;
-      this.activeCompany = company.name.name;
-      /* eslint-enable */
-    },
-    /*
-      Dynamically sets the half(ish)-page background height on resize
-    */
-    adjustBackground() {
-      const height = document.getElementById('js__profile__main__info').offsetHeight;
-      const offset = document.getElementById('js__profile__main__info').parentElement.offsetTop;
-      document.getElementById('js__profile__bg').style.height = `${height + offset}px`;
     },
   },
 };
@@ -270,11 +250,6 @@ export default {
         border-radius: $round-radius;
         transition: all 0.2s ease-in-out;
         height: 10px;
-        &:hover{
-          cursor: pointer;
-          background: transparentize($white, 0.1);
-          color: $blue;
-        }
         &:first-child{
           margin: 0 0.25rem 0 0;
           padding: 1rem 2rem 1rem 0;

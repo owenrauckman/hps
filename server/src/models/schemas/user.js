@@ -38,8 +38,8 @@ var UserSchema = mongoose.Schema({
   profileViews: {
     type: Number
   },
-  companies: {
-    type: Array
+  company: {
+    type: Object
   }
 });
 
