@@ -1,21 +1,25 @@
 <template>
   <div class="signup__section">
-    <h2 class="signup__section__heading">What companies do you work for?</h2>
+    <h2 class="signup__section__heading">What states do you want to be listed in?</h2>
 
     <div class="filters__section">
 
       <div class="filters__section__input-container">
         <div class="filters__section__input-wrapper">
-          <input class="filters__section__input" :placeholder="companySearchPlaceholder" v-model="companyName">
+          <input class="filters__section__input" :placeholder="statePlaceholder" v-model="stateName">
         </div>
       </div>
 
+      <div class="signup__section__queries">
+        <button class="signup__section__query-button" v-for="state in $store.state.signUpInfo.states" @click="removeQuery(state)">{{state.name}}</button>
+      </div>
+
       <ul class="filters__section__list filters--margin">
-        <li v-for="company in filterBy(companies, companyName, 'name')" @click="selectCompany(company)" :class="[{ 'filters__section__list__item--selected':company.active },'filters__section__list__item']">{{company.name}}</li>
+        <li v-for="state in filterBy(states, stateName, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected':state.active },'filters__section__list__item']">{{state.name.name}}</li>
       </ul>
     </div>
 
-    <router-link to="/signup/states" class="signup__section__button">Continue</router-link>
+    <router-link to="/signup/cities" class="signup__section__button">Continue</router-link>
 
   </div>
 </template>
@@ -27,35 +31,56 @@ export default {
   name: 'companies',
   data() {
     return {
-      companySearchPlaceholder: 'Search By Company',
-      companies: [],
-      companyName: '',
+      statePlaceholder: 'Search By State',
+      states: [],
+      stateName: '',
     };
   },
   mounted() {
-    this.getCompanies();
+    this.getStates().then(() => {
+      this.makeStatesActive();
+    });
   },
   methods: {
     /*
       Get list of state that a user can search by
     */
-    getCompanies() {
+    getStates() {
       return new Promise((resolve, reject) => {
-        fetch(`${config.api}/search/companies`).then((data, err) => {
+        fetch(`${config.api}/search/states`).then((data, err) => {
           if (err) {
-            reject('Something went wrong fetching companies');
+            reject('Something went wrong fetching states');
           }
-          data.json().then((companies) => {
-            const newCompanies = [];
+          data.json().then((states) => {
+            const newStates = [];
             /* eslint-disable */
-            companies.forEach((company) => {
-              newCompanies.push({name: company, active: false});
+            states.forEach((state) => {
+              newStates.push({name: state, active: false});
             });
             /* eslint-enable */
-            this.companies = newCompanies;
-            resolve(this.companies);
+            this.states = newStates;
+            resolve(this.states);
           });
         });
+      });
+    },
+    /*
+      Removes element from query and performs a new search
+    */
+    removeQuery(item) {
+      if (this.$store.state.signUpInfo.states.includes(item)) {
+        this.$store.state.signUpInfo.states.splice(
+          this.$store.state.signUpInfo.states.indexOf(item), 1);
+      } else {
+        this.$store.state.signUpInfo.states.push(item);
+      }
+
+      this.states.forEach((state) => {
+        /* eslint-disable */
+        if (state.name === item) {
+          state.active = !state.active;
+        }
+        /* eslint-enable */
       });
     },
     /*
@@ -63,14 +88,37 @@ export default {
       if the selected state is tapped again, clear the values
       @param {object} - selected item
     */
-    selectCompany(item) {
-      this.companies.forEach((company) => {
+    selectState(item) {
+      /* TODO: make this whole component use an object instead
+
+        currently its an array, need {name: partylite, area: etc}
+        and still be able to loop through that
+
+
+      /* if the item isn't in the list, add it, otherwise remove it */
+      if (this.$store.state.signUpInfo.states.includes(item.name)) {
+        this.$store.state.signUpInfo.states.splice(
+          this.$store.state.signUpInfo.states.indexOf(item.name), 1);
+      } else {
+        this.$store.state.signUpInfo.states.push(item.name);
+      }
+
+      this.states.forEach((state) => {
         /* eslint-disable */
-        if (company.name === item.name) {
-          company.active = !company.active;
-          this.$store.commit('updateSignUpInfoCompany', company.name);
-        } else{
-          company.active = false;
+        if (state.name === item.name) {
+          state.active = !state.active;
+        }
+        /* eslint-enable */
+      });
+    },
+    /*
+      Selects companies that are already in the store on page load
+    */
+    makeStatesActive() {
+      this.states.forEach((state) => {
+        /* eslint-disable */
+        if (this.$store.state.signUpInfo.states.includes(state.name)) {
+          state.active = !state.active;
         }
         /* eslint-enable */
       });

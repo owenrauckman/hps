@@ -38,7 +38,8 @@ export default new Vuex.Store({
       { name: 'industry', active: false },
     ],
     signUpInfo: {
-      companies: [],
+      company: '',
+      states: [],
     },
   },
   mutations: {
@@ -67,6 +68,9 @@ export default new Vuex.Store({
       state.loadingResults = loadingResults;
     },
     /* -- END HOME PAGE MUTATIONS -- */
+    updateSignUpInfoCompany(state, company){
+      state.signUpInfo.company = company;
+    },
 
     /* eslint-enable */
   },
