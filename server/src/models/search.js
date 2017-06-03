@@ -169,6 +169,30 @@ module.exports = class SearchModel{
   }
 
   /*
+    Checks to see if premium city/state listings are taken for a given company
+    @params {string} - company
+    @params {string} - state
+    @params {array} - array of objects containing {state (abbr), cities}
+  */
+  checkForPremiumStates(params){
+
+    return new Promise((resolve, reject)=>{
+      User.aggregate(
+        { $unwind: "$company.areasServed" },
+        { $match: {$and: [ {"company.areasServed.ownsPremium" : true}, {"company.areasServed.state": params.state }, {"company.name": { $regex : params.company, $options : 'i' }} ] } },
+        (err, users)=>{
+          if(err){
+            reject({err: err.message});
+          }
+
+          /* return the length, check if its greater than 1 bool */
+          resolve({length: users.length});
+        }
+      )
+    });
+  }
+
+  /*
     Takes a company name and relates it back to the given industry
     @params {string} - the URL param (already passed in as params.industry)
   */
