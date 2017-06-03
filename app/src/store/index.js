@@ -38,8 +38,29 @@ export default new Vuex.Store({
       { name: 'industry', active: false },
     ],
     signUpInfo: {
-      company: '',
       states: [],
+      cities: [],
+      firstName: '',
+      lastName: '',
+      username: '',
+      password: '',
+      phoneNumber: '',
+      profilePicture: '',
+      company: {
+        name: '',
+        aboutCompany: '',
+        aboutMe: '',
+        areasServed: [],
+        links: {
+          website: '',
+          facebook: '',
+          twitter: '',
+          instagram: '',
+          pinterest: '',
+          youtube: '',
+        },
+      },
+
     },
   },
   mutations: {
@@ -69,7 +90,7 @@ export default new Vuex.Store({
     },
     /* -- END HOME PAGE MUTATIONS -- */
     updateSignUpInfoCompany(state, company){
-      state.signUpInfo.company = company;
+      state.signUpInfo.company.name = company;
     },
 
     /* eslint-enable */

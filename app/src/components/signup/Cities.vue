@@ -1,25 +1,29 @@
 <template>
   <div class="signup__section">
-    <h2 class="signup__section__heading">What states do you want to be listed in?</h2>
+    <h2 class="signup__section__heading">What cities do you want to be listed in?</h2>
 
     <div class="filters__section">
 
+      <div class="signup__section__queries">
+        <button :class="[{ 'signup__section__query-button--active':state.active },'signup__section__query-button']" v-for="state in $store.state.signUpInfo.states" @click="selectState(state)">{{state.name.name}}</button>
+      </div>
+
       <div class="filters__section__input-container">
         <div class="filters__section__input-wrapper">
-          <input class="filters__section__input" :placeholder="statePlaceholder" v-model="stateName">
+          <input class="filters__section__input" :placeholder="cityPlaceholder" v-model="cityName">
         </div>
       </div>
 
       <div class="signup__section__queries">
-        <button class="signup__section__query-button" v-for="state in $store.state.signUpInfo.states" @click="removeQuery(state)">{{state.name.name}}</button>
+        <button class="signup__section__query-button signup__section__query-button--remove" v-for="city in $store.state.signUpInfo.cities" @click="removeCity(city)">{{city}}</button>
       </div>
 
       <ul class="filters__section__list filters--margin">
-        <li v-for="state in filterBy(states, stateName, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected':state.active },'filters__section__list__item']">{{state.name.name}}</li>
+        <li v-for="city in filterBy(cities, cityName, 'name')" @click="selectCity(city)" :class="[{ 'filters__section__list__item--selected':city.active },'filters__section__list__item']">{{city.name}}</li>
       </ul>
     </div>
 
-    <router-link to="/signup/cities" class="signup__section__button">Continue</router-link>
+    <router-link to="/signup/premium" class="signup__section__button">Continue</router-link>
 
   </div>
 </template>
@@ -31,35 +35,33 @@ export default {
   name: 'companies',
   data() {
     return {
-      statePlaceholder: 'Search By State',
-      states: [],
-      stateName: '',
+      cityPlaceholder: 'Search By City',
+      cities: [],
+      cityName: '',
     };
   },
   mounted() {
-    this.getStates().then(() => {
-      this.makeStatesActive();
-    });
+    this.getCities(this.$store.state.signUpInfo.states[0].name.abbr);
   },
   methods: {
     /*
       Get list of state that a user can search by
     */
-    getStates() {
+    getCities(state) {
       return new Promise((resolve, reject) => {
-        fetch(`${config.api}/search/states`).then((data, err) => {
+        fetch(`${config.api}/search/cities?state=${state}`).then((data, err) => {
           if (err) {
-            reject('Something went wrong fetching states');
+            reject('Something went wrong fetching cities');
           }
-          data.json().then((states) => {
-            const newStates = [];
+          data.json().then((cities) => {
+            const newCities = [];
             /* eslint-disable */
-            states.forEach((state) => {
-              newStates.push({name: state, active: false});
+            cities.forEach((city) => {
+              newCities.push({name: city, active: false});
             });
             /* eslint-enable */
-            this.states = newStates;
-            resolve(this.states);
+            this.cities = newCities;
+            resolve(this.cities);
           });
         });
       });
@@ -67,61 +69,62 @@ export default {
     /*
       Removes element from query and performs a new search
     */
-    removeQuery(item) {
-      if (this.stateExists(this.$store.state.signUpInfo.states, item)) {
-        this.$store.state.signUpInfo.states.splice(
-          this.$store.state.signUpInfo.states.indexOf(item), 1);
-      } else {
-        this.$store.state.signUpInfo.states.push({ name: item, active: false });
-      }
-
-      this.states.forEach((state) => {
+    selectState(item) {
+      this.$store.state.signUpInfo.states.forEach((state) => {
         /* eslint-disable */
-        if (state.name === item.name) {
+        if (state.name.name === item.name.name) {
           state.active = !state.active;
+          this.getCities(state.name.abbr);
+        } else{
+          state.active = false;
         }
         /* eslint-enable */
       });
-    },
-
-    /*
-      Checks to see if an object exists in array
-      @param {array} - list of states to check against
-      @param {object} - the object that is being checked
-    */
-    stateExists(arr, state) {
-      return arr.some(el => el.name === state.name);
     },
     /*
       Select a state from the listand set the value in the store
       if the selected state is tapped again, clear the values
       @param {object} - selected item
     */
-    selectState(item) {
+    selectCity(item) {
+      /* TODO: make this whole component use an object instead
+
+        currently its an array, need {name: partylite, area: etc}
+        and still be able to loop through that
+
+
       /* if the item isn't in the list, add it, otherwise remove it */
-      if (this.stateExists(this.$store.state.signUpInfo.states, item)) {
-        this.$store.state.signUpInfo.states.splice(
-          this.$store.state.signUpInfo.states.indexOf(item), 1);
+      if (this.$store.state.signUpInfo.cities.includes(item.name)) {
+        this.$store.state.signUpInfo.cities.splice(
+          this.$store.state.signUpInfo.cities.indexOf(item.name), 1);
       } else {
-        this.$store.state.signUpInfo.states.push({ name: item.name, active: false });
+        this.$store.state.signUpInfo.cities.push(item.name);
       }
 
-      this.states.forEach((state) => {
+      this.cities.forEach((city) => {
         /* eslint-disable */
-        if (state.name === item.name) {
-          state.active = !state.active;
+        if (city.name === item.name) {
+          city.active = !city.active;
         }
         /* eslint-enable */
       });
     },
+
     /*
-      Selects companies that are already in the store on page load
+      Removes element from query and performs a new search
     */
-    makeStatesActive() {
-      this.states.forEach((state) => {
+    removeCity(item) {
+      if (this.$store.state.signUpInfo.cities.includes(item)) {
+        this.$store.state.signUpInfo.cities.splice(
+          this.$store.state.signUpInfo.cities.indexOf(item), 1);
+      } else {
+        this.$store.state.signUpInfo.cities.push(item);
+      }
+
+      this.cities.forEach((city) => {
         /* eslint-disable */
-        if (this.$store.state.signUpInfo.states.includes(state.name)) {
-          state.active = !state.active;
+        if (city.name === item) {
+          city.active = !city.active;
         }
         /* eslint-enable */
       });
@@ -171,7 +174,7 @@ export default {
   }
   &__query-button{
     border: solid 1px $gray-light;
-    padding: 0.5rem 2rem 0.5rem 1rem;
+    padding: 0.5rem 1rem;
     border-radius: $round-radius;
     color: $gray-medium;
     position: relative;
@@ -179,16 +182,24 @@ export default {
     margin: 0.5rem;
     display: block;
     flex: 0 0 auto;
-    &:after{
-      position: absolute;
-      content: '';
-      height: 15px;
-      width: 15px;
-      top: 50%;
-      right: 0.5rem;
-      transform: translateY(-50%);
-      background: url('../../../static/svg/close-dark.svg');
-      transition: background 0.25s ease-in-out;
+    &--remove{
+      padding: 0.5rem 2rem 0.5rem 1rem;
+      &:after{
+        position: absolute;
+        content: '';
+        height: 15px;
+        width: 15px;
+        top: 50%;
+        right: 0.5rem;
+        transform: translateY(-50%);
+        background: url('../../../static/svg/close-dark.svg');
+        transition: background 0.25s ease-in-out;
+      }
+    }
+    &--active{
+      border: solid 1px transparent;
+      background: $blue;
+      color: $white;
     }
     &:hover{
       background: $gray-light;
