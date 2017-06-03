@@ -7,6 +7,7 @@ import PersonalInfo from '@/components/signup/PersonalInfo';
 import Companies from '@/components/signup/Companies';
 import States from '@/components/signup/States';
 import Cities from '@/components/signup/Cities';
+import Premium from '@/components/signup/Premium';
 
 Vue.use(Router);
 
@@ -44,6 +45,11 @@ export default new Router({
           name: 'cities',
           path: 'cities',
           component: Cities,
+        },
+        {
+          name: 'premium',
+          path: 'premium',
+          component: Premium,
         },
       ],
     },
