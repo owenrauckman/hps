@@ -4,17 +4,20 @@
 
     <div class="filters__section">
 
+      <!-- input to filter companies -->
       <div class="filters__section__input-container">
         <div class="filters__section__input-wrapper">
           <input class="filters__section__input" :placeholder="companySearchPlaceholder" v-model="companyName">
         </div>
       </div>
 
+      <!-- show list of possible companies -->
       <ul class="filters__section__list filters--margin">
         <li v-for="company in filterBy(companies, companyName, 'name')" @click="selectCompany(company)" :class="[{ 'filters__section__list__item--selected':company.active },'filters__section__list__item']">{{company.name}}</li>
       </ul>
     </div>
 
+    <!-- link to next page in process -->
     <router-link to="/signup/states" class="signup__section__button">Continue</router-link>
 
   </div>

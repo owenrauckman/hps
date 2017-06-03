@@ -4,21 +4,25 @@
 
     <div class="filters__section">
 
+      <!-- input to filter states -->
       <div class="filters__section__input-container">
         <div class="filters__section__input-wrapper">
           <input class="filters__section__input" :placeholder="statePlaceholder" v-model="stateName">
         </div>
       </div>
 
+      <!-- list selected states -->
       <div class="signup__section__queries">
         <button class="signup__section__query-button" v-for="state in $store.state.signUpInfo.states" @click="removeQuery(state)">{{state.name.name}}</button>
       </div>
 
+      <!-- list possible states -->
       <ul class="filters__section__list filters--margin">
         <li v-for="state in filterBy(states, stateName, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected':state.active },'filters__section__list__item']">{{state.name.name}}</li>
       </ul>
     </div>
 
+    <!-- link to next page in process -->
     <router-link to="/signup/cities" class="signup__section__button">Continue</router-link>
 
   </div>

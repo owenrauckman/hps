@@ -1,28 +1,33 @@
 <template>
   <div class="signup__section">
-    <h2 class="signup__section__heading">What cities do you want to be listed in?</h2>
+    <h2 class="signup__section__heading">What cities do you want to be listed in for *each state*?</h2>
 
     <div class="filters__section">
 
+      <!-- list out possible states, make first active by default -->
       <div class="signup__section__queries">
-        <button :class="[{ 'signup__section__query-button--active':state.active },'signup__section__query-button']" v-for="state in $store.state.signUpInfo.states" @click="selectState(state)">{{state.name.name}}</button>
+        <button :class="[{ 'signup__section__query-button--active':state.active || state.name.name === activeState },'signup__section__query-button']" v-for="state in $store.state.signUpInfo.states" @click="selectState(state)">{{state.name.name}}</button>
       </div>
 
+      <!-- filter cities -->
       <div class="filters__section__input-container">
         <div class="filters__section__input-wrapper">
           <input class="filters__section__input" :placeholder="cityPlaceholder" v-model="cityName">
         </div>
       </div>
 
+      <!-- list selected cities, conditionally by which state is active -->
       <div class="signup__section__queries">
-        <button class="signup__section__query-button signup__section__query-button--remove" v-for="city in $store.state.signUpInfo.cities" @click="removeCity(city)">{{city}}</button>
+        <button class="signup__section__query-button signup__section__query-button--remove" v-for="city in $store.state.signUpInfo.cities" v-if="city.state === activeState" @click="removeCity(city)">{{city.city}}</button>
       </div>
 
+      <!-- list the cities in a state with conditional active checks -->
       <ul class="filters__section__list filters--margin">
         <li v-for="city in filterBy(cities, cityName, 'name')" @click="selectCity(city)" :class="[{ 'filters__section__list__item--selected':city.active },'filters__section__list__item']">{{city.name}}</li>
       </ul>
     </div>
 
+    <!-- link to next page in process -->
     <router-link to="/signup/premium" class="signup__section__button">Continue</router-link>
 
   </div>
@@ -32,16 +37,18 @@
 const config = require('../../../config/appConfig.json');
 
 export default {
-  name: 'companies',
+  name: 'cities',
   data() {
     return {
       cityPlaceholder: 'Search By City',
       cities: [],
       cityName: '',
+      activeState: '',
     };
   },
   mounted() {
     this.getCities(this.$store.state.signUpInfo.states[0].name.abbr);
+    this.activeState = this.$store.state.signUpInfo.states[0].name.name;
   },
   methods: {
     /*
@@ -66,6 +73,16 @@ export default {
         });
       });
     },
+
+    /*
+      Checks to see if an object exists in array
+      @param {array} - list of cities to check against
+      @param {object} - the object that is being checked
+    */
+    cityExists(arr, city) {
+      return arr.some(el => el.city === city.city);
+    },
+
     /*
       Removes element from query and performs a new search
     */
@@ -74,31 +91,40 @@ export default {
         /* eslint-disable */
         if (state.name.name === item.name.name) {
           state.active = !state.active;
-          this.getCities(state.name.abbr);
+          if(state.active === true){
+            this.activeState = state.name.name;
+          }
+          this.getCities(state.name.abbr).then(()=>{
+            /* give the appropriate cities in the list the active class*/
+            this.makeCitiesActive();
+          });
         } else{
           state.active = false;
         }
         /* eslint-enable */
       });
     },
+
     /*
       Select a state from the listand set the value in the store
       if the selected state is tapped again, clear the values
       @param {object} - selected item
     */
     selectCity(item) {
-      /* TODO: make this whole component use an object instead
-
-        currently its an array, need {name: partylite, area: etc}
-        and still be able to loop through that
-
+      /* need to reconstruct an object to have the same keys of {city, state} */
+      const objectToCheckAgainst = { city: item.name, state: this.activeState };
 
       /* if the item isn't in the list, add it, otherwise remove it */
-      if (this.$store.state.signUpInfo.cities.includes(item.name)) {
-        this.$store.state.signUpInfo.cities.splice(
-          this.$store.state.signUpInfo.cities.indexOf(item.name), 1);
+      if (this.cityExists(this.$store.state.signUpInfo.cities, objectToCheckAgainst)) {
+        /* need to get the position of an object in an array with map */
+        const pos = this.$store.state.signUpInfo.cities.map(e => e.city).indexOf(item.name);
+        this.$store.state.signUpInfo.cities.splice(pos, 1);
       } else {
-        this.$store.state.signUpInfo.cities.push(item.name);
+        /* before we push, put it in an object with the state name */
+        this.$store.state.signUpInfo.cities.push({
+          state: this.activeState,
+          city: item.name,
+        });
       }
 
       this.cities.forEach((city) => {
@@ -114,16 +140,34 @@ export default {
       Removes element from query and performs a new search
     */
     removeCity(item) {
-      if (this.$store.state.signUpInfo.cities.includes(item)) {
-        this.$store.state.signUpInfo.cities.splice(
-          this.$store.state.signUpInfo.cities.indexOf(item), 1);
-      } else {
-        this.$store.state.signUpInfo.cities.push(item);
+      /* need to reconstruct an object to have the same keys of {city, state} */
+      const objectToCheckAgainst = { city: item.city, state: this.activeState };
+
+      /* if the item isn't in the list, add it, otherwise remove it */
+      if (this.cityExists(this.$store.state.signUpInfo.cities, objectToCheckAgainst)) {
+        /* need to get the position of an object in an array with map */
+        const pos = this.$store.state.signUpInfo.cities.map(e => e.city).indexOf(item.city);
+        this.$store.state.signUpInfo.cities.splice(pos, 1);
       }
 
       this.cities.forEach((city) => {
         /* eslint-disable */
-        if (city.name === item) {
+        if (city.name === item.city) {
+          city.active = !city.active;
+        }
+        /* eslint-enable */
+      });
+    },
+
+    /*
+      Selects cities that are already in the store on load or toggle change
+    */
+    makeCitiesActive() {
+      this.cities.forEach((city) => {
+        /* need to reconstruct an object to have the same keys of {city, state} */
+        const objectToCheckAgainst = { city: city.name, state: this.activeState };
+        /* eslint-disable */
+        if (this.cityExists(this.$store.state.signUpInfo.cities, objectToCheckAgainst)) {
           city.active = !city.active;
         }
         /* eslint-enable */

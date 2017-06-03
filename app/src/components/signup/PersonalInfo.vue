@@ -25,6 +25,7 @@
       </div>
     </div>
 
+    <!-- link to next page in process -->
     <router-link to="/signup/companies" class="signup__section__button">Continue</router-link>
 
   </div>
