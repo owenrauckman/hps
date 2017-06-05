@@ -33,8 +33,8 @@ router.get('/premium', function(req, res){
   Search.searchPremium().then(res.send.bind(res));
 });
 
-router.get('/omg', function(req, res){
-  Search.checkForPremiumStates(req.query).then( res.send.bind(res) );
+router.get('/checkPremium', function(req, res){
+  Search.checkForPremium(req.query).then( res.send.bind(res) );
 });
 
 module.exports = router

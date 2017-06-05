@@ -169,27 +169,54 @@ module.exports = class SearchModel{
   }
 
   /*
-    Checks to see if premium city/state listings are taken for a given company
+    Checks to see if premium city/state listings are taken for a given company based on the following criteria.
+    Mongo Aggregate unpacks each item in array to get the exact truthy value
     @params {string} - company
     @params {string} - state
-    @params {array} - array of objects containing {state (abbr), cities}
+    @params {string} - city
   */
-  checkForPremiumStates(params){
-
-    return new Promise((resolve, reject)=>{
-      User.aggregate(
-        { $unwind: "$company.areasServed" },
-        { $match: {$and: [ {"company.areasServed.ownsPremium" : true}, {"company.areasServed.state": params.state }, {"company.name": { $regex : params.company, $options : 'i' }} ] } },
-        (err, users)=>{
-          if(err){
-            reject({err: err.message});
+  checkForPremium(params){
+    let premiumQuery;
+    /* run a different query and unwind an extra array if searching by city */
+    if(params.city){
+      // todo ON BOTH QUERIES remove regex for cities, companies, states to ensure no faulty listings
+      premiumQuery = [ {"company.areasServed.state": params.state }, { "company.areasServed.cities" : { $elemMatch : { city: { $regex : params.city, $options : 'i' }, ownsPremium: true } } }, {"company.name": { $regex : params.company, $options : 'i' }}];
+      return new Promise((resolve, reject)=>{
+        User.aggregate(
+          { $match: {$and: premiumQuery } },
+          { $unwind: "$company.areasServed" },
+          { $unwind: "$company.areasServed.cities" },
+          (err, users)=>{
+            if(err){
+              reject({err: err.message});
+            }
+            if(users && users.length > 0){
+              resolve({premiumAvailable: false});
+            } else{
+              resolve({premiumAvailable: true});
+            }
           }
-
-          /* return the length, check if its greater than 1 bool */
-          resolve({length: users.length});
-        }
-      )
-    });
+        )
+      });
+    } else{
+      premiumQuery = [ {"company.areasServed.ownsPremium" : true}, {"company.areasServed.state": params.state }, {"company.name": { $regex : params.company, $options : 'i' }} ]
+      return new Promise((resolve, reject)=>{
+        User.aggregate(
+          { $unwind: "$company.areasServed" },
+          { $match: {$and: premiumQuery } },
+          (err, users)=>{
+            if(err){
+              reject({err: err.message});
+            }
+            if(users && users.length > 0){
+              resolve({premiumAvailable: false});
+            } else{
+              resolve({premiumAvailable: true});
+            }
+          }
+        )
+      });
+    }
   }
 
   /*

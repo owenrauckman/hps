@@ -10,6 +10,7 @@
 </template>
 
 <script>
+const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'premium',
@@ -17,6 +18,44 @@ export default {
     return {
     };
   },
+  beforeMount() {
+    console.log('----- STATES -----');
+    this.$store.state.signUpInfo.states.forEach((state) => {
+      this.checkPremium(
+      this.$store.state.signUpInfo.company.name,
+      state.name.abbr,
+      ).then((response) => {
+        // todo set this.statesAvailable for this
+        console.log(`${state.name.abbr} : ${response.premiumAvailable}`);
+      });
+    });
+  },
+  methods: {
+    checkPremium(company, state, city) {
+      /* Build the URL based on state or city */
+      let url;
+      if (city) {
+        url = `${config.api}/search/checkPremium?` +
+        `company=${company}&state=${state}&city=${city}`;
+      } else {
+        url = `${config.api}/search/checkPremium?` +
+        `company=${company}&state=${state}`;
+      }
+
+      /* perform the request */
+      return new Promise((resolve, reject) => {
+        fetch(url).then((data, err) => {
+          if (err) {
+            reject('Something went wrong fetching cities');
+          }
+          data.json().then((json) => {
+            resolve(json);
+          });
+        });
+      });
+    },
+  },
+
 };
 </script>
 
