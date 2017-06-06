@@ -2,6 +2,11 @@
   <div class="signup__section">
     <h2 class="signup__section__heading">Choose Which Areas You Want Premium In</h2>
 
+    <h1>States Avaialable</h1>
+    <p v-for="state in premiumStates">{{state.state}} : {{state.premiumAvailable}}</p>
+
+    <h1>Cities Avaialable</h1>
+    <p v-for="city in premiumCities">{{city.city}} : {{city.premiumAvailable}}</p>
     <!-- link to next page in process -->
     <router-link to="/signup/pay" class="signup__section__button">Continue</router-link>
     <!-- todo ELSE add route to success if the total is 0 and sign them up -->
@@ -16,18 +21,38 @@ export default {
   name: 'premium',
   data() {
     return {
+      premiumStates: [],
+      premiumCities: [],
     };
   },
   beforeMount() {
-    console.log('----- STATES -----');
     this.$store.state.signUpInfo.states.forEach((state) => {
       this.checkPremium(
       this.$store.state.signUpInfo.company.name,
       state.name.abbr,
-      ).then((response) => {
-        // todo set this.statesAvailable for this
-        console.log(`${state.name.abbr} : ${response.premiumAvailable}`);
+    ).then((stateResponse) => {
+      this.premiumStates.push({
+        state: state.name.abbr,
+        premiumAvailable: stateResponse.premiumAvailable,
       });
+      console.log(`${state.name.abbr} : ${stateResponse.premiumAvailable}`);
+
+      this.$store.state.signUpInfo.cities.forEach((city) => {
+        if (city.state === state.name.name) {
+          this.checkPremium(
+            this.$store.state.signUpInfo.company.name,
+            state.name.abbr,
+            city.city,
+          ).then((cityResponse) => {
+            this.premiumCities.push({
+              city: city.city,
+              premiumAvailable: cityResponse.premiumAvailable,
+            });
+            console.log(`${city.city} : ${cityResponse.premiumAvailable}`);
+          });
+        }
+      });
+    });
     });
   },
   methods: {
@@ -36,10 +61,10 @@ export default {
       let url;
       if (city) {
         url = `${config.api}/search/checkPremium?` +
-        `company=${company}&state=${state}&city=${city}`;
+        `company=${encodeURI(company)}&state=${state}&city=${encodeURI(city)}`;
       } else {
         url = `${config.api}/search/checkPremium?` +
-        `company=${company}&state=${state}`;
+        `company=${encodeURI(company)}&state=${encodeURI(state)}`;
       }
 
       /* perform the request */
