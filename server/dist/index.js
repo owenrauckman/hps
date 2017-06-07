@@ -58,7 +58,7 @@ var db = _mongoose2.default.connection;
 
 // Initialize App
 var app = module.exports = (0, _express2.default)();
-app.use(_bodyParser2.default.urlencoded({ extended: false }));
+app.use(_bodyParser2.default.urlencoded({ extended: true }));
 app.use(_bodyParser2.default.json({}));
 
 // --- Cors allows for Auth to work across different ports

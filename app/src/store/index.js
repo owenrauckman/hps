@@ -40,6 +40,7 @@ export default new Vuex.Store({
     signUpInfo: {
       states: [],
       cities: [],
+      totalPrice: 0,
       firstName: '',
       lastName: '',
       username: '',

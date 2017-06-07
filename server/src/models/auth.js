@@ -47,6 +47,7 @@ module.exports = class Auth{
     @params {req, res, next} - Request Data contains user info
   */
   registerUser(req, res, err){
+
     if(!req.body.emailAddress || !req.body.password || !req.body.firstName || !req.body.lastName || !req.body.username){
       return res.json({ sucess: false, message: config.auth.minimumRequirements});
     }
@@ -75,11 +76,13 @@ module.exports = class Auth{
             return res.json({message: config.errors.stripeError});
           }
           newUser = new UserModel({
-            username: req.body.username.replace(/ /g,''),
-            password: req.body.password,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
+            username: req.body.username.replace(/ /g,''),
+            password: req.body.password,
             emailAddress: req.body.emailAddress,
+            company: req.body.company,
+
             stripeId: customer.id
             /* todo: all additional User Info Here */
           });
@@ -93,8 +96,8 @@ module.exports = class Auth{
             /* By default sign them up for all plans (quantity 0) */
             items: [
               { plan: "basic", quantity: 9 },
-              { plan: "pro", quantity: 2,},
-              { plan: "premium", quantity: 1}
+              { plan: "pro", quantity: 0,}, //todo pass these in the user object!!!!!
+              { plan: "premium", quantity: 0}
             ]
           }).then((subscription, err) =>{
             if(err){

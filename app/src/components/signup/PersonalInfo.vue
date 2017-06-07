@@ -3,22 +3,22 @@
     <h2 class="signup__section__heading">Personal Information</h2>
     <div class="signup__section__form">
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" type="text" placeholder="*First Name"/>
+        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.firstName" type="text" placeholder="*First Name"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" type="text" placeholder="*Last Name"/>
+        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.lastName" type="text" placeholder="*Last Name"/>
       </div>
       <div class="signup__section__form--full">
-        <input class="signup__section__form__input" type="text" placeholder="*Username"/>
+        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.username" type="text" placeholder="*Username"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" type="email" placeholder="*Email Address"/>
+        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.emailAddress" type="email" placeholder="*Email Address"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" type="tel" placeholder="*Phone Number"/>
+        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.phoneNumber" type="tel" placeholder="*Phone Number"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" type="password" placeholder="*Password"/>
+        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.password" type="password" placeholder="*Password"/>
       </div>
       <div class="signup__section__form--half">
         <input class="signup__section__form__input" type="password" placeholder="*Repeat Password"/>

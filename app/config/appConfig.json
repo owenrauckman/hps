@@ -1,3 +1,5 @@
 {
-  "api": "http://localhost:3000/api"
+  "api": "http://localhost:3000/api",
+  "cityPrice": 5,
+  "statePrice": 50
 }

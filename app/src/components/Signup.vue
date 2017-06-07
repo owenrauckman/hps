@@ -13,7 +13,8 @@
           </div>
           <div class="signup__cost">
             <p class="signup__cost__copy">Your monthly subscription fee is: </p>
-            <p class="signup__cost__price">Free</p>
+            <p class="signup__cost__price" v-if="this.$store.state.signUpInfo.totalPrice <= 0">Free</p>
+            <p class="signup__cost__price" v-else>${{this.$store.state.signUpInfo.totalPrice}}</p>
           </div>
         </div>
       </div>
