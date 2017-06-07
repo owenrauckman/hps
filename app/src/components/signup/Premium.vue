@@ -169,6 +169,7 @@ export default {
 
         console.log(signUpInfo);
 
+        // todo: ADD nums for premiumTypes to sign up Object (auth.js in express)
         axios.post(`${config.api}/users/register`, signUpInfo)
           .then((response) => {
             console.log(response);
