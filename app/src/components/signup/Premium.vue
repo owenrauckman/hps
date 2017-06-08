@@ -36,6 +36,9 @@ export default {
     return {
       chosenStates: [],
       chosenCities: [],
+      basicPlans: 0,
+      proPlans: 0,
+      premiumPlans: 0,
     };
   },
   beforeMount() {
@@ -130,10 +133,26 @@ export default {
         object populates before redirect
       */
       const setCompanies = new Promise((resolve) => {
+        /* reset plan counts each time in case they have been updated */
+        this.basicPlans = 0;
+        this.proPlans = 0;
+        this.premiumPlans = 0;
+
         this.chosenStates.forEach((state) => {
+          /* check if they want premium */
+          if (state.premium) {
+            this.premiumPlans += 1;
+          } else {
+            this.basicPlans += 1;
+          }
           const cities = [];
           this.chosenCities.forEach((city) => {
             if (city.state === state.name) {
+              if (city.premium) {
+                this.proPlans += 1;
+              } else {
+                this.basicPlans += 1;
+              }
               cities.push({
                 city: city.city,
                 ownsPremium: city.premium,
@@ -153,32 +172,39 @@ export default {
       });
 
       setCompanies.then(() => {
-        /* after the object is created redirect to /signup/pay */
-        /* todo: add conditional to check price and skip payment if 0 */
-        /* todo: also, add a reset on this page for back buton state */
-        const storeData = this.$store.state.signUpInfo;
-        console.log(storeData);
-        const signUpInfo = {
-          firstName: storeData.firstName,
-          lastName: storeData.lastName,
-          username: storeData.username,
-          password: storeData.password,
-          emailAddress: storeData.emailAddress,
-          company: storeData.company,
-        };
+        if (this.proPlans > 0 || this.premiumPlans > 0) {
+          /* redirect to payment */
+          this.$router.push('/signup/pay');
+          /* otherwise go ahead and sign them up */
+        } else {
+          /* after the object is created redirect to /signup/pay */
+          /* todo: add conditional to check price and skip payment if 0 */
+          /* todo: also, add a reset on this page for back buton state */
+          const storeData = this.$store.state.signUpInfo;
+          console.log(storeData);
+          const signUpInfo = {
+            firstName: storeData.firstName,
+            lastName: storeData.lastName,
+            username: storeData.username,
+            password: storeData.password,
+            emailAddress: storeData.emailAddress,
+            company: storeData.company,
+            basicPlans: this.basicPlans,
+            proPlans: this.proPlans,
+            premiumPlans: this.premiumPlans,
+          };
 
-        console.log(signUpInfo);
+          console.log(signUpInfo);
 
-        // todo: ADD nums for premiumTypes to sign up Object (auth.js in express)
-        axios.post(`${config.api}/users/register`, signUpInfo)
-          .then((response) => {
-            console.log(response);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-
-        /* todo uncomment this //this.$router.push('/signup/pay'); */
+          // todo: ADD nums for premiumTypes to sign up Object (auth.js in express)
+          axios.post(`${config.api}/users/register`, signUpInfo)
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
       });
     },
   },

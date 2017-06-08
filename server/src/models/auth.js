@@ -88,6 +88,10 @@ module.exports = class Auth{
           });
           return customer;
         }).then((customer) =>{
+          /* todo remove these */
+          console.log('basic: ' + req.body.basicPlans);
+          console.log('pro: ' + req.body.proPlans);
+          console.log('premium: ' + req.body.premiumPlans);
           stripe.subscriptions.create({
             customer: customer.id,
             /* This is Generated from the stripe.js form */
@@ -95,9 +99,9 @@ module.exports = class Auth{
 
             /* By default sign them up for all plans (quantity 0) */
             items: [
-              { plan: "basic", quantity: 9 },
-              { plan: "pro", quantity: 0,}, //todo pass these in the user object!!!!!
-              { plan: "premium", quantity: 0}
+              { plan: "basic", quantity: req.body.basicPlans },
+              { plan: "pro", quantity: req.body.proPlans,}, //todo pass these in the user object!!!!!
+              { plan: "premium", quantity: req.body.premiumPlans}
             ]
           }).then((subscription, err) =>{
             if(err){
