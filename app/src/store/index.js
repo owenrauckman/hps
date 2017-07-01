@@ -47,6 +47,9 @@ export default new Vuex.Store({
       password: '',
       phoneNumber: '',
       profilePicture: '',
+      basicPlans: 0,
+      proPlans: 0,
+      premiumPlans: 0,
       company: {
         name: '',
         aboutCompany: '',

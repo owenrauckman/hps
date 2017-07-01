@@ -19,8 +19,10 @@
     </div>
 
     <!-- link to next page in process -->
-    <a v-on:click.prevent="updateAreasServed" class="signup__section__button">Continue</a>
-    <!-- todo ELSE add route to success if the total is 0 and sign them up -->
+    <a v-on:click.prevent="updateAreasServed" class="signup__section__button">
+      <span v-if="this.$store.state.signUpInfo.totalPrice > 0">Continue</span>
+      <span v-else>Sign Up</span>
+    </a>
 
   </div>
 </template>
@@ -173,36 +175,41 @@ export default {
 
       setCompanies.then(() => {
         if (this.proPlans > 0 || this.premiumPlans > 0) {
+          /* before redirecting to payment, add new info to store */
+          this.$store.state.signUpInfo.basicPlans = this.basicPlans;
+          this.$store.state.signUpInfo.proPlans = this.proPlans;
+          this.$store.state.signUpInfo.premiumPlans = this.premiumPlans;
+
           /* redirect to payment */
           this.$router.push('/signup/pay');
           /* otherwise go ahead and sign them up */
         } else {
           /* after the object is created redirect to /signup/pay */
-          /* todo: add conditional to check price and skip payment if 0 */
           /* todo: also, add a reset on this page for back buton state */
           const storeData = this.$store.state.signUpInfo;
-          console.log(storeData);
           const signUpInfo = {
             firstName: storeData.firstName,
             lastName: storeData.lastName,
             username: storeData.username,
             password: storeData.password,
             emailAddress: storeData.emailAddress,
+            phoneNumber: storeData.phoneNumber,
+            profilePicture: storeData.profilePicture,
             company: storeData.company,
             basicPlans: this.basicPlans,
             proPlans: this.proPlans,
             premiumPlans: this.premiumPlans,
           };
-
-          console.log(signUpInfo);
-
-          // todo: ADD nums for premiumTypes to sign up Object (auth.js in express)
           axios.post(`${config.api}/users/register`, signUpInfo)
             .then((response) => {
-              console.log(response);
+              if (response.data.success === true) {
+                this.$router.push('/signup/success');
+              }
             })
             .catch((error) => {
+              /* eslint-disable */
               console.log(error);
+              /* eslint-enable */
             });
         }
       });

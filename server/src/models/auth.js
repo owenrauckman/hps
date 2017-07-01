@@ -82,9 +82,9 @@ module.exports = class Auth{
             password: req.body.password,
             emailAddress: req.body.emailAddress,
             company: req.body.company,
-
+            phoneNumber: req.body.phoneNumber,
+            profilePicture: req.body.profilePicture,
             stripeId: customer.id
-            /* todo: all additional User Info Here */
           });
           return customer;
         }).then((customer) =>{

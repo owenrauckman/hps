@@ -63,7 +63,7 @@
       /* ----- CREATE TOKEN AND SUBMIT ----- */
       // Create a token or display an error the form is submitted.
       var form = document.getElementById('payment-form');
-      form.addEventListener('submit', function(event) {
+      form.addEventListener('submit', function(event) { 
         event.preventDefault();
 
         stripe.createToken(card).then(function(result) {

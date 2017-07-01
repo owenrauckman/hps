@@ -32,26 +32,28 @@
               </div>
             </div>
 
-            <div class="profile__main__details__box profile__main__details__box--blue">
+            <div class="profile__main__details__box profile__main__details__box--blue"
+              v-if="user.company.links.facebook.url || user.company.links.instagram.url || user.company.links.twitter.url || user.company.links.pinterest.url || user.company.links.youtube.url || user.company.links.website.url"
+            >
               <h2 class="profile__main__details__heading profile__main__details__heading--light">Connect With {{user.firstName}}</h2>
 
               <div class="profile__main__details__social">
-                <a v-if="user.company.links.facebook.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.facebook.url">
+                <a v-if="user.company.links.facebook.url" class="profile__main__details__social__icon" :href="user.company.links.facebook.url">
                   <img src="../../static/svg/facebook.svg"/>
                 </a>
-                <a v-if="user.company.links.instagram.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.instagram.url">
+                <a v-if="user.company.links.instagram.url" class="profile__main__details__social__icon" :href="user.company.links.instagram.url">
                   <img src="../../static/svg/instagram.svg"/>
                 </a>
-                <a v-if="user.company.links.twitter.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.twitter.url">
+                <a v-if="user.company.links.twitter.url" class="profile__main__details__social__icon" :href="user.company.links.twitter.url">
                   <img src="../../static/svg/twitter.svg"/>
                 </a>
-                <a v-if="user.company.links.pinterest.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.pinterest.url">
+                <a v-if="user.company.links.pinterest.url" class="profile__main__details__social__icon" :href="user.company.links.pinterest.url">
                   <img src="../../static/svg/pinterest.svg"/>
                 </a>
-                <a v-if="user.company.links.youtube.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.youtube.url">
+                <a v-if="user.company.links.youtube.url" class="profile__main__details__social__icon" :href="user.company.links.youtube.url">
                   <img src="../../static/svg/youtube.svg"/>
                 </a>
-                <a v-if="user.company.links.website.url.length > 1" class="profile__main__details__social__icon" :href="user.company.links.website.url">
+                <a v-if="user.company.links.website.url" class="profile__main__details__social__icon" :href="user.company.links.website.url">
                   <img src="../../static/svg/website.svg"/>
                 </a>
               </div>

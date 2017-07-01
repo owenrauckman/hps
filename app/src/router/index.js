@@ -8,6 +8,8 @@ import Companies from '@/components/signup/Companies';
 import States from '@/components/signup/States';
 import Cities from '@/components/signup/Cities';
 import Premium from '@/components/signup/Premium';
+import Pay from '@/components/signup/Pay';
+import Success from '@/components/signup/Success';
 
 Vue.use(Router);
 
@@ -50,6 +52,16 @@ export default new Router({
           name: 'premium',
           path: 'premium',
           component: Premium,
+        },
+        {
+          name: 'pay',
+          path: 'pay',
+          component: Pay,
+        },
+        {
+          name: 'success',
+          path: 'success',
+          component: Success,
         },
       ],
     },
