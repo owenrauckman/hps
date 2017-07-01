@@ -47,8 +47,8 @@ var UserSchema = _mongoose2.default.Schema({
   profileViews: {
     type: Number
   },
-  companies: {
-    type: Array
+  company: {
+    type: Object
   }
 });
 

@@ -40,16 +40,16 @@ module.exports = function () {
         var searchParameters = []; // add the mongo query to this array
 
         if (params.city && params.state) {
-          searchParameters.push({ "companies.areasServed.cities": { $elemMatch: { city: { $regex: params.city, $options: 'i' } } } });
+          searchParameters.push({ "company.areasServed.cities": { $elemMatch: { city: { $regex: params.city, $options: 'i' } } } });
         } else if (params.state) {
-          searchParameters.push({ "companies.areasServed": { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } });
+          searchParameters.push({ "company.areasServed": { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } });
         } else if (params.city) {
           resolve({ err: _config2.default.defineCity });
         } else {
           resolve({ err: _config2.default.defineLocation });
         }
         if (params.company) {
-          searchParameters.push({ "companies.name": { $regex: params.company, $options: 'i' } });
+          searchParameters.push({ "company.name": { $regex: params.company, $options: 'i' } });
         }
 
         /*
@@ -58,7 +58,7 @@ module.exports = function () {
         */
         if (params.industry) {
           _this.getCompaniesByIndustry(params.industry).then(function (companies) {
-            searchParameters.push({ "companies.name": { $in: companies } });
+            searchParameters.push({ "company.name": { $in: companies } });
           }).then(function (companies) {
             /* Set a number of users, and get the count to use in aggregate for random sorting */
             User.count({ $and: searchParameters }, function (err, users, userCount) {
@@ -66,7 +66,7 @@ module.exports = function () {
                 reject({ err: err.message });
               }
             }).then(function (userCount, companies) {
-              User.aggregate({ $match: { $and: searchParameters } }, { $sample: { size: userCount } }, { $sort: { "companies.areasServed.ownsPremium": -1 } }, { $sort: { "companies.areasServed.cities.ownsPremium": -1 } }, function (err, users) {
+              User.aggregate({ $match: { $and: searchParameters } }, { $sample: { size: userCount } }, { $sort: { "company.areasServed.ownsPremium": -1 } }, { $sort: { "company.areasServed.cities.ownsPremium": -1 } }, function (err, users) {
                 if (err) {
                   reject({ err: err.message });
                 }
@@ -90,7 +90,7 @@ module.exports = function () {
                 reject({ err: err.message });
               }
             }).then(function (userCount) {
-              User.aggregate({ $match: { $and: searchParameters } }, { $sample: { size: userCount } }, { $sort: { "companies.areasServed.ownsPremium": -1 } }, { $sort: { "companies.areasServed.cities.ownsPremium": -1 } }, function (err, users) {
+              User.aggregate({ $match: { $and: searchParameters } }, { $sample: { size: userCount } }, { $sort: { "company.areasServed.ownsPremium": -1 } }, { $sort: { "company.areasServed.cities.ownsPremium": -1 } }, function (err, users) {
                 if (err) {
                   reject({ err: err.message });
                 }
@@ -138,28 +138,26 @@ module.exports = function () {
       var base = [];
 
       users.forEach(function (user) {
-        user.companies.forEach(function (company) {
-          /* check states first */
-          company.areasServed.forEach(function (area) {
-            if (area.ownsPremium === true && area.state === params.state) {
+        /* check states first */
+        user.company.areasServed.forEach(function (area) {
+          if (area.ownsPremium === true && area.state === params.state) {
+            if (!_this2.userExists(states, user) && !_this2.userExists(cities, user) && !_this2.userExists(base, user)) {
+              states.push(user);
+            }
+          }
+          /* check cities next */
+          area.cities.forEach(function (city) {
+            if (city.ownsPremium === true && city.city == params.city) {
               if (!_this2.userExists(states, user) && !_this2.userExists(cities, user) && !_this2.userExists(base, user)) {
-                states.push(user);
+                cities.push(user);
               }
             }
-            /* check cities next */
-            area.cities.forEach(function (city) {
-              if (city.ownsPremium === true && city.city == params.city) {
-                if (!_this2.userExists(states, user) && !_this2.userExists(cities, user) && !_this2.userExists(base, user)) {
-                  cities.push(user);
-                }
-              }
-            });
           });
-          /* otherwise, after the loops finish push into the base array */
-          if (!_this2.userExists(states, user) && !_this2.userExists(cities, user) && !_this2.userExists(base, user)) {
-            base.push(user);
-          }
         });
+        /* otherwise, after the loops finish push into the base array */
+        if (!_this2.userExists(states, user) && !_this2.userExists(cities, user) && !_this2.userExists(base, user)) {
+          base.push(user);
+        }
       });
 
       return states.concat(cities).concat(base);
@@ -174,7 +172,7 @@ module.exports = function () {
     key: 'searchPremium',
     value: function searchPremium() {
       return new Promise(function (resolve, reject) {
-        User.aggregate({ $match: { "companies.areasServed.ownsPremium": true } }, { $sample: { size: _config2.default.numRandomResults } }, function (err, users) {
+        User.aggregate({ $match: { "company.areasServed.ownsPremium": true } }, { $sample: { size: _config2.default.numRandomResults } }, function (err, users) {
           if (err) {
             reject({ err: err.message });
           }
@@ -185,6 +183,51 @@ module.exports = function () {
           });
         });
       });
+    }
+
+    /*
+      Checks to see if premium city/state listings are taken for a given company based on the following criteria.
+      Mongo Aggregate unpacks each item in array to get the exact truthy value
+      @params {string} - company
+      @params {string} - state
+      @params {string} - city
+    */
+
+  }, {
+    key: 'checkForPremium',
+    value: function checkForPremium(params) {
+      var premiumQuery = void 0;
+      /* run a different query and unwind an extra array if searching by city */
+      if (params.city) {
+        // todo ON BOTH QUERIES remove regex for cities, companies, states to ensure no faulty listings
+        premiumQuery = [{ "company.areasServed.state": params.state }, { "company.areasServed.cities": { $elemMatch: { city: { $regex: params.city, $options: 'i' }, ownsPremium: true } } }, { "company.name": { $regex: params.company, $options: 'i' } }];
+        return new Promise(function (resolve, reject) {
+          User.aggregate({ $match: { $and: premiumQuery } }, { $unwind: "$company.areasServed" }, { $unwind: "$company.areasServed.cities" }, function (err, users) {
+            if (err) {
+              reject({ err: err.message });
+            }
+            if (users && users.length > 0) {
+              resolve({ premiumAvailable: false });
+            } else {
+              resolve({ premiumAvailable: true });
+            }
+          });
+        });
+      } else {
+        premiumQuery = [{ "company.areasServed.ownsPremium": true }, { "company.areasServed.state": params.state }, { "company.name": { $regex: params.company, $options: 'i' } }];
+        return new Promise(function (resolve, reject) {
+          User.aggregate({ $unwind: "$company.areasServed" }, { $match: { $and: premiumQuery } }, function (err, users) {
+            if (err) {
+              reject({ err: err.message });
+            }
+            if (users && users.length > 0) {
+              resolve({ premiumAvailable: false });
+            } else {
+              resolve({ premiumAvailable: true });
+            }
+          });
+        });
+      }
     }
 
     /*

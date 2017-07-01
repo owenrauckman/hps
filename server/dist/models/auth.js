@@ -78,6 +78,7 @@ module.exports = function () {
   }, {
     key: 'registerUser',
     value: function registerUser(req, res, err) {
+
       if (!req.body.emailAddress || !req.body.password || !req.body.firstName || !req.body.lastName || !req.body.username) {
         return res.json({ sucess: false, message: _config2.default.auth.minimumRequirements });
       }
@@ -103,23 +104,30 @@ module.exports = function () {
               return res.json({ message: _config2.default.errors.stripeError });
             }
             newUser = new _user2.default({
-              username: req.body.username.replace(/ /g, ''),
-              password: req.body.password,
               firstName: req.body.firstName,
               lastName: req.body.lastName,
+              username: req.body.username.replace(/ /g, ''),
+              password: req.body.password,
               emailAddress: req.body.emailAddress,
+              company: req.body.company,
+              phoneNumber: req.body.phoneNumber,
+              profilePicture: req.body.profilePicture,
               stripeId: customer.id
-              /* todo: all additional User Info Here */
             });
             return customer;
           }).then(function (customer) {
+            /* todo remove these */
+            console.log('basic: ' + req.body.basicPlans);
+            console.log('pro: ' + req.body.proPlans);
+            console.log('premium: ' + req.body.premiumPlans);
             stripe.subscriptions.create({
               customer: customer.id,
               /* This is Generated from the stripe.js form */
               source: req.body.stripeToken,
 
               /* By default sign them up for all plans (quantity 0) */
-              items: [{ plan: "basic", quantity: 9 }, { plan: "pro", quantity: 2 }, { plan: "premium", quantity: 1 }]
+              items: [{ plan: "basic", quantity: req.body.basicPlans }, { plan: "pro", quantity: req.body.proPlans }, //todo pass these in the user object!!!!!
+              { plan: "premium", quantity: req.body.premiumPlans }]
             }).then(function (subscription, err) {
               if (err) {
                 return res.json({ message: _config2.default.errors.stripeError });
