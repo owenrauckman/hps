@@ -43,6 +43,7 @@ export default new Vuex.Store({
       totalPrice: 0,
       firstName: '',
       lastName: '',
+      emailAddress: '',
       username: '',
       password: '',
       phoneNumber: '',

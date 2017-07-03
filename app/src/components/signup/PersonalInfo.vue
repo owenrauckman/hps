@@ -3,30 +3,36 @@
     <h2 class="signup__section__heading">Personal Information</h2>
     <div class="signup__section__form">
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.firstName" type="text" placeholder="*First Name"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('first_name') },'signup__section__form__input']" v-model="$store.state.signUpInfo.firstName" v-validate="{ rules: { required: true} }" type="text" name="first_name" placeholder="*First Name"/>
+        <span v-show="errors.has('first_name')" class="signup__section__form__error">Please enter your first name.</span>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.lastName" type="text" placeholder="*Last Name"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('last_name') },'signup__section__form__input']" v-model="$store.state.signUpInfo.lastName" v-validate="{ rules: { required: true} }" type="text" name="last_name" placeholder="*Last Name"/>
+        <span v-show="errors.has('last_name')" class="signup__section__form__error">Please enter your last name.</span>
       </div>
       <div class="signup__section__form--full">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.username" type="text" placeholder="*Username"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('username') },'signup__section__form__input']" v-model="$store.state.signUpInfo.username" v-validate="{ rules: { required: true} }" type="text" name="username" placeholder="*Username"/>
+        <span v-show="errors.has('username')" class="signup__section__form__error">Please enter a username.</span>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.emailAddress" type="email" placeholder="*Email Address"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('email') },'signup__section__form__input']" v-model="$store.state.signUpInfo.emailAddress" v-validate="{ rules: { required: true, email: true } }" type="email" name="email" placeholder="*Email Address"/>
+        <span v-show="errors.has('email')" class="signup__section__form__error">Please enter a valid email address.</span>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.phoneNumber" type="tel" placeholder="*Phone Number"/>
+        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.phoneNumber" type="tel" placeholder="Phone Number"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.password" type="password" placeholder="*Password"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('password') },'signup__section__form__input']" v-model="$store.state.signUpInfo.password" v-validate="{ rules: { required: true } }" type="password" name="password" placeholder="*Password"/>
+        <span v-show="errors.has('password')" class="signup__section__form__error">Please enter a password.</span>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" type="password" placeholder="*Repeat Password"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('password_confirmation') },'signup__section__form__input']"  v-model="repeatPassword" type="password" v-validate="'required|confirmed:password'" name="password_confirmation" data-vv-as="password" placeholder="*Repeat Password"/>
+        <span v-show="errors.has('password_confirmation')" class="signup__section__form__error">Your password confirmation does not match</span>
       </div>
     </div>
 
     <!-- link to next page in process -->
-    <router-link to="/signup/companies" class="signup__section__button">Continue</router-link>
+    <a @click="validateForm" class="signup__section__button">Continue</a>
 
   </div>
 </template>
@@ -37,7 +43,18 @@ export default {
   name: 'personal-info',
   data() {
     return {
+      repeatPassword: '',
     };
+  },
+  methods: {
+    validateForm() {
+      /* if there are 0 veeValidate errors (and everything is filled out), contintue the route */
+      this.$validator.validateAll().then((isValidated) => {
+        if (isValidated === true) {
+          this.$router.push('/signup/companies');
+        }
+      });
+    },
   },
 };
 </script>
@@ -62,6 +79,11 @@ export default {
     flex-wrap: wrap;
     width: 100%;
     justify-content: space-between;
+    &__error{
+      font-size: 0.8rem;
+      color: $red-orange;
+      display: block;
+    }
     &__input{
       color: $gray-dark;
       box-sizing: border-box;
@@ -71,6 +93,9 @@ export default {
       margin: 1rem 0;
       padding: 1rem;
       width: 100%;
+      &--error{
+        border: solid 1px $red-orange;
+      }
     }
     &--half{
       width: 100%;
