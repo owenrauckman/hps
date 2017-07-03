@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+const config = require('../../config/appConfig.json');
+
 Vue.use(Vuex);
 
 
@@ -47,7 +49,7 @@ export default new Vuex.Store({
       username: '',
       password: '',
       phoneNumber: '',
-      profilePicture: '',
+      profilePicture: config.defaultProfileImage,
       basicPlans: 0,
       proPlans: 0,
       premiumPlans: 0,

@@ -23,9 +23,15 @@
       </div>
       <!-- profile pic -->
       <div class="signup__section__form--full">
-        <label for="avatar" class="m__register__form__button">Upload Profile Picture</label>
-        <img :src="$store.state.signUpInfo.profilePicture" alt="Red dot" />
-        <input id="avatar" style="display:none" type="file" @change="onFileChange" value="test">
+        <label for="profileImage" class="signup__section__upload">
+          <div class="signup__section__upload__box signup__section__upload__box--image">
+            <div class="signup__section__upload__box__image" :style="{ 'background-image': `url('${$store.state.signUpInfo.profilePicture}')` }" alt="Profile Image"></div>
+          </div>
+          <div class="signup__section__upload__box">
+            <span class="signup__section__upload__box__info">Upload Profile Picture</span>
+          </div>
+        </label>
+        <input id="profileImage" style="display:none" type="file" @change="onFileChange">
       </div>
       <!-- profile pic -->
       <div class="signup__section__form--half">
@@ -97,9 +103,6 @@ export default {
          */
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
 
           /* Resize our image to the desired specifications, 600 should be fine */
           const maxWidth = 600;
@@ -116,9 +119,12 @@ export default {
             width *= maxHeight / height;
             height = maxHeight;
           }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
 
           /* draw the new canvas image and assign it to the store */
-          ctx.drawImage(img, 0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height, 0, 0, width, height);
           const compressedBase64 = canvas.toDataURL('image/png');
           this.$store.state.signUpInfo.profilePicture = compressedBase64;
         };
@@ -139,6 +145,36 @@ export default {
   margin: 0;
   @include breakpoint(desktop){
     margin: 0 2rem;
+  }
+  &__upload{
+    display: flex;
+    width: 60%;
+    margin: 1rem 0;
+    &__box{
+      display: flex;
+      align-items: center;
+      &--image{
+        width: 75px;
+      }
+      &__info{
+        color: lighten($gray-light, 5%);
+        font-size: 0.8rem;
+        text-align: left;
+        margin: 0 0 0 1rem;
+        &--description{
+          display: block;
+          font-style: italic;
+        }
+      }
+      &__image{
+        border-radius: $circle-radius;
+        border: solid 1px $gray-border;
+        height: 75px;
+        width: 75px;
+        background-size: cover;
+        background-position: center;
+      }
+    }
   }
   &__heading{
     font-size: 1.25rem;

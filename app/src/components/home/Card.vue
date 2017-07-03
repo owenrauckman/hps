@@ -1,6 +1,6 @@
 <template>
   <router-link :to="options.username" :class="[{ 'card--white': ownsPremiumCity && !ownsPremiumState }, { 'card--blue': ownsPremiumState }, { 'card--white': !ownsPremiumState }, 'card']">
-    <img class="card__image" :src="options.profilePicture"/>
+    <div class="card__image" :style="{ 'background-image': `url('${options.profilePicture}')` }"></div>
     <div class="card__info">
       <h2 class="card__info__name">{{options.firstName}} {{options.lastName}}</h2>
       <h3 class="card__info__company">
@@ -133,6 +133,8 @@ export default {
       width: $card-image-width;
       height: $card-image-width;
       border-radius: $circle-radius;
+      background-size: cover;
+      background-position: center;
     }
     &__info{
       margin: 1rem;
