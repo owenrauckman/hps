@@ -21,6 +21,13 @@
       <div class="signup__section__form--half">
         <input class="signup__section__form__input" v-model="$store.state.signUpInfo.phoneNumber" type="tel" placeholder="Phone Number"/>
       </div>
+      <!-- profile pic -->
+      <div class="signup__section__form--full">
+        <label for="avatar" class="m__register__form__button">Upload Profile Picture</label>
+        <img :src="$store.state.signUpInfo.profilePicture" alt="Red dot" />
+        <input id="avatar" style="display:none" type="file" @change="onFileChange" value="test">
+      </div>
+      <!-- profile pic -->
       <div class="signup__section__form--half">
         <input :class="[{ 'signup__section__form__input--error': errors.has('password') },'signup__section__form__input']" v-model="$store.state.signUpInfo.password" v-validate="{ rules: { required: true } }" type="password" name="password" placeholder="*Password"/>
         <span v-show="errors.has('password')" class="signup__section__form__error">Please enter a password.</span>
@@ -54,6 +61,69 @@ export default {
           this.$router.push('/signup/companies');
         }
       });
+    },
+    /*
+      calls the create image function on image upload
+      @param {object} - event
+    */
+    onFileChange(e) {
+      const files = e.target.files || e.dataTransfer.files;
+      if (!files.length) { return; }
+      /* validate that it is actually an image first */
+      if (!files[0].type.match(/image.*/)) {
+        /* eslint-disable */
+        alert('Please upload a file with a valid image format (e.g. png, jpg, or gif)');
+        /* eslint-enable */
+      } else {
+        /* create and compress the image */
+        this.createImage(files[0]);
+      }
+    },
+
+    /*
+      Creates base64 of image, compresses, and assigns it to profilePicture in store
+      @param {object} - the uploaded image
+    */
+    createImage(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        /* create new image to base canvas off of */
+        const img = document.createElement('img');
+        img.src = e.target.result;
+
+        /*
+          once the canvas has loaded we can perform our modifications.
+          Note: Any store update must go inside of the callback
+         */
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+
+          /* Resize our image to the desired specifications, 600 should be fine */
+          const maxWidth = 600;
+          const maxHeight = 600;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            }
+          } else if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+
+          /* draw the new canvas image and assign it to the store */
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL('image/png');
+          this.$store.state.signUpInfo.profilePicture = compressedBase64;
+        };
+      };
+      reader.readAsDataURL(file);
     },
   },
 };

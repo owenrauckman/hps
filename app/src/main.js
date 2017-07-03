@@ -3,7 +3,6 @@
 import Vue from 'vue';
 import Vue2Filters from 'vue2-filters';
 import VeeValidate from 'vee-validate';
-import validator from 'validator';
 import App from './App';
 import router from './router';
 import store from './store';
@@ -17,7 +16,6 @@ const VueScrollTo = require('vue-scrollto');
 Vue.use(Vue2Filters);
 Vue.use(VueScrollTo);
 Vue.use(VeeValidate);
-Vue.use(validator);
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */
