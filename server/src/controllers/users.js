@@ -15,6 +15,15 @@ router.get('/u/:username', (req, res) =>{
   User.getProfile(req.params.username).then( res.send.bind(res) );
 });
 
+/* check if user exists by either email or username */
+router.get('/u/e/:email', (req, res) =>{
+  User.checkExistanceByEmail(decodeURIComponent(req.params.email)).then( res.send.bind(res) );
+});
+
+router.get('/u/u/:username', (req, res) =>{
+  User.checkExistanceByUsername(decodeURIComponent(req.params.username)).then( res.send.bind(res) );
+});
+
 /*
   AUTH ROUTES
   # Login

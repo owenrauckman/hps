@@ -13,15 +13,16 @@
       <div class="signup__section__form--full">
         <input :class="[{ 'signup__section__form__input--error': errors.has('username') },'signup__section__form__input']" v-model="$store.state.signUpInfo.username" v-validate="{ rules: { required: true} }" type="text" name="username" placeholder="*Username"/>
         <span v-show="errors.has('username')" class="signup__section__form__error">Please enter a username.</span>
+        <span v-show="usernameTaken" class="signup__section__form__error">That username is already taken. Please choose another.</span>
       </div>
       <div class="signup__section__form--half">
         <input :class="[{ 'signup__section__form__input--error': errors.has('email') },'signup__section__form__input']" v-model="$store.state.signUpInfo.emailAddress" v-validate="{ rules: { required: true, email: true } }" type="email" name="email" placeholder="*Email Address"/>
         <span v-show="errors.has('email')" class="signup__section__form__error">Please enter a valid email address.</span>
+        <span v-show="emailTaken" class="signup__section__form__error">There is already an account with that email address. Please login or use another address.</span>
       </div>
       <div class="signup__section__form--half">
         <input class="signup__section__form__input" v-model="$store.state.signUpInfo.phoneNumber" type="tel" placeholder="Phone Number"/>
       </div>
-      <!-- profile pic -->
       <div class="signup__section__form--full">
         <label for="profileImage" class="signup__section__upload">
           <div class="signup__section__upload__box signup__section__upload__box--image">
@@ -33,7 +34,6 @@
         </label>
         <input id="profileImage" style="display:none" type="file" @change="onFileChange">
       </div>
-      <!-- profile pic -->
       <div class="signup__section__form--half">
         <input :class="[{ 'signup__section__form__input--error': errors.has('password') },'signup__section__form__input']" v-model="$store.state.signUpInfo.password" v-validate="{ rules: { required: true } }" type="password" name="password" placeholder="*Password"/>
         <span v-show="errors.has('password')" class="signup__section__form__error">Please enter a password.</span>
@@ -51,23 +51,82 @@
 </template>
 
 <script>
+import axios from 'axios';
+
+const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'personal-info',
   data() {
     return {
       repeatPassword: '',
+      usernameTaken: false,
+      emailTaken: false,
     };
   },
   methods: {
+    /*
+      Validates form using veevalidate and directs to next page on success.
+      Additionally, calls methods to check username/email before continuing
+    */
     validateForm() {
       /* if there are 0 veeValidate errors (and everything is filled out), contintue the route */
       this.$validator.validateAll().then((isValidated) => {
         if (isValidated === true) {
-          this.$router.push('/signup/companies');
+          /* check if username and email address are already in use */
+          this.isUsernameAvailable().then((usernameAvailable) => {
+            if (usernameAvailable === false) {
+              this.usernameTaken = true;
+            } else {
+              this.usernameTaken = false;
+            }
+            this.isEmailAvailable().then((emailAvailable) => {
+              if (emailAvailable === false) {
+                this.emailTaken = true;
+              } else {
+                this.emailTaken = false;
+              }
+              /* finally, check to see if both are still available so we can route */
+              if (this.emailTaken === false && this.usernameTaken === false) {
+                this.$router.push('/signup/companies');
+              }
+            });
+          });
         }
       });
     },
+    /*
+      Checks to make sure a users username aren't already in use
+    */
+    isUsernameAvailable() {
+      return new Promise((resolve) => {
+        axios.get(`${config.api}/users/u/u/${encodeURIComponent(this.$store.state.signUpInfo.username)}`)
+        .then((response) => {
+          if (response.data.userExists) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        });
+      });
+    },
+
+    /*
+      Checks to make sure a users email isn't already in use
+    */
+    isEmailAvailable() {
+      return new Promise((resolve) => {
+        axios.get(`${config.api}/users/u/e/${encodeURIComponent(this.$store.state.signUpInfo.emailAddress)}`)
+        .then((response) => {
+          if (response.data.userExists) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        });
+      });
+    },
+
     /*
       calls the create image function on image upload
       @param {object} - event

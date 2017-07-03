@@ -40,6 +40,48 @@ module.exports = class User{
   }
 
   /*
+    Check if a user exists based on their email address
+    @param {string} - The email for the profile to retrieve
+  */
+  checkExistanceByEmail(emailAddress){
+    return new Promise( (resolve, reject)=>{
+      var query = {emailAddress: emailAddress};
+      UserSchema.find(query, (err, user)=>{
+        if(err){
+          reject({status: false, err: err.message});
+        }
+        if(user.length > 0){
+          resolve({status: true, userExists: true});
+        } else{
+          resolve({status: true, userExists: false});
+        }
+
+      });
+    });
+  }
+
+  /*
+    Check if a user exists based on their email address
+    @param {string} - The email for the profile to retrieve
+  */
+  checkExistanceByUsername(username){
+    return new Promise( (resolve, reject)=>{
+      var query = {username: username};
+      UserSchema.find(query, (err, user)=>{
+        if(err){
+          reject({status: false, err: err.message});
+        }
+        if(user.length > 0){
+          resolve({status: true, userExists: true});
+        } else{
+          resolve({status: true, userExists: false});
+        }
+
+      });
+    });
+  }
+
+  /*
     Get A User By their username
     @param {string} - The Unique User ID for the profile to retrieve
     @param {function} - Hits the passportSetup.js file to confirm user exists
