@@ -10,6 +10,7 @@ import Cities from '@/components/signup/Cities';
 import Premium from '@/components/signup/Premium';
 import Pay from '@/components/signup/Pay';
 import Success from '@/components/signup/Success';
+import AdditionalInfo from '@/components/signup/AdditionalInfo';
 
 Vue.use(Router);
 
@@ -47,6 +48,11 @@ export default new Router({
           name: 'cities',
           path: 'cities',
           component: Cities,
+        },
+        {
+          name: 'additional-info',
+          path: 'additional-info',
+          component: AdditionalInfo,
         },
         {
           name: 'premium',

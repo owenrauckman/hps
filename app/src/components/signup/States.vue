@@ -11,6 +11,8 @@
         </div>
       </div>
 
+      <p v-show="!stateSelected" class="signup__section__error">Please Select a state</p>
+
       <!-- list selected states -->
       <div class="signup__section__queries">
         <button class="signup__section__query-button" v-for="state in $store.state.signUpInfo.states" @click="removeQuery(state)">{{state.name.name}}</button>
@@ -23,7 +25,7 @@
     </div>
 
     <!-- link to next page in process -->
-    <router-link to="/signup/cities" class="signup__section__button">Continue</router-link>
+    <a @click="validateStates" class="signup__section__button">Continue</a>
 
   </div>
 </template>
@@ -38,6 +40,7 @@ export default {
       statePlaceholder: 'Search By State',
       states: [],
       stateName: '',
+      stateSelected: true,
     };
   },
   mounted() {
@@ -130,6 +133,17 @@ export default {
         /* eslint-enable */
       });
     },
+    /*
+      Validate and make sure a company is selected before moving on
+    */
+    validateStates() {
+      if (this.$store.state.signUpInfo.states.length > 0) {
+        this.stateSelected = true;
+        this.$router.push('/signup/cities');
+      } else {
+        this.stateSelected = false;
+      }
+    },
   },
 };
 </script>
@@ -142,6 +156,12 @@ export default {
   display: flex;
   flex-direction: column;
   margin: 0;
+  &__error{
+    padding-left: 2rem;
+    font-size: 0.8rem;
+    color: $red-orange;
+    display: block;
+  }
   @include breakpoint(desktop){
     margin: 0 2rem;
   }

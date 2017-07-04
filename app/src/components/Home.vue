@@ -5,7 +5,7 @@
         <h1 class="home__heading">Home Party Shows</h1>
         <h2 class="home__subheading">Find and build your direct sales team today.</h2>
         <div class="home__cta">
-          <button class="home__cta__item home__cta__item--border">Sign Up Now</button>
+          <router-link to="/signup" class="home__cta__item home__cta__item--border">Sign Up Now</router-link>
           <button class="home__cta__item" v-scroll-to="{element: '#js__home__search', duration: 1000}">Start Your Search</button>
         </div>
         <div class="home__search__container">
@@ -96,6 +96,7 @@ export default {
       letter-spacing: 0.5px;
       margin: 1rem;
       font-size: 0.8rem;
+      text-decoration: none;
       &:hover{
         cursor: pointer;
       }

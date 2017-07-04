@@ -1,15 +1,16 @@
 <template>
   <div class="signup__section">
-    <h2 class="signup__section__heading">What companies do you work for?</h2>
+    <h2 class="signup__section__heading">What company do you work for?</h2>
 
     <div class="filters__section">
-
       <!-- input to filter companies -->
       <div class="filters__section__input-container">
         <div class="filters__section__input-wrapper">
           <input class="filters__section__input" :placeholder="companySearchPlaceholder" v-model="companyName">
         </div>
       </div>
+
+      <p v-show="!companySelected" class="signup__section__error">Please Select a company</p>
 
       <!-- show list of possible companies -->
       <ul class="filters__section__list filters--margin">
@@ -18,7 +19,7 @@
     </div>
 
     <!-- link to next page in process -->
-    <router-link to="/signup/states" class="signup__section__button">Continue</router-link>
+    <a @click="validateCompany" class="signup__section__button">Continue</a>
 
   </div>
 </template>
@@ -33,6 +34,7 @@ export default {
       companySearchPlaceholder: 'Search By Company',
       companies: [],
       companyName: '',
+      companySelected: true,
     };
   },
   mounted() {
@@ -67,16 +69,35 @@ export default {
       @param {object} - selected item
     */
     selectCompany(item) {
-      this.companies.forEach((company) => {
-        /* eslint-disable */
+      /* eslint-disable */
+      for(let company of this.companies){
         if (company.name === item.name) {
           company.active = !company.active;
           this.$store.commit('updateSignUpInfoCompany', company.name);
+          this.companySelected = true;
+          /* check again if this is false so it doesn't spoof and move forward */
+          if(company.active === false){
+            this.$store.commit('updateSignUpInfoCompany', '');
+            company.active = false;
+          }
+          break;
         } else{
+          this.$store.commit('updateSignUpInfoCompany', '');
           company.active = false;
         }
-        /* eslint-enable */
-      });
+      }
+      /* eslint-enable */
+    },
+    /*
+      Validate and make sure a company is selected before moving on
+    */
+    validateCompany() {
+      if (this.$store.state.signUpInfo.company.name.length > 0) {
+        this.companySelected = true;
+        this.$router.push('/signup/states');
+      } else {
+        this.companySelected = false;
+      }
     },
   },
 };
@@ -90,6 +111,12 @@ export default {
   display: flex;
   flex-direction: column;
   margin: 0;
+  &__error{
+    padding-left: 2rem;
+    font-size: 0.8rem;
+    color: $red-orange;
+    display: block;
+  }
   @include breakpoint(desktop){
     margin: 0 2rem;
   }

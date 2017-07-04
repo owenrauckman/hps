@@ -1,6 +1,6 @@
 <template>
   <div class="signup__section">
-    <h2 class="signup__section__heading">What cities do you want to be listed in for *each state*?</h2>
+    <h2 class="signup__section__heading">What cities do you want to be listed in?</h2>
 
     <div class="filters__section">
 
@@ -28,7 +28,7 @@
     </div>
 
     <!-- link to next page in process -->
-    <router-link to="/signup/premium" class="signup__section__button">Continue</router-link>
+    <router-link to="/signup/additional-info" class="signup__section__button">Continue</router-link>
 
   </div>
 </template>
@@ -210,7 +210,7 @@ export default {
   }
   &__queries{
     max-width: calc(768px - 4rem);
-    margin: 0 auto 0rem auto;
+    margin: 0 auto 1rem auto;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;

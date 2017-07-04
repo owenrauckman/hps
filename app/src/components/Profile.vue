@@ -8,7 +8,7 @@
           <!-- info -->
           <div class="profile__main__info" id="js__profile__main__info">
             <div class="profile__main__info__image-container">
-              <img class="profile__main__info__image" :src="user.profilePicture"/>
+              <div class="profile__main__info__image" :style="{ 'background-image': `url('${user.profilePicture}')` }"></div>
             </div>
             <span v-if="ownsPremiumState" class="profile__main__info__premium profile__main__info__premium--badge">Premium State Owner</span>
             <span v-else-if="ownsPremiumCity" class="profile__main__info__premium profile__main__info__premium--badge">Premium City Owner</span>
@@ -189,6 +189,11 @@ export default {
       justify-content: space-between;
       &__image{
         border-radius: $circle-radius;
+        background-size: cover;
+        background-position: center;
+        background-color: $white;
+        height: 100px;
+        width: 100px;
       }
       &__premium{
         color: $white;
