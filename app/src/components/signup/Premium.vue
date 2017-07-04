@@ -203,6 +203,7 @@ export default {
           axios.post(`${config.api}/users/register`, signUpInfo)
             .then((response) => {
               if (response.data.success === true) {
+                this.resetState();
                 this.$router.push('/signup/success');
               }
             })
@@ -214,6 +215,35 @@ export default {
         }
       });
     },
+  },
+
+  /*
+    Resets any sign up data back to normal after successful sign up
+  */
+  resetState() {
+    this.$store.state.signUpInfo.states = [];
+    this.$store.state.signUpInfo.cities = [];
+    this.$store.state.signUpInfo.totalPrice = 0;
+    this.$store.state.signUpInfo.firstName = '';
+    this.$store.state.signUpInfo.lastName = '';
+    this.$store.state.signUpInfo.emailAddress = '';
+    this.$store.state.signUpInfo.username = '';
+    this.$store.state.signUpInfo.password = '';
+    this.$store.state.signUpInfo.phoneNumber = '';
+    this.$store.state.signUpInfo.profilePicture = config.defaultProfileImage;
+    this.$store.state.signUpInfo.basicPlans = 0;
+    this.$store.state.signUpInfo.proPlans = 0;
+    this.$store.state.signUpInfo.premiumPlans = 0;
+    this.$store.state.signUpInfo.company.name = '';
+    this.$store.state.signUpInfo.company.aboutCompany = '';
+    this.$store.state.signUpInfo.company.aboutMe = '';
+    this.$store.state.signUpInfo.company.areasServed = [];
+    this.$store.state.signUpInfo.company.links.website = '';
+    this.$store.state.signUpInfo.company.links.facebook = '';
+    this.$store.state.signUpInfo.company.links.twitter = '';
+    this.$store.state.signUpInfo.company.links.instagram = '';
+    this.$store.state.signUpInfo.company.links.pinterest = '';
+    this.$store.state.signUpInfo.company.links.youtube = '';
   },
 
 };
