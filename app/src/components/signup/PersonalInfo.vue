@@ -21,7 +21,8 @@
         <span v-show="emailTaken" class="signup__section__form__error">There is already an account with that email address. Please login or use another address.</span>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.phoneNumber" type="tel" placeholder="Phone Number"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('phone') },'signup__section__form__input']" v-model="$store.state.signUpInfo.phoneNumber" v-validate="'numeric'" name="phone" type="tel" placeholder="Phone Number"/>
+        <span v-show="errors.has('phone')" class="signup__section__form__error">Please enter a valid phone number</span>
       </div>
       <div class="signup__section__form--full">
         <label for="profileImage" class="signup__section__upload">
