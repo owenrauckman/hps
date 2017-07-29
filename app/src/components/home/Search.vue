@@ -108,6 +108,35 @@ export default {
           if (users.users && users.users.length > 0) {
             this.$store.state.isResults = true;
           }
+
+
+          /* todo filter the basics */
+          /* eslint-disable */
+          let basicUsers = [];
+          let premiumUsers = [];
+          for(let user of users.users){
+            for(let areas of user.company.areasServed){
+              for(let city of areas.cities){
+                /* check state premium */
+                if(
+                  areas.state === this.$store.state.filterQueries.state.abbr && areas.ownsPremium === true ||
+                  (city.ownsPremium === true && areas.state === this.$store.state.filterQueries.state.abbr)
+                ){
+                  premiumUsers.push(user);
+                } else{
+                  basicUsers.push(user);
+                }
+              }
+            }
+          }
+          console.log('PREMIUM');
+          console.log(premiumUsers);
+          console.log('BASIC');
+          console.log(basicUsers);
+
+          /* eslint-enable */
+          /* end filter basics */
+
           this.$store.state.loadingResults = false;
           this.$store.commit('updateResults', users);
         });

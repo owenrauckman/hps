@@ -37,17 +37,20 @@ module.exports = class SearchModel{
         (aggregate) is a duplicate of the one below, will need to refactor late to be DRY
       */
       if(params.industry){
+        let companyList = []; //define up here first
         this.getCompaniesByIndustry(params.industry).then( (companies)=> {
           searchParameters.push({ "company.name" : {$in: companies} });
+          companyList = companies;
         }).then((companies)=>{
           /* Set a number of users, and get the count to use in aggregate for random sorting */
-          User.count({ $and : searchParameters }, (err, users, userCount) =>{
+          User.count({ $or: [{ $and : searchParameters }, {$and: [{"company.areasServed.ownsPremium": true}, { "company.areasServed" : { $elemMatch : { state: { $regex : params.state, $options : 'i' } } } }, { "company.name" : {$in: companyList} }]}] }, (err, users, userCount) =>{
+
             if(err){
               reject({err: err.message});
             }
           }).then((userCount, companies)=>{
             User.aggregate(
-              { $match: { $and : searchParameters } },
+              { $match: { $or: [{ $and : searchParameters }, {$and: [{"company.areasServed.ownsPremium": true}, { "company.areasServed" : { $elemMatch : { state: { $regex : params.state, $options : 'i' } } } }, { "company.name" : {$in: companyList} }]}] } },
               { $sample: { size: userCount } },
               { $sort: { "company.areasServed.ownsPremium": -1} },
               { $sort: {"company.areasServed.cities.ownsPremium": -1 } },
@@ -69,14 +72,21 @@ module.exports = class SearchModel{
       }
       /* Else, no promise to check for companies, just execute the query, todo: refactor DRY */
       else{
+        /* FYI this whole query thing is disgusting, will need to refactor in the future */
+        let finalQuery = { $or: [{ $and : searchParameters }, {$and: [{"company.areasServed.ownsPremium": true}, { "company.areasServed" : { $elemMatch : { state: { $regex : params.state, $options : 'i' } } } }]}] };
+        /* double check for company if chosen */
+        if(params.company){
+          finalQuery = { $or: [{ $and : searchParameters }, {$and: [{"company.areasServed.ownsPremium": true}, { "company.areasServed" : { $elemMatch : { state: { $regex : params.state, $options : 'i' } } } }, { "company.name" : { $regex : params.company, $options : 'i' } }]}] };
+        }
         /* Set a number of users, and get the count to use in aggregate for random sorting */
-        User.count({ $and : searchParameters }, (err, users, userCount) =>{
+        /* We are checking for the search params ***OR just premium state owners with no company/industry */
+        User.count(finalQuery, (err, users, userCount) =>{
           if(err){
             reject({err: err.message});
           }
         }).then((userCount)=>{
           User.aggregate(
-            { $match: { $and : searchParameters } },
+            { $match: finalQuery },
             { $sample: { size: userCount } },
             { $sort: { "company.areasServed.ownsPremium": -1} },
             { $sort: {"company.areasServed.cities.ownsPremium": -1 } },
@@ -129,17 +139,18 @@ module.exports = class SearchModel{
         }
         /* check cities next */
         area.cities.forEach((city)=>{
-          if(city.ownsPremium === true && city.city == params.city){
+          if(city.ownsPremium === true && city.city === params.city){
             if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
               cities.push(user);
             }
           }
+
+          /* otherwise, after the loops finish push into the base array (assuming the city matches)*/
+          if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user) && city.city === params.city){
+            base.push(user);
+          }
         });
       });
-      /* otherwise, after the loops finish push into the base array */
-      if(!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)){
-        base.push(user);
-      }
     });
 
     return states.concat(cities).concat(base);
