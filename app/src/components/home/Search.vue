@@ -92,6 +92,9 @@ export default {
       Perform Search, passes all possible queries, empty ones won't affect response
     */
     performSearch() {
+      /* reset the 'show more' options */
+      this.$store.state.hideBasicCards = true;
+
       /* empty these on each search so premium info updates in card */
       this.$store.state.results = [];
       this.$store.state.loadingResults = true;
@@ -105,42 +108,27 @@ export default {
       ).then((data) => {
         data.json().then((users) => {
           /* check if there are users returned*/
-          if (users.users && users.users.length > 0) {
+          if (users.users && (users.users.premiumStates.length > 0 ||
+              users.users.premiumCities.length > 0 ||
+              users.users.basic.length > 0)) {
             this.$store.state.isResults = true;
           }
-
-
-          /* todo filter the basics */
-          /* eslint-disable */
-          let basicUsers = [];
-          let premiumUsers = [];
-          for(let user of users.users){
-            for(let areas of user.company.areasServed){
-              for(let city of areas.cities){
-                /* check state premium */
-                if(
-                  areas.state === this.$store.state.filterQueries.state.abbr && areas.ownsPremium === true ||
-                  (city.ownsPremium === true && areas.state === this.$store.state.filterQueries.state.abbr)
-                ){
-                  premiumUsers.push(user);
-                } else{
-                  basicUsers.push(user);
-                }
-              }
-            }
-          }
-          console.log('PREMIUM');
-          console.log(premiumUsers);
-          console.log('BASIC');
-          console.log(basicUsers);
-
-          /* eslint-enable */
-          /* end filter basics */
 
           this.$store.state.loadingResults = false;
           this.$store.commit('updateResults', users);
         });
       });
+    },
+
+    /*
+    Checks to see if a user object exists in array
+    @param {array} - list of users to check against
+    @param {object} - the object that is being checked
+  */
+    userExists(arr, user) {
+      /* eslint-disable */
+      return arr.some(el => el._id === user._id);
+      /* eslint-enable */
     },
 
     /*

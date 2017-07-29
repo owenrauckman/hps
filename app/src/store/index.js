@@ -14,6 +14,7 @@ export default new Vuex.Store({
     results: [],
     isResults: true,
     isResultsError: false,
+    hideBasicCards: true,
     filterQueries: {
       state: {
         name: '',

@@ -8,7 +8,7 @@
         <button class="results__queries__query" @click="removeQuery" id="js__query__company" v-if="$store.state.filterQueries.company.name.length > 0">{{$store.state.filterQueries.company.name}}</button>
         <button class="results__queries__query" @click="removeQuery" id="js__query__industry" v-if="$store.state.filterQueries.industry.name.length > 0">{{$store.state.filterQueries.industry.name}}</button>
       </div>
-      <p v-if="$store.state.results.users && $store.state.isResults" class="results__results__info__text g__container">Showing {{$store.state.results.users.length}} of {{$store.state.results.users.length}} results</p>
+      <!-- <p v-if="$store.state.results.users && $store.state.isResults" class="results__results__info__text g__container">Showing {{$store.state.results.users.length}} of {{$store.state.results.users.length}} results</p> -->
     </div>
     <div :class="[{ 'results__loading--active': $store.state.loadingResults }, 'results__loading g__container']">
       <div class='results__loading__dot results__loading__dot__1'></div>
@@ -16,14 +16,24 @@
       <div class='results__loading__dot results__loading__dot__3'></div>
       <div class='results__loading__dot results__loading__dot__4'></div>
     </div>
-    <div v-if="$store.state.isResults" class="results__card-container g__container" id="js__results__results">
-      <Card v-for="card in $store.state.results.users" :key="card.plan" :options="card"/>
+    <div v-if="$store.state.isResults && $store.state.results.users" class="results__card-container g__container" id="js__results__results">
+      <Card v-for="card in $store.state.results.users.premiumStates" :key="card.plan" :options="card"/>
+      <Card v-for="card in $store.state.results.users.premiumCities" :key="card.plan" :options="card"/>
+      <Card v-for="card in $store.state.results.users.basic" :key="card.plan" :options="card" :class="[{ 'results__basic-cards--hidden': $store.state.hideBasicCards }, 'results__basic-cards']" /></span>
     </div>
     <div v-else class="results__no-results-container g__container">
       <div>
         <p class="results__no-results-container__text">It looks like there are no consultants in this area. Want to secure your spot?</p>
         <router-link to="signup" class="results__no-results-container__link">Sign up today</router-link>
       </div>
+    </div>
+    <!-- Button for showing non premium users -->
+    <div class="results__no-results-container g__container" v-if="$store.state.results.users && $store.state.results.users.basic && $store.state.results.users.basic.length > 0">
+      <button @click="showBasic()" class="results__no-results-container__link">
+        <span v-if="$store.state.hideBasicCards">View </span>
+        <span v-else>Hide </span>
+        Non-Premium Users
+      </button>
     </div>
     <!-- end results and loading state -->
 
@@ -64,9 +74,19 @@ export default {
     },
 
     /*
+      On Click this shows the basic cards
+    */
+    showBasic() {
+      this.$store.state.hideBasicCards = !this.$store.state.hideBasicCards;
+    },
+
+    /*
       Perform Search, passes all possible queries, empty ones won't affect response
     */
     performSearch() {
+      /* reset the 'show more' options */
+      this.$store.state.hideBasicCards = true;
+
       /* empty these on each search so premium info updates in card */
       this.$store.state.results = [];
       this.$store.state.loadingResults = true;
@@ -81,7 +101,9 @@ export default {
       .then((data) => {
         data.json().then((users) => {
           /* check if there are users returned*/
-          if (users.users && users.users.length > 0) {
+          if (users.users && (users.users.premiumStates.length > 0 ||
+              users.users.premiumCities.length > 0 ||
+              users.users.basic.length > 0)) {
             this.$store.state.isResults = true;
           }
           this.$store.state.loadingResults = false;
@@ -98,6 +120,12 @@ export default {
 @import '../../sass/main.scss';
 
 .results{
+  &__basic-cards{
+    display: flex;
+    &--hidden{
+      display: none !important;
+    }
+  }
   &__card-container{
     display: flex;
     flex-wrap: wrap;
@@ -127,6 +155,7 @@ export default {
       &:hover{
         background: $blue;
         color: $white;
+        cursor: pointer;
       }
     }
   }

@@ -153,7 +153,12 @@ module.exports = class SearchModel{
       });
     });
 
-    return states.concat(cities).concat(base);
+    // return states.concat(cities).concat(base);
+    return {
+      premiumStates: states,
+      premiumCities: cities,
+      basic: base
+    }
   }
 
   /*
@@ -171,7 +176,9 @@ module.exports = class SearchModel{
         }
 
         resolve({
-          users: users,
+          users: {
+            premiumStates: users
+          },
           query: { state: '', city: '', company: '' }
         });
 

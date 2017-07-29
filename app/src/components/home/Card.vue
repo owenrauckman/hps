@@ -3,12 +3,7 @@
     <div class="card__image" :style="{ 'background-image': `url('${options.profilePicture}')` }"></div>
     <div class="card__info">
       <h2 class="card__info__name">{{options.firstName}} {{options.lastName}}</h2>
-      <h3 class="card__info__company">
-        <span v-for="(company, index) in options.companies">
-          {{company.name}}
-          <span v-if="index+1 < options.companies.length"> / </span>
-        </span>
-      </h3>
+      <h3 class="card__info__company">{{options.company.name}}</h3>
 
       <h4 class="card__info__location">
         <span v-if="$store.state.filterQueries.city.name.length > 0">{{$store.state.filterQueries.city.name}},</span>
