@@ -120,6 +120,21 @@ module.exports = class SearchModel{
   }
 
   /*
+    Shuffles an array of results before returning
+    @param {array} - list of items to shuffle
+  */
+  shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+
+  /*
     Breaks apart the returned data from the mongo query and sorts based on membership type
     @param {array} - list of users from mongo query
     @param {array} - the params from the request
@@ -153,7 +168,11 @@ module.exports = class SearchModel{
       });
     });
 
-    // return states.concat(cities).concat(base);
+    /* Shuffle the arrays */
+    states = this.shuffleArray(states);
+    cities= this.shuffleArray(cities);
+    base = this.shuffleArray(base);
+
     return {
       premiumStates: states,
       premiumCities: cities,
