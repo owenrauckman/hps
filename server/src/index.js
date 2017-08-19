@@ -24,9 +24,10 @@ const db = mongoose.connection;
 
 // Initialize App
 let app = module.exports = express();
+app.use(bodyParser.json({extended: false}));
 app.use(bodyParser.urlencoded({ extended: false }))
 /* setting the payload to accept up to 2mb so it can handle large images */
-app.use(bodyParser.json({limit: '2mb'})); 
+app.use(bodyParser.json({limit: '2mb'}));
 
 // --- Cors allows for Auth to work across different ports
 // TODO: es6ify this
@@ -48,7 +49,8 @@ app.use(function(req, res, next) {
 app.use(session({
   secret: config.sessionSecret,
   saveUninitialized: true,
-  resave: true
+  resave: true,
+  name: 'hps.sid'
 }));
 app.use(passport.initialize());
 app.use(passport.session());

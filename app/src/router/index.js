@@ -11,6 +11,7 @@ import Premium from '@/components/signup/Premium';
 import Pay from '@/components/signup/Pay';
 import Success from '@/components/signup/Success';
 import AdditionalInfo from '@/components/signup/AdditionalInfo';
+import Login from '@/components/dashboard/Login';
 
 Vue.use(Router);
 
@@ -20,6 +21,11 @@ export default new Router({
       path: '/',
       name: 'Home',
       component: Home,
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
     },
     {
       path: '/signup',

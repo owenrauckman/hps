@@ -8,10 +8,11 @@ let router = express.Router();
 const User= new user();
 const Auth= new auth();
 
+
 /*
   /u is to avoid wildcard issues with other routes
 */
-router.get('/u/:username', (req, res) =>{
+router.get('/u/:username', ensureAuthenticated, (req, res) =>{
   User.getProfile(req.params.username).then( res.send.bind(res) );
 });
 
