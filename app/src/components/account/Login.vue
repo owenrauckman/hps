@@ -35,14 +35,13 @@ export default {
       e.preventDefault();
 
       // login API
-      axios.post(`${config.api}/users/login`, this.credentials)
+      axios.post(`${config.api}/users/login`, this.credentials, { withCredentials: true })
         .then((response) => {
           /* eslint-disable */
-          console.log(response.data.success);
           if (response.data.success === true) {
-            this.$router.push('/signup/success');
+            this.$store.state.isLoggedIn = true;
+            this.$router.push('/account');
           } else {
-            alert('nawh');
             this.showError = true;
           }
         })

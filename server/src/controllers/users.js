@@ -3,8 +3,10 @@
 // Add Dependencies
 import express from 'express';
 import user from '../models/user';
+import passport from 'passport';
 import auth from '../models/auth';
-let router = express.Router();
+
+const  router = express.Router();
 const User= new user();
 const Auth= new auth();
 
@@ -12,7 +14,8 @@ const Auth= new auth();
 /*
   /u is to avoid wildcard issues with other routes
 */
-router.get('/u/:username', ensureAuthenticated, (req, res) =>{
+router.get('/u/:username', (req, res) =>{
+  console.log(req.user);
   User.getProfile(req.params.username).then( res.send.bind(res) );
 });
 
@@ -60,7 +63,7 @@ router.delete('/delete/:username', User.deleteUser, (req, res) =>{})
   # Get Invoices
 */
 
-/* TODO make secret (including other card routes) */
+/* TODO make protected (including other card routes) */
 router.post('/addCreditCard', (req, res) =>{
   User.addCreditCard(req, res);
 });
@@ -80,10 +83,10 @@ router.get('/setDefaultCreditCard', (req, res) =>{
 router.get('/invoices', User.getInvoices, (req, res, next) =>{});
 
 /*
-  Secret Route -- Temporary, Base Auth Routes off of this
-  */
-router.get('/secret', Auth.checkAuth, (req, res, next) =>{
-  res.json('YOU ARE IN MY MAN');   // add returned data here specific to what route to hit
+  Account - Protected routes for edit profile pages
+*/
+router.get('/account', passport.authenticate('jwt', {session: false}), (req, res, next) =>{
+  User.getProfile(req.user.username).then( res.send.bind(res) );
 });
 
 module.exports = router;

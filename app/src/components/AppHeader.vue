@@ -9,38 +9,26 @@
       </button>
     </div>
     <ul :class="[{ 'header__content--active': menuActive },'header__content']">
-      <router-link :to="item.href" v-for="item in menu" :key="item.name" class="header__content__item">
-        <li @click="toggleMenu">{{item.name}}</li>
-      </router-link>
+      <router-link to="about" class="header__content__item">About</router-link>
+      <router-link to="pricing" class="header__content__item">Pricing</router-link>
+      <router-link v-show="$store.state.isLoggedIn" to="account" class="header__content__item">Account</router-link>
+      <a href=""  @click="logout" v-if="$store.state.isLoggedIn" class="header__content__item header__content__item--logout">Log Out</a>
+      <router-link v-else to="login" class="header__content__item">Log In</router-link>
+      <router-link v-if="!$store.state.isLoggedIn" to="signup" class="header__content__item">Sign Up</router-link>
     </ul>
   </div>
 </template>
 
 <script>
+
+const config = require('../../config/appConfig.json');
+
 export default {
   name: 'header',
   data() {
     return {
       title: 'Home Party Shows',
       signUp: 'Sign Up',
-      menu: [
-        {
-          name: 'About',
-          href: 'about',
-        },
-        {
-          name: 'Pricing',
-          href: 'pricing',
-        },
-        {
-          name: 'Log In',
-          href: 'login',
-        },
-        {
-          name: 'Sign Up',
-          href: 'signup',
-        },
-      ],
       menuActive: false,
       signUpActive: false,
     };
@@ -53,6 +41,16 @@ export default {
       if (window.outerWidth < 1024) {
         this.menuActive = !this.menuActive;
       }
+    },
+    /*
+      Hits API route to log user out
+    */
+    logout(e) {
+      e.preventDefault();
+      this.$store.state.isLoggedIn = false;
+      /* todo: better solution once cookies are secure */
+      document.cookie = `${config.jwtCookieName}=;`;
+      this.$router.push('/login');
     },
   },
 };
@@ -149,6 +147,13 @@ export default {
       text-align: center;
       @include breakpoint(desktop){
         margin: 0 1rem;
+      }
+      /* since it is sometimes the last child */
+      &--logout{
+        border: none !important;
+        padding: 0 !important;
+        border-radius: $round-radius  !important;
+        transition: none !important;
       }
     }
     &__hamburger{

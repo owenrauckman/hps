@@ -11,7 +11,8 @@ import Premium from '@/components/signup/Premium';
 import Pay from '@/components/signup/Pay';
 import Success from '@/components/signup/Success';
 import AdditionalInfo from '@/components/signup/AdditionalInfo';
-import Login from '@/components/dashboard/Login';
+import Login from '@/components/account/Login';
+import Account from '@/components/account/Account';
 
 Vue.use(Router);
 
@@ -27,6 +28,13 @@ export default new Router({
       name: 'login',
       component: Login,
     },
+    /* todo make this a group */
+    {
+      path: '/account',
+      name: 'account',
+      component: Account,
+    },
+    /* end todo */
     {
       path: '/signup',
       component: Signup,

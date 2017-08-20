@@ -109,7 +109,6 @@ export default {
     getUser(username) {
       fetch(
         `${config.api}/users/u/${username}`,
-        { credentials: 'include' },
       ).then((data) => {
         data.json().then((userInfo) => {
           if (userInfo.status === false) {

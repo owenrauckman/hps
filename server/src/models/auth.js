@@ -1,5 +1,6 @@
 'use strict';
 
+import jwt from 'jsonwebtoken';
 import UserModel from '../models/schemas/user';
 import user from './user';
 import bcrypt from 'bcrypt';
@@ -18,27 +19,36 @@ module.exports = class Auth{
     @params {req, res, next} - Request Data contains user info
   */
   login(req, res, next){
-    passport.authenticate('local', (err, user, info) =>{
-      if(err){
-        return next(err);
-      }
-      if(!user){
+    UserModel.findOne({
+      id: req.body.id
+    }, (err, user)=>{
+      if(err || !user){
         return res.send({ success : false, message : config.auth.loginFailed });
       }
-      req.logIn(user, (err) => {
-        if(err) return next(err);
-        return res.send({ success : true, message : config.auth.loginSuccess, user: user});
+      User.comparePassword(req.body.password, user.password, (err, isMatch)=>{
+        if(err){
+          return res.json({ success : false, message : config.auth.loginFailed });
+        }
+        if(isMatch){
+          // TODO: if prod, set secure: true for the cookie & httpOnly
+          const token = jwt.sign({id: user.id}, config.jwtSecret, {expiresIn: config.jwtExpiration}); //in seconds
+          res.cookie(config.jwtCookieName , token, { secure: false, httpOnly: false, maxAge: config.jwtExpiration * 1000}); // in MS
+
+          return res.send({ success : true, message : config.auth.loginSuccess, user: user});
+        } else{
+          return res.json({ success : false, message : config.auth.loginFailed });
+        }
       });
-    })(req, res, next);
+    });
   }
 
   /*
-    Logout a user and blow away the session data
+    Logout a user and blow away the JWT in the cookie
     @params {req, res} - Request Data contains user info
   */
   logout(req, res){
-    req.logout();
-    res.json({success: true, message: config.auth.loggedOut});
+    res.cookie('hpsjwt2', '', { secure: false, httpOnly: false, maxAge: 100000}); // in MS
+    res.send();
   }
 
   /*
@@ -136,17 +146,5 @@ module.exports = class Auth{
     });
   }
 
-  /*
-    Middleware to make sure a user is authenticated. Will return next if authenticated
-    @params {req, res, next} - Request Data
-  */
-  checkAuth(req, res, next) {
-  	if(req.isAuthenticated()){
-  		return next();
-  	}
-  	else{
-  		return res.json({success: false, message: config.auth.notAuthenticated});
-  	}
-  }
 
 }
