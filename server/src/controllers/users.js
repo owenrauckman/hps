@@ -82,7 +82,9 @@ router.get('/invoices', User.getInvoices, (req, res, next) =>{});
   Secret Route -- Temporary, Base Auth Routes off of this
   */
 router.get('/secret', Auth.checkAuth, (req, res, next) =>{
-  res.json('YOU ARE IN MY MAN');   // add returned data here specific to what route to hit
+  // todo make a different model that returns MORE info for a profile
+  res.json({success: true, message: 'YOU MADE IT'});
+  // User.getProfile(req.params.username).then( res.send.bind(res) );
 });
 
 module.exports = router;

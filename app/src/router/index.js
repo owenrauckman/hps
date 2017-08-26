@@ -11,6 +11,8 @@ import Premium from '@/components/signup/Premium';
 import Pay from '@/components/signup/Pay';
 import Success from '@/components/signup/Success';
 import AdditionalInfo from '@/components/signup/AdditionalInfo';
+import Login from '@/components/account/Login';
+import Dashboard from '@/components/account/Dashboard';
 
 Vue.use(Router);
 
@@ -20,6 +22,15 @@ export default new Router({
       path: '/',
       name: 'Home',
       component: Home,
+    },
+    // Account Nested Routes
+    {
+      path: '/account',
+      component: Dashboard,
+    },
+    {
+      path: '/login',
+      component: Login,
     },
     {
       path: '/signup',

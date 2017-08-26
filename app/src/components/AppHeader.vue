@@ -34,7 +34,7 @@ export default {
         },
         {
           name: 'Log In',
-          href: 'login',
+          href: '/login',
         },
         {
           name: 'Sign Up',
