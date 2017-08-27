@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import createPersistedState from 'vuex-persistedstate';
+import createPersist from 'vuex-localstorage';
 
 const config = require('../../config/appConfig.json');
 
@@ -99,11 +99,27 @@ export default new Vuex.Store({
       state.loadingResults = loadingResults;
     },
     /* -- END HOME PAGE MUTATIONS -- */
+
+    /* -- BASIC INFO SIGN UP -- */
+    updateSignUpInfo(state, signUpInfo){
+      //does nothing, just updates store
+    },
+
+    /* -- STATES SIGN UP -- */
+    updateStates(state, selectedStates){
+      state.signUpInfo.states = selectedStates;
+    },
+
+    /* -- COMPANY SIGN UP -- */
     updateSignUpInfoCompany(state, company){
       state.signUpInfo.company.name = company;
     },
 
     /* eslint-enable */
   },
-  plugins: [createPersistedState()],
+  plugins: [createPersist({
+    namespace: 'namespace-for-state',
+    initialState: {},
+    expires: 5 * 60 * 1e3, //5min
+  })],
 });

@@ -15,7 +15,7 @@
 
       <!-- list selected states -->
       <div class="signup__section__queries">
-        <button class="signup__section__query-button" v-for="state in $store.state.signUpInfo.states" @click="removeQuery(state)">{{state.name.name}}</button>
+        <button class="signup__section__query-button" v-for="state in selectedStates" @click="removeQuery(state)">{{state.name.name}}</button>
       </div>
 
       <!-- list possible states -->
@@ -39,6 +39,7 @@ export default {
     return {
       statePlaceholder: 'Search By State',
       states: [],
+      selectedStates: this.$store.state.signUpInfo.states,
       stateName: '',
       stateSelected: true,
     };
@@ -76,19 +77,17 @@ export default {
     */
     removeQuery(item) {
       if (this.stateExists(this.$store.state.signUpInfo.states, item)) {
-        this.$store.state.signUpInfo.states.splice(
-          this.$store.state.signUpInfo.states.indexOf(item), 1);
-      } else {
-        this.$store.state.signUpInfo.states.push({ name: item, active: false });
+        /* remove checkmark */
+        const index = this.states.findIndex(state => state.name.name === item.name.name);
+        this.states[index].active = false;
+
+        /* remove item from store */
+        this.selectedStates.splice(this.selectedStates.indexOf(item), 1);
       }
 
-      this.states.forEach((state) => {
-        /* eslint-disable */
-        if (state.name === item.name) {
-          state.active = !state.active;
-        }
-        /* eslint-enable */
-      });
+      // Go through and disable items in the list below (checkmarks)
+      this.$store.commit('updateStates', this.selectedStates);
+      this.makeStatesActive();
     },
 
     /*
@@ -99,6 +98,10 @@ export default {
     stateExists(arr, state) {
       return arr.some(el => el.name === state.name);
     },
+    stateExistsDeeper(arr, state) {
+      return arr.some(el => el.name.name === state.name.name);
+    },
+
     /*
       Select a state from the listand set the value in the store
       if the selected state is tapped again, clear the values
@@ -106,39 +109,45 @@ export default {
     */
     selectState(item) {
       /* if the item isn't in the list, add it, otherwise remove it */
-      if (this.stateExists(this.$store.state.signUpInfo.states, item)) {
-        this.$store.state.signUpInfo.states.splice(
-          this.$store.state.signUpInfo.states.indexOf(item), 1);
-      } else {
-        this.$store.state.signUpInfo.states.push({ name: item.name, active: false });
+      if (this.stateExistsDeeper(this.selectedStates, item)) {
+        /* eslint-disable */
+        item.active = false; // remove reference
+        /* eslint-enable */
+
+        this.selectedStates.splice(
+          this.selectedStates.findIndex(state => state.name.name === item.name.name),
+          1,
+        );
+      } else if (!this.stateExistsDeeper(this.selectedStates, item)) {
+        /* eslint-disable */
+        item.active = true; // add reference
+        /* eslint-enable */
+        this.selectedStates.push({ name: item.name, active: true });
       }
 
-      this.states.forEach((state) => {
-        /* eslint-disable */
-        if (state.name === item.name) {
-          state.active = !state.active;
-        }
-        /* eslint-enable */
-      });
+      this.$store.commit('updateStates', this.selectedStates);
     },
     /*
       Selects companies that are already in the store on page load
     */
     makeStatesActive() {
       this.states.forEach((state) => {
-        /* eslint-disable */
-        if (this.$store.state.signUpInfo.states.includes(state.name)) {
-          state.active = !state.active;
-        }
-        /* eslint-enable */
+        this.selectedStates.forEach((activeState) => {
+          if (state.name.name === activeState.name.name) {
+            /* eslint-disable*/
+            state.active = true;
+            /* eslint-enable */
+          }
+        });
       });
     },
     /*
       Validate and make sure a company is selected before moving on
     */
     validateStates() {
-      if (this.$store.state.signUpInfo.states.length > 0) {
+      if (this.selectedStates.length > 0) {
         this.stateSelected = true;
+        this.$store.commit('updateStates', this.selectedStates);
         this.$router.push('/signup/cities');
       } else {
         this.stateSelected = false;

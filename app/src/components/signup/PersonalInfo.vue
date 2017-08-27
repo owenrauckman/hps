@@ -89,6 +89,8 @@ export default {
               }
               /* finally, check to see if both are still available so we can route */
               if (this.emailTaken === false && this.usernameTaken === false) {
+                /* this doesn't do anything, we are just calling it to make sure state updates */
+                this.$store.commit('updateSignUpInfo', '');
                 this.$router.push('/signup/companies');
               }
             });

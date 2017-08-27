@@ -38,7 +38,10 @@ export default {
     };
   },
   mounted() {
-    this.getCompanies();
+    this.getCompanies().then(() => {
+      this.companyName = this.$store.state.signUpInfo.company.name;
+      this.setInitialList(this.$store.state.signUpInfo.company.name);
+    });
   },
   methods: {
     /*
@@ -63,6 +66,20 @@ export default {
         });
       });
     },
+
+    /*
+      Sets the selected item in the list to the current state
+      @param {string} - the current selected item
+    */
+    setInitialList(selectedCompany) {
+      /* eslint-disable */
+      for(let company of this.companies){
+        if (company.name === selectedCompany) {
+          company.active = true;
+        }
+      }
+      /* eslint-enable */
+    },
     /*
       Select a state from the listand set the value in the store
       if the selected state is tapped again, clear the values
@@ -71,18 +88,13 @@ export default {
     selectCompany(item) {
       /* eslint-disable */
       for(let company of this.companies){
-        if (company.name === item.name) {
+        if(company.name === item.name && company.name === this.$store.state.signUpInfo.company.name){
+         company.active = false;
+         this.$store.commit('updateSignUpInfoCompany', '');
+       } else if (company.name === item.name) {
           company.active = !company.active;
           this.$store.commit('updateSignUpInfoCompany', company.name);
-          this.companySelected = true;
-          /* check again if this is false so it doesn't spoof and move forward */
-          if(company.active === false){
-            this.$store.commit('updateSignUpInfoCompany', '');
-            company.active = false;
-          }
-          break;
         } else{
-          this.$store.commit('updateSignUpInfoCompany', '');
           company.active = false;
         }
       }
