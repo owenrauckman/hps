@@ -10,13 +10,14 @@ import passport from 'passport';
 import mongoose from 'mongoose';
 import config from './config.json';
 const passportSetup = require('./models/passportSetup.js');
+const MongoStore = require('connect-mongo')(session);
 
 // Add Controllers
 import users from './controllers/users'
 import search from './controllers/search'
 
 // DB Connection
-mongoose.connect(config.db);
+mongoose.connect(config.db, { useMongoClient: true });
 mongoose.set('Promise', Promise);
 mongoose.Promise = Promise;
 
@@ -43,6 +44,11 @@ app.use(function(req, res, next) {
   next();
 });
 
+// Options for Session Storage
+const sessionStoreOptions = {
+  mongooseConnection: db,
+  touchAfter: config.sessionLength // measured in seconds (lazy)
+}
 
 //Init Session Data and Passport
 app.use(session({
@@ -51,8 +57,9 @@ app.use(session({
   resave: true,
   cookie: {
     secure: false, //todo turn this to true in prod
-    maxAge: 30 * 1000 //30 seconds
-  }
+    maxAge: config.sessionLength * 1000 // multiplied * 1000 b/c measure in millis
+  },
+  store: new MongoStore(sessionStoreOptions)
 }));
 app.use(passport.initialize());
 app.use(passport.session());

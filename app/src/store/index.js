@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import createPersistedState from 'vuex-persistedstate';
 
 const config = require('../../config/appConfig.json');
 
@@ -104,4 +105,5 @@ export default new Vuex.Store({
 
     /* eslint-enable */
   },
+  plugins: [createPersistedState()],
 });

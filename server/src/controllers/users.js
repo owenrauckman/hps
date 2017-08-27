@@ -48,6 +48,16 @@ router.put('/edit/:username', (req, res, next) =>{
   User.editUser(req, res, next);
 });
 
+
+/*
+  PROTECTED ROUTES
+  # Dashboard
+*/
+
+router.get('/dashboard', Auth.checkAuth, (req, res, next) =>{
+  User.getProfile(req.user.username, true).then( res.send.bind(res) );
+});
+
 router.delete('/delete/:username', User.deleteUser, (req, res) =>{})
 
 /*
@@ -78,13 +88,5 @@ router.get('/setDefaultCreditCard', (req, res) =>{
 
 router.get('/invoices', User.getInvoices, (req, res, next) =>{});
 
-/*
-  Secret Route -- Temporary, Base Auth Routes off of this
-  */
-router.get('/secret', Auth.checkAuth, (req, res, next) =>{
-  // todo make a different model that returns MORE info for a profile
-  res.json({success: true, message: 'YOU MADE IT'});
-  // User.getProfile(req.params.username).then( res.send.bind(res) );
-});
 
 module.exports = router;

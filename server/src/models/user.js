@@ -12,10 +12,16 @@ module.exports = class User{
   /*
     Get A User's Profile Information
     @param {string} - The Username for the profile to retrieve
+    @param {bool} - Whether or not we should include private user data
   */
-  getProfile(username){
+  getProfile(username, privateData){
+    /* Decide which items to exclude */
+    let exclude = {_id: 0, password: 0, stripeId: 0, subscriptionItems: 0, __v: 0}
+    if(privateData){
+      exclude = {__v: 0};
+    }
     return new Promise( (resolve, reject)=>{
-      UserSchema.findOne({"username": username}, (err, user) =>{
+      UserSchema.findOne({"username": username}, exclude, (err, user) =>{
         if(err){
           reject({err: err.message});
         }

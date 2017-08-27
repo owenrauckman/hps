@@ -1,6 +1,31 @@
 <template>
   <div class="temp">
-    <h1>{{message}}</h1>
+    <h1>DASHBOARD</h1>
+
+    <h2>ID</h2>
+    <p>{{data._id}}</p>
+
+    <h2>FIRST NAME</h2>
+    <p>{{data.lastName}}</p>
+
+    <h2>LAST NAME</h2>
+    <p>{{data.firstName}}</p>
+
+    <h2>USERNAME</h2>
+    <p>{{data.username}}</p>
+
+    <h2>PASSWORD</h2>
+    <p>{{data.password}}</p>
+
+    <h2>Email</h2>
+    <p>{{data.emailAddress}}</p>
+
+    <h2>Subscription Items</h2>
+    <p>{{data.subscriptionItems}}</p>
+
+    <h2>Company</h2>
+    <p>{{data.company}}</p>
+
   </div>
 </template>
 
@@ -10,10 +35,11 @@ import axios from 'axios';
 const config = require('../../../config/appConfig.json');
 
 export default {
-  name: 'login',
+  name: 'dashboard',
   data() {
     return {
       message: '',
+      data: {},
     };
   },
   beforeMount() {
@@ -25,18 +51,21 @@ export default {
   methods: {
     checkAuth() {
       // login API
-      axios.get(`${config.api}/users/secret`, { withCredentials: true })
+      axios.get(`${config.api}/users/dashboard`, { withCredentials: true })
         .then((response) => {
-          console.log(response);
-          if (response.data.success === true) {
+          if (response.data.status === true) {
+            this.data = response.data.user;
             this.$store.state.isLoggedIn = true;
             this.message = 'YOU ARE LOGGED IN';
           } else {
             this.message = 'NOT AUTHORIZED';
+            this.$store.state.isLoggedIn = false;
+            this.$router.push('/login');
           }
         })
         .catch((error) => {
           if (error) {
+            // todo 500 page
             this.message = 'SOME ERROR HAPPENED';
           }
         });

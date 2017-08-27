@@ -3,7 +3,6 @@
 // Add Dependencies
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-var mongooseHidden = require('mongoose-hidden')({ defaultHidden: { password: true, __v: true } });
 
 var UserSchema = mongoose.Schema({
   firstName: {
@@ -18,7 +17,6 @@ var UserSchema = mongoose.Schema({
   },
   password: {
     type: String,
-    hide: true
   },
   emailAddress: {
     type: String
@@ -27,22 +25,17 @@ var UserSchema = mongoose.Schema({
     type: String
   },
   stripeId: {
-    type: String
+    type: String,
   },
   subscriptionItems: {
-    type: Array
+    type: Array,
   },
   profilePicture: {
     type: String
-  },
-  profileViews: {
-    type: Number
   },
   company: {
     type: Object
   }
 });
 
-// Hide Fields Specified in mongooseHidden from public API and export module
-UserSchema.plugin(mongooseHidden);
 let User = module.exports = mongoose.model('User', UserSchema);

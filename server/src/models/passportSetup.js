@@ -50,9 +50,6 @@ passport.serializeUser((user, done) => {
 */
 passport.deserializeUser((id, done) => {
   User.getUserById(id, (err, user) => {
-		console.log('waooo');
-		console.log(user);
-
     done(err, user);
   });
 });

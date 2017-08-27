@@ -9,14 +9,23 @@
       </button>
     </div>
     <ul :class="[{ 'header__content--active': menuActive },'header__content']">
-      <router-link :to="item.href" v-for="item in menu" :key="item.name" class="header__content__item">
-        <li @click="toggleMenu">{{item.name}}</li>
-      </router-link>
+      <router-link to="about" class="header__content__item"><li @click="toggleMenu">About</li></router-link>
+      <router-link to="pricing" class="header__content__item"><li @click="toggleMenu">Pricing</li></router-link>
+      <!-- login or out -->
+      <router-link v-if="$store.state.isLoggedIn" to="login" class="header__content__item"><li @click="toggleMenu('logout')">Log Out</li></router-link>
+      <router-link v-else to="login" class="header__content__item"><li @click="toggleMenu">Log In</li></router-link>
+      <!-- end login or out -->
+      <router-link v-if="$store.state.isLoggedIn" to="account" class="header__content__item"><li @click="toggleMenu">Account</li></router-link>
+      <router-link v-else to="signup" class="header__content__item"><li @click="toggleMenu">Sign Up</li></router-link>
     </ul>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
+const config = require('../../config/appConfig.json');
+
 export default {
   name: 'header',
   data() {
@@ -48,11 +57,33 @@ export default {
   methods: {
     /*
       Toggles the menu on mobile devices
+      @param {string} - Option to logout on click
     */
-    toggleMenu() {
+    toggleMenu(action) {
+      if (action === 'logout') {
+        this.logout();
+      }
       if (window.outerWidth < 1024) {
         this.menuActive = !this.menuActive;
       }
+    },
+
+    logout() {
+      // logout API
+      axios.get(`${config.api}/users/logout`, { withCredentials: true })
+        .then((response) => {
+          if (response.data.success === true) {
+            this.$store.state.isLoggedIn = false;
+            this.$router.push('/login');
+          } else {
+            alert('something went wrong when logging out. Please try again.');
+          }
+        })
+        .catch((error) => {
+          if (error) {
+            alert('something went wrong when logging out. Please try again.');
+          }
+        });
     },
   },
 };
