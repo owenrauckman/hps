@@ -46,15 +46,14 @@ app.use(function(req, res, next) {
 
 // Options for Session Storage
 const sessionStoreOptions = {
-  mongooseConnection: db,
-  touchAfter: config.sessionLength // measured in seconds (lazy)
+  mongooseConnection: db
 }
 
 //Init Session Data and Passport
 app.use(session({
   secret: config.sessionSecret,
-  saveUninitialized: true,
-  resave: true,
+  saveUninitialized: false,
+  resave: false,
   cookie: {
     secure: false, //todo turn this to true in prod
     maxAge: config.sessionLength * 1000 // multiplied * 1000 b/c measure in millis
