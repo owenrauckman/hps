@@ -2,16 +2,16 @@
   <div class="signup__section">
     <h2 class="signup__section__heading">Choose Which Areas You Want Premium In</h2>
     <div class="signup__section__form__container">
-      <div v-for="state, stateIndex in chosenStates" class="signup__section__form__box">
+      <div v-for="state, stateIndex in $store.state.signUpInfo.chosenStates" class="signup__section__form__box">
         <b class="signup__section__form__box--state">{{state.name}}</b>
         <div v-if="state.premiumAvailable">
-          <input type="checkbox" :id="['toggleState' + stateIndex]" @click="addPremium(state, 'state')" class="signup__section__form__hide-checkbox">
+          <input type="checkbox" :id="['toggleState' + stateIndex]" @click="addPremium(state, 'state')" class="signup__section__form__hide-checkbox" :checked="state.premium">
           <label v-bind:for="['toggleState' + stateIndex]" class="signup__section__form__switch-button"></label>
         </div>
-        <div v-for="(city, cityIndex) in chosenCities" v-if="city.state === state.name" class="signup__section__form__box">
+        <div v-for="(city, cityIndex) in $store.state.signUpInfo.chosenCities" v-if="city.state === state.name" class="signup__section__form__box">
           <p>{{city.city}}</p>
           <div v-if="city.premiumAvailable">
-            <input type="checkbox" :id="['toggleCity' + cityIndex]"  @click="addPremium(city, 'city')" class="signup__section__form__hide-checkbox">
+            <input type="checkbox" :id="['toggleCity' + cityIndex]"  @click="addPremium(city, 'city')" class="signup__section__form__hide-checkbox" :checked="city.premium">
             <label v-bind:for="['toggleCity' + cityIndex]" class="signup__section__form__switch-button"></label>
           </div>
         </div>
@@ -36,25 +36,31 @@ export default {
   name: 'premium',
   data() {
     return {
-      chosenStates: [],
-      chosenCities: [],
+      chosenStates: this.$store.state.signUpInfo.chosenStates,
+      chosenCities: this.$store.state.signUpInfo.chosenCities,
       basicPlans: 0,
       proPlans: 0,
       premiumPlans: 0,
     };
   },
   beforeMount() {
+    /* Reset these before each mount to keep from doubling on reMount */
+
     this.$store.state.signUpInfo.states.forEach((state) => {
       this.checkPremium(
       this.$store.state.signUpInfo.company.name,
       state.name.abbr,
     ).then((stateResponse) => {
-      this.chosenStates.push({
+      const stateObject = {
         abbr: state.name.abbr,
         name: state.name.name,
         premiumAvailable: stateResponse.premiumAvailable,
         premium: false,
-      });
+      };
+      /* make sure it doesn't already exist before pushing */
+      if (!this.stateExists(this.chosenStates, stateObject)) {
+        this.chosenStates.push(stateObject);
+      }
 
       this.$store.state.signUpInfo.cities.forEach((city) => {
         if (city.state === state.name.name) {
@@ -63,12 +69,17 @@ export default {
             state.name.abbr,
             city.city,
           ).then((cityResponse) => {
-            this.chosenCities.push({
+            const cityObject = {
               state: state.name.name,
               city: city.city,
               premiumAvailable: cityResponse.premiumAvailable,
               premium: false,
-            });
+            };
+
+            /* make sure it doesn't already exist before pushing */
+            if (!this.cityExists(this.chosenCities, cityObject)) {
+              this.chosenCities.push(cityObject);
+            }
           });
         }
       });
@@ -77,6 +88,22 @@ export default {
   },
   methods: {
 
+    /*
+      Checks to see if an object exists in array
+      @param {array} - list of cities to check against
+      @param {object} - the object that is being checked
+    */
+    cityExists(arr, city) {
+      return arr.some(el => el.city === city.city && el.state === city.state);
+    },
+
+    stateExists(arr, state) {
+      return arr.some(el => el.name === state.name);
+    },
+
+    /*
+      Checks to see if city or state has premium
+    */
     checkPremium(company, state, city) {
       /* Build the URL based on state or city */
       let url;
@@ -120,6 +147,10 @@ export default {
         item.premium = true;
         this.$store.state.signUpInfo.totalPrice += priceToChange;
       }
+
+      /* Notify the store */
+      this.$store.commit('updatePremiumCities', this.chosenCities);
+      this.$store.commit('updatePremiumStates', this.chosenStates);
       /* eslint-enable */
     },
 

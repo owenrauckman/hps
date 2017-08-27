@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <router-link to="/signup/premium" class="signup__section__button">Continue</router-link>
+    <a @click="continueToPremium" class="signup__section__button">Continue</a>
 
   </div>
 </template>
@@ -49,6 +49,13 @@ export default {
   data() {
     return {
     };
+  },
+  methods: {
+    continueToPremium(e) {
+      e.preventDefault();
+      // this.$store.commit('updateAdditionalInfo', '');
+      this.$router.push('/signup/premium');
+    },
   },
 };
 </script>

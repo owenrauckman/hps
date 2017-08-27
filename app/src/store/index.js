@@ -45,6 +45,8 @@ export default new Vuex.Store({
     signUpInfo: {
       states: [],
       cities: [],
+      chosenStates: [],
+      chosenCities: [],
       totalPrice: 0,
       firstName: '',
       lastName: '',
@@ -110,9 +112,29 @@ export default new Vuex.Store({
       state.signUpInfo.states = selectedStates;
     },
 
+    /* -- Cities SIGN UP -- */
+    updateCities(state, selectedStates){
+      //does nothing, just updates store
+    },
+
+    /* -- Additional Info SIGN UP -- */
+    updateAdditionalInfo(state, info){
+      //does nothing, just updates store
+    },
+
     /* -- COMPANY SIGN UP -- */
     updateSignUpInfoCompany(state, company){
       state.signUpInfo.company.name = company;
+    },
+
+    /* -- PREMIUM CITIES SIGN UP -- */
+    updatePremiumCities(state, cities){
+      state.signUpInfo.chosenCities = cities;
+    },
+
+    /* -- PREMIUM STATES SIGN UP -- */
+    updatePremiumStates(state, states){
+      state.signUpInfo.chosenStates = states;
     },
 
     /* eslint-enable */

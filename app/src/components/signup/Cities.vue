@@ -47,8 +47,19 @@ export default {
     };
   },
   mounted() {
-    this.getCities(this.$store.state.signUpInfo.states[0].name.abbr);
+    this.getCities(this.$store.state.signUpInfo.states[0].name.abbr).then(() => {
+      this.makeCitiesActive();
+    });
     this.activeState = this.$store.state.signUpInfo.states[0].name.name;
+
+    // set all states inactive except first TODO move this to a function
+    this.$store.state.signUpInfo.states.forEach((state, index) => {
+      if (index !== 0) {
+        /* eslint-disable */
+        state.active = false;
+        /* eslint-enable */
+      }
+    });
   },
   methods: {
     /*
@@ -134,6 +145,9 @@ export default {
         }
         /* eslint-enable */
       });
+
+      /* Update store */
+      this.$store.commit('updateCities', '');
     },
 
     /*
@@ -168,7 +182,7 @@ export default {
         const objectToCheckAgainst = { city: city.name, state: this.activeState };
         /* eslint-disable */
         if (this.cityExists(this.$store.state.signUpInfo.cities, objectToCheckAgainst)) {
-          city.active = !city.active;
+          city.active = true;
         }
         /* eslint-enable */
       });
