@@ -1,11 +1,14 @@
 'use strict';
 
+import async from 'async';
+import crypto from 'crypto';
 import UserModel from '../models/schemas/user';
 import user from './user';
 import bcrypt from 'bcrypt';
 import passport from 'passport';
 import config from '../config.json';
 const User = new user();
+const mailgun = require('mailgun-js')({apiKey: config.mail.key, domain: config.mail.domain});
 const stripe = require("stripe")(config.stripeTestKey);
 
 module.exports = class Auth{
@@ -88,10 +91,6 @@ module.exports = class Auth{
           });
           return customer;
         }).then((customer) =>{
-          /* todo remove these */
-          console.log('basic: ' + req.body.basicPlans);
-          console.log('pro: ' + req.body.proPlans);
-          console.log('premium: ' + req.body.premiumPlans);
           stripe.subscriptions.create({
             customer: customer.id,
             /* This is Generated from the stripe.js form */
@@ -133,6 +132,138 @@ module.exports = class Auth{
           });
         });
       }
+    });
+  }
+
+  /*
+    Forgot Password - Generates a random token used for reset link and stored in mongo temporarily
+    @params {req, res, next} - Request Data
+  */
+  forgotPassword(req, res, next){
+
+    /* generate token */
+    const createCrypto = new Promise((resolve, reject)=>{
+      crypto.randomBytes(20, (err, buf)=> {
+        if(err){
+          reject({success: false, message: config.errors.general});
+        }
+        const token = buf.toString('hex');
+        resolve(token);
+      });
+    }).catch(()=>{
+      return res.json({success: false, message: config.errors.general});
+    });
+
+    /* set token and expiration (save to mongo) */
+    createCrypto.then((token)=>{
+      return new Promise((resolve, reject)=>{
+        UserModel.findOne({emailAddress: req.body.emailAddress}, (err, user)=>{
+          if(!user || user == null){
+            reject({success: false, message: config.errors.userDoesNotExist});
+          }
+          if(err){
+            reject({success: false, message: config.errors.general});
+          }
+
+          user.resetPasswordToken = token;
+          user.resetPasswordExpires = Date.now() + (1800 * 1000); // 30min (in millis)
+
+          user.save((err)=>{
+            if(err){
+              reject({success: false, message: config.errors.general});
+            }
+            resolve({token: token, user: user});
+          });
+        });
+      })
+      .catch((err)=>{
+        return res.json({success: false, message: config.errors.general});
+      })
+      /* Send email once token is generated and saved */
+      .then((response)=>{
+        const emailMessage = `you are receiving this because you have requested the reset of the password for your account. </br></br> Please click the following link, or paste it into your browser to complete the process: </br></br>
+         ${config.mail.resetRootUrl}?token=${response.token} </br></br> If you did not request this, please ignore this email and your password will remain unchanged.`;
+
+         this.sendMail(response.user.emailAddress, config.mail.passwordResetSubject, emailMessage, req, res);
+
+      }).catch((err)=>{
+        if(err){
+          return res.json({success: false, message: config.errors.general});
+        }
+      });
+    });
+  }
+
+  /*
+    Reset Password from the reset password page
+    @params {req, res, next} - Request Data
+  */
+  resetPassword(req, res, next){
+    const findUser = new Promise((resolve, reject)=>{
+      UserModel.findOne(
+        {resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } },
+        (err, user)=> {
+          if (!user || user === null || err) {
+            reject({success: false, message: config.errors.general});
+          } else{
+            /* bcrypt the password and unset the token/expiration */
+            bcrypt.genSalt(10, (err, salt) =>{
+              bcrypt.hash(req.body.password, salt, (err, hash) =>{
+                user.password = hash;
+                user.resetPasswordToken = undefined;
+                user.resetPasswordExpires = undefined;
+                /* save the new user */
+                user.save((error)=>{
+                  if(error){
+                    reject({success: false, message: config.errors.general});
+                  }
+                  resolve(user);
+                });
+              });
+            });
+          }
+        });
+    }).catch((err)=>{
+      console.log(config.errors.general);
+    });
+
+    findUser.then((user, err)=>{
+      if(!user || user === undefined || err){
+        return res.json({success: false, message: config.errors.general});
+      }
+
+      /* Send new email */
+      const emailMessage = `Hello, ${user.firstName}, This is a confirmation that the password for your account ${user.emailAddress} has been changed.`;
+      this.sendMail(user.emailAddress, config.mail.passwordConfirmSubject, emailMessage, req, res);
+
+    }).catch((err)=>{
+      return res.json({success: false, message: config.errors.general});
+    });
+  }
+
+  /*
+    Send Email - Utilizes mailgun API to send an email
+    @param {String} Email Address
+    @param {String} subject
+    @param {String} message (HTML)
+    @params {Object} req, res
+  */
+  sendMail(emailAddress, subject, message, req, res){
+
+    console.log(user);
+    /* todo send as a good looking template */
+    const data = {
+      from: config.mail.fromAddress,
+      to: emailAddress,
+      subject: subject,
+      html: message
+    };
+
+    mailgun.messages().send(data, (error, body)=> {
+      if(error){
+        return res.json({success: false, message: config.errors.general});
+      }
+      return res.json({success: true, message: config.mail.success});
     });
   }
 

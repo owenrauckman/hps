@@ -35,6 +35,13 @@ var UserSchema = mongoose.Schema({
   },
   company: {
     type: Object
+  },
+  //for password reset
+  resetPasswordExpires: {
+    type: Number
+  },
+  resetPasswordToken: {
+    type: String
   }
 });
 

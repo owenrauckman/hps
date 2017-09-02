@@ -31,6 +31,8 @@ router.get('/u/u/:username', (req, res) =>{
   # Register
   # Edit
   # Delete
+  # Forgot Password
+  # Reset Password
 */
 router.post('/login', (req, res, next) =>{
   Auth.login(req, res, next);
@@ -46,6 +48,14 @@ router.post('/register', (req, res) =>{
 
 router.put('/edit/:username', (req, res, next) =>{
   User.editUser(req, res, next);
+});
+
+router.post('/forgotPassword', (req, res, next) =>{
+  Auth.forgotPassword(req, res, next);
+});
+
+router.post('/resetPassword', (req, res, next) =>{
+  Auth.resetPassword(req, res, next);
 });
 
 

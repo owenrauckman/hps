@@ -13,6 +13,8 @@ import Success from '@/components/signup/Success';
 import AdditionalInfo from '@/components/signup/AdditionalInfo';
 import Login from '@/components/account/Login';
 import Dashboard from '@/components/account/Dashboard';
+import Reset from '@/components/account/Reset';
+import ForgotPassword from '@/components/account/ForgotPassword';
 
 Vue.use(Router);
 
@@ -31,6 +33,14 @@ export default new Router({
     {
       path: '/login',
       component: Login,
+    },
+    {
+      path: '/forgot-password',
+      component: ForgotPassword,
+    },
+    {
+      path: '/reset',
+      component: Reset,
     },
     {
       path: '/signup',
