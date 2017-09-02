@@ -43,7 +43,7 @@
   },
 	"mail": {
 		"domain": "sandboxcacd01660f4146c3a5a13f14280eed4e.mailgun.org",
-		"key": "key-b971a56ef7ff80b8058608420768926d",
+		"key": "",
 		"fromAddress": "Mailgun Sandbox <postmaster@sandboxcacd01660f4146c3a5a13f14280eed4e.mailgun.org>",
 		"passwordResetSubject": "Home Party Shows Password Reset Link",
 		"passwordConfirmSubject": "Your Home Party Shows Password Has Been Updated",
