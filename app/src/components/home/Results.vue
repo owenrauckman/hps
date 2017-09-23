@@ -100,7 +100,7 @@ export default {
       )
       .then((data) => {
         data.json().then((users) => {
-          /* check if there are users returned*/
+          /* check if there are users returned */
           if (users.users && (users.users.premiumStates.length > 0 ||
               users.users.premiumCities.length > 0 ||
               users.users.basic.length > 0)) {

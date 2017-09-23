@@ -142,6 +142,6 @@ export default new Vuex.Store({
   plugins: [createPersist({
     namespace: 'namespace-for-state',
     initialState: {},
-    expires: 5 * 60 * 1e3, //5min
+    expires: 5 * 60 * 1e3, // 5min
   })],
 });
