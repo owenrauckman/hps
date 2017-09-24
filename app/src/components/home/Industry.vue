@@ -4,14 +4,14 @@
 
         <div class="filters__section__input-container">
           <div class="filters__section__input-wrapper">
-            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="industrySearchPlaceholder" v-model="$store.state.filterQueries.industry.name">
+            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="industrySearchPlaceholder" v-model="$store.state.temp.filterQueries.industry.name">
             <SearchButton/>
           </div>
         </div>
 
         <p v-if="needState" class="filter-required">{{needStateMessage}}</p>
         <ul class="filters__section__list filters--margin">
-          <li v-for="industry in filterBy(industries, $store.state.filterQueries.industry.name, 'name')" @click="selectIndustry(industry)" :class="[{ 'filters__section__list__item--selected':industry.active },'filters__section__list__item']">{{industry.name}}</li>
+          <li v-for="industry in filterBy(industries, $store.state.temp.filterQueries.industry.name, 'name')" @click="selectIndustry(industry)" :class="[{ 'filters__section__list__item--selected':industry.active },'filters__section__list__item']">{{industry.name}}</li>
         </ul>
       </div>
     </div>
@@ -21,8 +21,6 @@
 
 <script>
 import SearchButton from './SearchButton';
-
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'industry',
@@ -36,11 +34,11 @@ export default {
   },
   components: { SearchButton },
   mounted() {
-    if (this.$store.state.filterQueries.state.name.length === 0) {
+    if (this.$store.state.temp.filterQueries.state.name.length === 0) {
       this.needState = true;
     } else {
       this.getIndustries().then(() => {
-        this.selectIndustry(this.$store.state.filterQueries.industry);
+        this.selectIndustry(this.$store.state.temp.filterQueries.industry);
       });
     }
   },
@@ -50,7 +48,7 @@ export default {
     */
     getIndustries() {
       return new Promise((resolve, reject) => {
-        fetch(`${config.api}/search/industries`).then((data, err) => {
+        fetch(`${this.$config.default.api}/search/industries`).then((data, err) => {
           if (err) {
             reject('Something went wrong fetching industries');
           }
@@ -93,7 +91,7 @@ export default {
       Checks if input is empty, if so, sets all cities to inactive class (removes check)
     */
     checkForEmptyInput() {
-      if (this.$store.state.filterQueries.industry.name.length === 0) {
+      if (this.$store.state.temp.filterQueries.industry.name.length === 0) {
         this.industries.forEach((industry) => {
           /* eslint-disable */
           industry.active = false;

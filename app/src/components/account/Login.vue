@@ -11,9 +11,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'login',
@@ -34,11 +31,11 @@ export default {
       e.preventDefault();
 
       // login API
-      axios.post(`${config.api}/users/login`, this.credentials, { withCredentials: true })
+      this.axios.post(`${this.$config.default.api}/users/login`, this.credentials, { withCredentials: true })
         .then((response) => {
           /* eslint-disable */
           if (response.data.success === true) {
-            this.$store.state.isLoggedIn = true;
+            this.$store.state.temp.isLoggedIn = true;
             this.$router.push('/account');
           } else {
             this.showError = true;

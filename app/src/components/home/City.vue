@@ -4,14 +4,14 @@
 
         <div class="filters__section__input-container">
           <div class="filters__section__input-wrapper">
-            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="citySearchPlaceholder" v-model="$store.state.filterQueries.city.name">
+            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="citySearchPlaceholder" v-model="$store.state.temp.filterQueries.city.name">
             <SearchButton/>
           </div>
         </div>
 
         <p v-if="needState" class="filter-required">{{needStateMessage}}</p>
         <ul class="filters__section__list filters--margin">
-          <li v-for="city in filterBy(cities, $store.state.filterQueries.city.name, 'name')" @click="selectCity(city)" :class="[{ 'filters__section__list__item--selected':city.active },'filters__section__list__item']">{{city.name}}</li>
+          <li v-for="city in filterBy(cities, $store.state.temp.filterQueries.city.name, 'name')" @click="selectCity(city)" :class="[{ 'filters__section__list__item--selected':city.active },'filters__section__list__item']">{{city.name}}</li>
         </ul>
       </div>
     </div>
@@ -21,8 +21,6 @@
 
 <script>
 import SearchButton from './SearchButton';
-
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'city',
@@ -36,12 +34,12 @@ export default {
   },
   components: { SearchButton },
   mounted() {
-    if (this.$store.state.filterQueries.state.name.length === 0) {
+    if (this.$store.state.temp.filterQueries.state.name.length === 0) {
       this.needState = true;
     } else {
       this.needState = false;
-      this.getCities(this.$store.state.filterQueries.state.abbr).then(() => {
-        this.selectCity(this.$store.state.filterQueries.city);
+      this.getCities(this.$store.state.temp.filterQueries.state.abbr).then(() => {
+        this.selectCity(this.$store.state.temp.filterQueries.city);
       });
     }
   },
@@ -51,7 +49,7 @@ export default {
     */
     getCities(state) {
       return new Promise((resolve, reject) => {
-        fetch(`${config.api}/search/cities?state=${state}`).then((data, err) => {
+        fetch(`${this.$config.default.api}/search/cities?state=${state}`).then((data, err) => {
           if (err) {
             reject('Something went wrong fetching cities');
           }
@@ -94,7 +92,7 @@ export default {
       Checks if input is empty, if so, sets all cities to inactive class (removes check)
     */
     checkForEmptyInput() {
-      if (this.$store.state.filterQueries.city.name.length === 0) {
+      if (this.$store.state.temp.filterQueries.city.name.length === 0) {
         this.cities.forEach((city) => {
           /* eslint-disable */
           city.active = false;

@@ -13,8 +13,8 @@
           </div>
           <div class="signup__cost">
             <p class="signup__cost__copy">Your monthly subscription fee is: </p>
-            <p class="signup__cost__price" v-if="this.$store.state.signUpInfo.totalPrice <= 0">Free</p>
-            <p class="signup__cost__price" v-else>${{this.$store.state.signUpInfo.totalPrice}}</p>
+            <p class="signup__cost__price" v-if="this.$store.state.temp.signUpInfo.totalPrice <= 0">Free</p>
+            <p class="signup__cost__price" v-else>${{this.$store.state.temp.signUpInfo.totalPrice}}</p>
           </div>
         </div>
       </div>
@@ -33,7 +33,7 @@ export default {
   },
   components: { PersonalInfo },
   beforeMount() {
-    this.$store.state.menuType = 'signup';
+    this.$store.state.temp.menuType = 'signup';
   },
   mounted() {
     /* set the title of the page */

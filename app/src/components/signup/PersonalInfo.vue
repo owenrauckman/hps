@@ -3,31 +3,31 @@
     <h2 class="signup__section__heading">Personal Information</h2>
     <div class="signup__section__form">
       <div class="signup__section__form--half">
-        <input :class="[{ 'signup__section__form__input--error': errors.has('first_name') },'signup__section__form__input']" v-model="$store.state.signUpInfo.firstName" v-validate="{ rules: { required: true} }" type="text" name="first_name" placeholder="*First Name"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('first_name') },'signup__section__form__input']" v-model="$store.state.temp.signUpInfo.firstName" v-validate="{ rules: { required: true} }" type="text" name="first_name" placeholder="*First Name"/>
         <span v-show="errors.has('first_name')" class="signup__section__form__error">Please enter your first name.</span>
       </div>
       <div class="signup__section__form--half">
-        <input :class="[{ 'signup__section__form__input--error': errors.has('last_name') },'signup__section__form__input']" v-model="$store.state.signUpInfo.lastName" v-validate="{ rules: { required: true} }" type="text" name="last_name" placeholder="*Last Name"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('last_name') },'signup__section__form__input']" v-model="$store.state.temp.signUpInfo.lastName" v-validate="{ rules: { required: true} }" type="text" name="last_name" placeholder="*Last Name"/>
         <span v-show="errors.has('last_name')" class="signup__section__form__error">Please enter your last name.</span>
       </div>
       <div class="signup__section__form--full">
-        <input :class="[{ 'signup__section__form__input--error': errors.has('username') },'signup__section__form__input']" v-model="$store.state.signUpInfo.username" v-validate="{ rules: { required: true} }" type="text" name="username" placeholder="*Username"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('username') },'signup__section__form__input']" v-model="$store.state.temp.signUpInfo.username" v-validate="{ rules: { required: true} }" type="text" name="username" placeholder="*Username"/>
         <span v-show="errors.has('username')" class="signup__section__form__error">Please enter a username.</span>
         <span v-show="usernameTaken" class="signup__section__form__error">That username is already taken. Please choose another.</span>
       </div>
       <div class="signup__section__form--half">
-        <input :class="[{ 'signup__section__form__input--error': errors.has('email') },'signup__section__form__input']" v-model="$store.state.signUpInfo.emailAddress" v-validate="{ rules: { required: true, email: true } }" type="email" name="email" placeholder="*Email Address"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('email') },'signup__section__form__input']" v-model="$store.state.temp.signUpInfo.emailAddress" v-validate="{ rules: { required: true, email: true } }" type="email" name="email" placeholder="*Email Address"/>
         <span v-show="errors.has('email')" class="signup__section__form__error">Please enter a valid email address.</span>
         <span v-show="emailTaken" class="signup__section__form__error">There is already an account with that email address. Please login or use another address.</span>
       </div>
       <div class="signup__section__form--half">
-        <input :class="[{ 'signup__section__form__input--error': errors.has('phone') },'signup__section__form__input']" v-model="$store.state.signUpInfo.phoneNumber" v-validate="'numeric'" name="phone" type="tel" placeholder="Phone Number"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('phone') },'signup__section__form__input']" v-model="$store.state.temp.signUpInfo.phoneNumber" v-validate="'numeric'" name="phone" type="tel" placeholder="Phone Number"/>
         <span v-show="errors.has('phone')" class="signup__section__form__error">Please enter a valid phone number</span>
       </div>
       <div class="signup__section__form--full">
         <label for="profileImage" class="signup__section__upload">
           <div class="signup__section__upload__box signup__section__upload__box--image">
-            <div class="signup__section__upload__box__image" :style="{ 'background-image': `url('${$store.state.signUpInfo.profilePicture}')` }" alt="Profile Image"></div>
+            <div class="signup__section__upload__box__image" :style="{ 'background-image': `url('${$store.state.temp.signUpInfo.profilePicture}')` }" alt="Profile Image"></div>
           </div>
           <div class="signup__section__upload__box">
             <span class="signup__section__upload__box__info">Upload Profile Picture</span>
@@ -36,7 +36,7 @@
         <input id="profileImage" style="display:none" type="file" @change="onFileChange">
       </div>
       <div class="signup__section__form--half">
-        <input :class="[{ 'signup__section__form__input--error': errors.has('password') },'signup__section__form__input']" v-model="$store.state.signUpInfo.password" v-validate="{ rules: { required: true } }" type="password" name="password" placeholder="*Password"/>
+        <input :class="[{ 'signup__section__form__input--error': errors.has('password') },'signup__section__form__input']" v-model="$store.state.temp.signUpInfo.password" v-validate="{ rules: { required: true } }" type="password" name="password" placeholder="*Password"/>
         <span v-show="errors.has('password')" class="signup__section__form__error">Please enter a password.</span>
       </div>
       <div class="signup__section__form--half">
@@ -52,10 +52,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const config = require('../../../config/appConfig.json');
-
 export default {
   name: 'personal-info',
   data() {
@@ -103,7 +99,7 @@ export default {
     */
     isUsernameAvailable() {
       return new Promise((resolve) => {
-        axios.get(`${config.api}/users/u/u/${encodeURIComponent(this.$store.state.signUpInfo.username)}`)
+        this.axios.get(`${this.$config.default.api}/users/u/u/${encodeURIComponent(this.$store.state.temp.signUpInfo.username)}`)
         .then((response) => {
           if (response.data.userExists) {
             resolve(false);
@@ -119,7 +115,7 @@ export default {
     */
     isEmailAvailable() {
       return new Promise((resolve) => {
-        axios.get(`${config.api}/users/u/e/${encodeURIComponent(this.$store.state.signUpInfo.emailAddress)}`)
+        this.axios.get(`${this.$config.default.api}/users/u/e/${encodeURIComponent(this.$store.state.temp.signUpInfo.emailAddress)}`)
         .then((response) => {
           if (response.data.userExists) {
             resolve(false);
@@ -188,7 +184,7 @@ export default {
           /* draw the new canvas image and assign it to the store */
           ctx.drawImage(img, 0, 0, width, height, 0, 0, width, height);
           const compressedBase64 = canvas.toDataURL('image/png');
-          this.$store.state.signUpInfo.profilePicture = compressedBase64;
+          this.$store.state.temp.signUpInfo.profilePicture = compressedBase64;
         };
       };
       reader.readAsDataURL(file);

@@ -30,9 +30,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'dashboard',
@@ -51,15 +48,15 @@ export default {
   methods: {
     checkAuth() {
       // login API
-      axios.get(`${config.api}/users/dashboard`, { withCredentials: true })
+      this.axios.get(`${this.$config.default.api}/users/dashboard`, { withCredentials: true })
         .then((response) => {
           if (response.data.status === true) {
             this.data = response.data.user;
-            this.$store.state.isLoggedIn = true;
+            this.$store.state.temp.isLoggedIn = true;
             this.message = 'YOU ARE LOGGED IN';
           } else {
             this.message = 'NOT AUTHORIZED';
-            this.$store.state.isLoggedIn = false;
+            this.$store.state.temp.isLoggedIn = false;
             this.$router.push('/login');
           }
         })

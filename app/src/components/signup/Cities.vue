@@ -6,7 +6,7 @@
 
       <!-- list out possible states, make first active by default -->
       <div class="signup__section__queries">
-        <button :class="[{ 'signup__section__query-button--active':state.active || state.name.name === activeState },'signup__section__query-button']" v-for="state in $store.state.signUpInfo.states" @click="selectState(state)">{{state.name.name}}</button>
+        <button :class="[{ 'signup__section__query-button--active':state.active || state.name.name === activeState },'signup__section__query-button']" v-for="state in $store.state.temp.signUpInfo.states" @click="selectState(state)">{{state.name.name}}</button>
       </div>
 
       <!-- filter cities -->
@@ -18,7 +18,7 @@
 
       <!-- list selected cities, conditionally by which state is active -->
       <div class="signup__section__queries">
-        <button class="signup__section__query-button signup__section__query-button--remove" v-for="city in $store.state.signUpInfo.cities" v-if="city.state === activeState" @click="removeCity(city)">{{city.city}}</button>
+        <button class="signup__section__query-button signup__section__query-button--remove" v-for="city in $store.state.temp.signUpInfo.cities" v-if="city.state === activeState" @click="removeCity(city)">{{city.city}}</button>
       </div>
 
       <!-- list the cities in a state with conditional active checks -->
@@ -34,8 +34,6 @@
 </template>
 
 <script>
-const config = require('../../../config/appConfig.json');
-
 export default {
   name: 'cities',
   data() {
@@ -47,13 +45,13 @@ export default {
     };
   },
   mounted() {
-    this.getCities(this.$store.state.signUpInfo.states[0].name.abbr).then(() => {
+    this.getCities(this.$store.state.temp.signUpInfo.states[0].name.abbr).then(() => {
       this.makeCitiesActive();
     });
-    this.activeState = this.$store.state.signUpInfo.states[0].name.name;
+    this.activeState = this.$store.state.temp.signUpInfo.states[0].name.name;
 
     // set all states inactive except first TODO move this to a function
-    this.$store.state.signUpInfo.states.forEach((state, index) => {
+    this.$store.state.temp.signUpInfo.states.forEach((state, index) => {
       if (index !== 0) {
         /* eslint-disable */
         state.active = false;
@@ -67,7 +65,7 @@ export default {
     */
     getCities(state) {
       return new Promise((resolve, reject) => {
-        fetch(`${config.api}/search/cities?state=${state}`).then((data, err) => {
+        fetch(`${this.$config.default.api}/search/cities?state=${state}`).then((data, err) => {
           if (err) {
             reject('Something went wrong fetching cities');
           }
@@ -98,7 +96,7 @@ export default {
       Removes element from query and performs a new search
     */
     selectState(item) {
-      this.$store.state.signUpInfo.states.forEach((state) => {
+      this.$store.state.temp.signUpInfo.states.forEach((state) => {
         /* eslint-disable */
         if (state.name.name === item.name.name) {
           state.active = !state.active;
@@ -126,13 +124,13 @@ export default {
       const objectToCheckAgainst = { city: item.name, state: this.activeState };
 
       /* if the item isn't in the list, add it, otherwise remove it */
-      if (this.cityExists(this.$store.state.signUpInfo.cities, objectToCheckAgainst)) {
+      if (this.cityExists(this.$store.state.temp.signUpInfo.cities, objectToCheckAgainst)) {
         /* need to get the position of an object in an array with map */
-        const pos = this.$store.state.signUpInfo.cities.map(e => e.city).indexOf(item.name);
-        this.$store.state.signUpInfo.cities.splice(pos, 1);
+        const pos = this.$store.state.temp.signUpInfo.cities.map(e => e.city).indexOf(item.name);
+        this.$store.state.temp.signUpInfo.cities.splice(pos, 1);
       } else {
         /* before we push, put it in an object with the state name */
-        this.$store.state.signUpInfo.cities.push({
+        this.$store.state.temp.signUpInfo.cities.push({
           state: this.activeState,
           city: item.name,
         });
@@ -158,10 +156,10 @@ export default {
       const objectToCheckAgainst = { city: item.city, state: this.activeState };
 
       /* if the item isn't in the list, add it, otherwise remove it */
-      if (this.cityExists(this.$store.state.signUpInfo.cities, objectToCheckAgainst)) {
+      if (this.cityExists(this.$store.state.temp.signUpInfo.cities, objectToCheckAgainst)) {
         /* need to get the position of an object in an array with map */
-        const pos = this.$store.state.signUpInfo.cities.map(e => e.city).indexOf(item.city);
-        this.$store.state.signUpInfo.cities.splice(pos, 1);
+        const pos = this.$store.state.temp.signUpInfo.cities.map(e => e.city).indexOf(item.city);
+        this.$store.state.temp.signUpInfo.cities.splice(pos, 1);
       }
 
       this.cities.forEach((city) => {
@@ -181,7 +179,7 @@ export default {
         /* need to reconstruct an object to have the same keys of {city, state} */
         const objectToCheckAgainst = { city: city.name, state: this.activeState };
         /* eslint-disable */
-        if (this.cityExists(this.$store.state.signUpInfo.cities, objectToCheckAgainst)) {
+        if (this.cityExists(this.$store.state.temp.signUpInfo.cities, objectToCheckAgainst)) {
           city.active = true;
         }
         /* eslint-enable */

@@ -87,8 +87,6 @@
 </template>
 
 <script>
-const config = require('../../config/appConfig.json');
-
 export default {
   name: 'profile',
   data() {
@@ -100,7 +98,7 @@ export default {
   },
   beforeMount() {
     this.getUser(this.$route.params.username);
-    this.$store.state.menuType = 'transparent';
+    this.$store.state.temp.menuType = 'transparent';
   },
   mounted() {
     document.body.classList.add('g__body__gray');
@@ -108,7 +106,7 @@ export default {
   methods: {
     getUser(username) {
       fetch(
-        `${config.api}/users/u/${username}`,
+        `${this.$config.default.api}/users/u/${username}`,
       ).then((data) => {
         data.json().then((userInfo) => {
           if (userInfo.status === false) {
@@ -121,20 +119,20 @@ export default {
             this.user.company.areasServed.forEach((area) => {
               let isStateQuery = true;
               let isCityQuery = true;
-              if (this.$store.state.filterQueries.state.name === '') {
+              if (this.$store.state.temp.filterQueries.state.name === '') {
                 isStateQuery = false;
               }
-              if (this.$store.state.filterQueries.city.name === '') {
+              if (this.$store.state.temp.filterQueries.city.name === '') {
                 isCityQuery = false;
               }
               if (area.ownsPremium === true &&
-                (this.$store.state.filterQueries.state.abbr === area.state
+                (this.$store.state.temp.filterQueries.state.abbr === area.state
                 || isStateQuery === false)) {
                 this.ownsPremiumState = true;
               }
               area.cities.forEach((city) => {
                 if (city.ownsPremium === true &&
-                  (this.$store.state.filterQueries.city.name === city.city
+                  (this.$store.state.temp.filterQueries.city.name === city.city
                   || isCityQuery === false)) {
                   this.ownsPremiumCity = true;
                 }

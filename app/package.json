@@ -18,6 +18,8 @@
     "sass-loader": "^6.0.3",
     "vee-validate": "^2.0.0-rc.6",
     "vue": "^2.2.6",
+    "vue-axios": "^2.0.2",
+    "vue-config": "^1.0.0",
     "vue-router": "^2.3.1",
     "vue2-filters": "^0.1.9",
     "vuex": "^2.3.1",

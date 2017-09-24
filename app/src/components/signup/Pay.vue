@@ -6,7 +6,7 @@
       <!-- Markup From Stripe -->
       <form id="payment-form">
         <div class="form-row">
-          <p class="signup__section__copy">You will be charged ${{this.$store.state.signUpInfo.totalPrice}}/mo after signup. You can update or cancel your plan anytime by logging into your account.</p>
+          <p class="signup__section__copy">You will be charged ${{this.$store.state.temp.signUpInfo.totalPrice}}/mo after signup. You can update or cancel your plan anytime by logging into your account.</p>
           <label class="signup__section__label" for="card-element">Credit or debit card</label>
           <div id="card-element">
             <!-- a Stripe Element will be inserted here. -->
@@ -26,10 +26,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const config = require('../../../config/appConfig.json');
-
 /* must define these variables here so they are available below */
 const stripe = window.Stripe('pk_test_iPXk4IDuTZGsu2Nov9dPf7dv');
 const elements = stripe.elements();
@@ -96,7 +92,7 @@ export default {
       Submits info to server to sign up user and redirect on success
     */
     submitPayment(stripeToken) {
-      const storeData = this.$store.state.signUpInfo;
+      const storeData = this.$store.state.temp.signUpInfo;
       const signUpInfo = {
         firstName: storeData.firstName,
         lastName: storeData.lastName,
@@ -111,7 +107,7 @@ export default {
         premiumPlans: storeData.premiumPlans,
         stripeToken,
       };
-      axios.post(`${config.api}/users/register`, signUpInfo)
+      this.axios.post(`${this.$config.default.api}/users/register`, signUpInfo)
         .then((response) => {
           if (response.data.success === true) {
             /* before we push, reset any items in the state related to sign up */
@@ -131,29 +127,29 @@ export default {
       Resets any sign up data back to normal after successful sign up
     */
     resetState() {
-      this.$store.state.signUpInfo.states = [];
-      this.$store.state.signUpInfo.cities = [];
-      this.$store.state.signUpInfo.totalPrice = 0;
-      this.$store.state.signUpInfo.firstName = '';
-      this.$store.state.signUpInfo.lastName = '';
-      this.$store.state.signUpInfo.emailAddress = '';
-      this.$store.state.signUpInfo.username = '';
-      this.$store.state.signUpInfo.password = '';
-      this.$store.state.signUpInfo.phoneNumber = '';
-      this.$store.state.signUpInfo.profilePicture = config.defaultProfileImage;
-      this.$store.state.signUpInfo.basicPlans = 0;
-      this.$store.state.signUpInfo.proPlans = 0;
-      this.$store.state.signUpInfo.premiumPlans = 0;
-      this.$store.state.signUpInfo.company.name = '';
-      this.$store.state.signUpInfo.company.aboutCompany = '';
-      this.$store.state.signUpInfo.company.aboutMe = '';
-      this.$store.state.signUpInfo.company.areasServed = [];
-      this.$store.state.signUpInfo.company.links.website = '';
-      this.$store.state.signUpInfo.company.links.facebook = '';
-      this.$store.state.signUpInfo.company.links.twitter = '';
-      this.$store.state.signUpInfo.company.links.instagram = '';
-      this.$store.state.signUpInfo.company.links.pinterest = '';
-      this.$store.state.signUpInfo.company.links.youtube = '';
+      this.$store.state.temp.signUpInfo.states = [];
+      this.$store.state.temp.signUpInfo.cities = [];
+      this.$store.state.temp.signUpInfo.totalPrice = 0;
+      this.$store.state.temp.signUpInfo.firstName = '';
+      this.$store.state.temp.signUpInfo.lastName = '';
+      this.$store.state.temp.signUpInfo.emailAddress = '';
+      this.$store.state.temp.signUpInfo.username = '';
+      this.$store.state.temp.signUpInfo.password = '';
+      this.$store.state.temp.signUpInfo.phoneNumber = '';
+      this.$store.state.temp.signUpInfo.profilePicture = this.$config.default.defaultProfileImage;
+      this.$store.state.temp.signUpInfo.basicPlans = 0;
+      this.$store.state.temp.signUpInfo.proPlans = 0;
+      this.$store.state.temp.signUpInfo.premiumPlans = 0;
+      this.$store.state.temp.signUpInfo.company.name = '';
+      this.$store.state.temp.signUpInfo.company.aboutCompany = '';
+      this.$store.state.temp.signUpInfo.company.aboutMe = '';
+      this.$store.state.temp.signUpInfo.company.areasServed = [];
+      this.$store.state.temp.signUpInfo.company.links.website = '';
+      this.$store.state.temp.signUpInfo.company.links.facebook = '';
+      this.$store.state.temp.signUpInfo.company.links.twitter = '';
+      this.$store.state.temp.signUpInfo.company.links.instagram = '';
+      this.$store.state.temp.signUpInfo.company.links.pinterest = '';
+      this.$store.state.temp.signUpInfo.company.links.youtube = '';
     },
 
   },

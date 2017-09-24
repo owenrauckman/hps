@@ -30,9 +30,7 @@ export default {
     return {
     };
   },
-  beforeMount() {
-    this.$store.state.menuType = 'transparent';
-  },
+
   mounted() {
     document.body.classList.add('g__body__gray');
 

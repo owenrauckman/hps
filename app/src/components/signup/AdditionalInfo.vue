@@ -4,36 +4,36 @@
     <div class="signup__section__form">
       <div class="signup__section__form--full">
         <h3 class="signup__section__heading-small">About You</h3>
-        <textarea class="signup__section__form__textarea" v-model="$store.state.signUpInfo.company.aboutMe"></textarea>
+        <textarea class="signup__section__form__textarea" v-model="$store.state.temp.signUpInfo.company.aboutMe"></textarea>
       </div>
       <div class="signup__section__form--full">
         <h3 class="signup__section__heading-small">
           About
-          <span v-if="$store.state.signUpInfo.company.name.length > 0">{{$store.state.signUpInfo.company.name}}</span>
+          <span v-if="$store.state.temp.signUpInfo.company.name.length > 0">{{$store.state.temp.signUpInfo.company.name}}</span>
           <span v-else>Your Company</span>
         </h3>
-        <textarea class="signup__section__form__textarea" v-model="$store.state.signUpInfo.company.aboutCompany"></textarea>
+        <textarea class="signup__section__form__textarea" v-model="$store.state.temp.signUpInfo.company.aboutCompany"></textarea>
       </div>
       <div class="signup__section__form--full">
         <h3 class="signup__section__heading-small">Social Media & Website Links</h3>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.company.links.website" placeholder="Website"/>
+        <input class="signup__section__form__input" v-model="$store.state.temp.signUpInfo.company.links.website" placeholder="Website"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.company.links.facebook" placeholder="Facebook"/>
+        <input class="signup__section__form__input" v-model="$store.state.temp.signUpInfo.company.links.facebook" placeholder="Facebook"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.company.links.twitter" placeholder="twitter"/>
+        <input class="signup__section__form__input" v-model="$store.state.temp.signUpInfo.company.links.twitter" placeholder="twitter"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.company.links.instagram" placeholder="instagram"/>
+        <input class="signup__section__form__input" v-model="$store.state.temp.signUpInfo.company.links.instagram" placeholder="instagram"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.company.links.pinterest" placeholder="pinterest"/>
+        <input class="signup__section__form__input" v-model="$store.state.temp.signUpInfo.company.links.pinterest" placeholder="pinterest"/>
       </div>
       <div class="signup__section__form--half">
-        <input class="signup__section__form__input" v-model="$store.state.signUpInfo.company.links.youtube" placeholder="youtube"/>
+        <input class="signup__section__form__input" v-model="$store.state.temp.signUpInfo.company.links.youtube" placeholder="youtube"/>
       </div>
     </div>
 

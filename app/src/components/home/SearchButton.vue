@@ -6,7 +6,6 @@
 </template>
 
 <script>
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'searchButton',
@@ -36,28 +35,28 @@ export default {
     */
     performSearch() {
       /* reset the 'show more' options */
-      this.$store.state.hideBasicCards = true;
+      this.$store.state.temp.hideBasicCards = true;
 
       /* empty these on each search so premium info updates in card */
-      this.$store.state.results = [];
-      this.$store.state.loadingResults = true;
-      this.$store.state.isResults = false;
+      this.$store.state.temp.results = [];
+      this.$store.state.temp.loadingResults = true;
+      this.$store.state.temp.isResults = false;
       this.hideFilters();
       fetch(
-        `${config.api}/search` +
-        `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.filterQueries.city.name)}` +
-        `&company=${encodeURIComponent(this.$store.state.filterQueries.company.name)}` +
-        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
+        `${this.$config.default.api}/search` +
+        `?state=${encodeURIComponent(this.$store.state.temp.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.$store.state.temp.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.$store.state.temp.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.$store.state.temp.filterQueries.industry.name)}`,
       ).then((data) => {
         data.json().then((users) => {
           /* check if there are users returned */
           if (users.users && (users.users.premiumStates.length > 0 ||
               users.users.premiumCities.length > 0 ||
               users.users.basic.length > 0)) {
-            this.$store.state.isResults = true;
+            this.$store.state.temp.isResults = true;
           }
-          this.$store.state.loadingResults = false;
+          this.$store.state.temp.loadingResults = false;
           this.$store.commit('updateResults', users);
         });
       });

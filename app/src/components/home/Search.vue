@@ -16,14 +16,12 @@
         <img class="search__wrapper__button__image" src="../../../static/svg/search-white.svg" id="js__search__wrapper__button__image" />
       </button>
     </div>
-    <Filters :class="[{ 'filter--show': $store.state.filtersVisible },'filter']"/>
+    <Filters :class="[{ 'filter--show': $store.state.temp.filtersVisible },'filter']"/>
   </div>
 </template>
 
 <script>
 import Filters from './Filters';
-
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'search',
@@ -70,21 +68,21 @@ export default {
     */
     activateChosenFilter(e) {
       /* eslint-disable */
-      this.$store.state.filterTabs.forEach((tab)=>{
+      this.$store.state.temp.filterTabs.forEach((tab)=>{
         tab.active = false;
       })
       /* eslint-enable */
       switch (e.target.id) {
         case 'js__search-tab__state':
-          this.$store.state.filterTabs[0].active = true; break;
+          this.$store.state.temp.filterTabs[0].active = true; break;
         case 'js__search-tab__city':
-          this.$store.state.filterTabs[1].active = true; break;
+          this.$store.state.temp.filterTabs[1].active = true; break;
         case 'js__search-tab__company':
-          this.$store.state.filterTabs[2].active = true; break;
+          this.$store.state.temp.filterTabs[2].active = true; break;
         case 'js__search-tab__industry':
-          this.$store.state.filterTabs[3].active = true; break;
+          this.$store.state.temp.filterTabs[3].active = true; break;
         default:
-          this.$store.state.filterTabs[0].active = true;
+          this.$store.state.temp.filterTabs[0].active = true;
       }
     },
 
@@ -93,28 +91,28 @@ export default {
     */
     performSearch() {
       /* reset the 'show more' options */
-      this.$store.state.hideBasicCards = true;
+      this.$store.state.temp.hideBasicCards = true;
 
       /* empty these on each search so premium info updates in card */
-      this.$store.state.results = [];
-      this.$store.state.loadingResults = true;
-      this.$store.state.isResults = false;
+      this.$store.state.temp.results = [];
+      this.$store.state.temp.loadingResults = true;
+      this.$store.state.temp.isResults = false;
       fetch(
-        `${config.api}/search` +
-        `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.filterQueries.city.name)}` +
-        `&company=${encodeURIComponent(this.$store.state.filterQueries.company.name)}` +
-        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`,
+        `${this.$config.default.api}/search` +
+        `?state=${encodeURIComponent(this.$store.state.temp.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.$store.state.temp.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.$store.state.temp.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.$store.state.temp.filterQueries.industry.name)}`,
       ).then((data) => {
         data.json().then((users) => {
           /* check if there are users returned */
           if (users.users && (users.users.premiumStates.length > 0 ||
               users.users.premiumCities.length > 0 ||
               users.users.basic.length > 0)) {
-            this.$store.state.isResults = true;
+            this.$store.state.temp.isResults = true;
           }
 
-          this.$store.state.loadingResults = false;
+          this.$store.state.temp.loadingResults = false;
           this.$store.commit('updateResults', users);
         });
       });
@@ -135,23 +133,23 @@ export default {
       Perform Initial Search - Gets Random Premium Users
     */
     performPremiumSearch() {
-      let url = `${config.api}/search/premium`;
+      let url = `${this.$config.default.api}/search/premium`;
       /* normally premium is searched, unless query already exists, we go back */
-      if (this.$store.state.filterQueries.state.name !== '') {
-        url = `${config.api}/search` +
-        `?state=${encodeURIComponent(this.$store.state.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.filterQueries.city.name)}` +
-        `&company=${encodeURIComponent(this.$store.state.filterQueries.company.name)}` +
-        `&industry=${encodeURIComponent(this.$store.state.filterQueries.industry.name)}`;
+      if (this.$store.state.temp.filterQueries.state.name !== '') {
+        url = `${this.$config.default.api}/search` +
+        `?state=${encodeURIComponent(this.$store.state.temp.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.$store.state.temp.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.$store.state.temp.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.$store.state.temp.filterQueries.industry.name)}`;
       }
       /* empty these on each search so premium info updates in card */
-      this.$store.state.results = [];
-      this.$store.state.loadingResults = true;
+      this.$store.state.temp.results = [];
+      this.$store.state.temp.loadingResults = true;
       fetch(
         url,
       ).then((data) => {
         data.json().then((users) => {
-          this.$store.state.loadingResults = false;
+          this.$store.state.temp.loadingResults = false;
           this.$store.commit('updateResults', users);
         });
       });

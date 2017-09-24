@@ -31,15 +31,13 @@
 </template>
 
 <script>
-const config = require('../../../config/appConfig.json');
-
 export default {
   name: 'companies',
   data() {
     return {
       statePlaceholder: 'Search By State',
       states: [],
-      selectedStates: this.$store.state.signUpInfo.states,
+      selectedStates: this.$store.state.temp.signUpInfo.states,
       stateName: '',
       stateSelected: true,
     };
@@ -55,7 +53,7 @@ export default {
     */
     getStates() {
       return new Promise((resolve, reject) => {
-        fetch(`${config.api}/search/states`).then((data, err) => {
+        fetch(`${this.$config.default.api}/search/states`).then((data, err) => {
           if (err) {
             reject('Something went wrong fetching states');
           }
@@ -76,7 +74,7 @@ export default {
       Removes element from query and performs a new search
     */
     removeQuery(item) {
-      if (this.stateExists(this.$store.state.signUpInfo.states, item)) {
+      if (this.stateExists(this.$store.state.temp.signUpInfo.states, item)) {
         /* remove checkmark */
         const index = this.states.findIndex(state => state.name.name === item.name.name);
         this.states[index].active = false;

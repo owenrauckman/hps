@@ -4,14 +4,14 @@
 
         <div class="filters__section__input-container">
           <div class="filters__section__input-wrapper">
-            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="companySearchPlaceholder" v-model="$store.state.filterQueries.company.name">
+            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="companySearchPlaceholder" v-model="$store.state.temp.filterQueries.company.name">
             <SearchButton/>
           </div>
         </div>
 
         <p v-if="needState" class="filter-required">{{needStateMessage}}</p>
         <ul class="filters__section__list filters--margin">
-          <li v-for="company in filterBy(companies, $store.state.filterQueries.company.name, 'name')" @click="selectCompany(company)" :class="[{ 'filters__section__list__item--selected':company.active },'filters__section__list__item']">{{company.name}}</li>
+          <li v-for="company in filterBy(companies, $store.state.temp.filterQueries.company.name, 'name')" @click="selectCompany(company)" :class="[{ 'filters__section__list__item--selected':company.active },'filters__section__list__item']">{{company.name}}</li>
         </ul>
       </div>
     </div>
@@ -21,8 +21,6 @@
 
 <script>
 import SearchButton from './SearchButton';
-
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'company',
@@ -36,11 +34,11 @@ export default {
   },
   components: { SearchButton },
   mounted() {
-    if (this.$store.state.filterQueries.state.name.length === 0) {
+    if (this.$store.state.temp.filterQueries.state.name.length === 0) {
       this.needState = true;
     } else {
       this.getCompanies().then(() => {
-        this.selectCompany(this.$store.state.filterQueries.company);
+        this.selectCompany(this.$store.state.temp.filterQueries.company);
       });
     }
   },
@@ -50,7 +48,7 @@ export default {
     */
     getCompanies() {
       return new Promise((resolve, reject) => {
-        fetch(`${config.api}/search/companies`).then((data, err) => {
+        fetch(`${this.$config.default.api}/search/companies`).then((data, err) => {
           if (err) {
             reject('Something went wrong fetching companies');
           }
@@ -93,7 +91,7 @@ export default {
       Checks if input is empty, if so, sets all cities to inactive class (removes check)
     */
     checkForEmptyInput() {
-      if (this.$store.state.filterQueries.company.name.length === 0) {
+      if (this.$store.state.temp.filterQueries.company.name.length === 0) {
         this.companies.forEach((company) => {
           /* eslint-disable */
           company.active = false;

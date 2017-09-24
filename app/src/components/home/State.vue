@@ -3,12 +3,12 @@
     <div class="filters__section">
       <div class="filters__section__input-container">
         <div class="filters__section__input-wrapper">
-          <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="stateSearchPlaceholder" v-model="$store.state.filterQueries.state.name">
+          <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="stateSearchPlaceholder" v-model="$store.state.temp.filterQueries.state.name">
           <SearchButton/>
         </div>
       </div>
       <ul class="filters__section__list filters--margin">
-        <li v-for="state in filterBy(states, $store.state.filterQueries.state.name, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected': state.active },'filters__section__list__item']">{{state.name}}</li>
+        <li v-for="state in filterBy(states, $store.state.temp.filterQueries.state.name, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected': state.active },'filters__section__list__item']">{{state.name}}</li>
       </ul>
     </div>
   </div>
@@ -17,8 +17,6 @@
 
 <script>
 import SearchButton from './SearchButton';
-
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'state',
@@ -31,7 +29,7 @@ export default {
   components: { SearchButton },
   mounted() {
     this.getStates().then(() => {
-      this.selectState(this.$store.state.filterQueries.state);
+      this.selectState(this.$store.state.temp.filterQueries.state);
     });
   },
   methods: {
@@ -40,7 +38,7 @@ export default {
     */
     getStates() {
       return new Promise((resolve, reject) => {
-        fetch(`${config.api}/search/states`).then((data, err) => {
+        fetch(`${this.$config.default.api}/search/states`).then((data, err) => {
           if (err) {
             reject('Something went wrong fetching states');
           }
@@ -82,7 +80,7 @@ export default {
       Checks if input is empty, if so, sets all states to inactive class (removes check)
     */
     checkForEmptyInput() {
-      if (this.$store.state.filterQueries.state.name.length === 0) {
+      if (this.$store.state.temp.filterQueries.state.name.length === 0) {
         this.states.forEach((state) => {
           /* eslint-disable */
           state.active = false;

@@ -25,8 +25,6 @@
 </template>
 
 <script>
-const config = require('../../../config/appConfig.json');
-
 export default {
   name: 'companies',
   data() {
@@ -39,8 +37,8 @@ export default {
   },
   mounted() {
     this.getCompanies().then(() => {
-      this.companyName = this.$store.state.signUpInfo.company.name;
-      this.setInitialList(this.$store.state.signUpInfo.company.name);
+      this.companyName = this.$store.state.temp.signUpInfo.company.name;
+      this.setInitialList(this.$store.state.temp.signUpInfo.company.name);
     });
   },
   methods: {
@@ -49,7 +47,7 @@ export default {
     */
     getCompanies() {
       return new Promise((resolve, reject) => {
-        fetch(`${config.api}/search/companies`).then((data, err) => {
+        fetch(`${this.$config.default.api}/search/companies`).then((data, err) => {
           if (err) {
             reject('Something went wrong fetching companies');
           }
@@ -88,7 +86,7 @@ export default {
     selectCompany(item) {
       /* eslint-disable */
       for(let company of this.companies){
-        if(company.name === item.name && company.name === this.$store.state.signUpInfo.company.name){
+        if(company.name === item.name && company.name === this.$store.state.temp.signUpInfo.company.name){
          company.active = false;
          this.$store.commit('updateSignUpInfoCompany', '');
        } else if (company.name === item.name) {
@@ -104,7 +102,7 @@ export default {
       Validate and make sure a company is selected before moving on
     */
     validateCompany() {
-      if (this.$store.state.signUpInfo.company.name.length > 0) {
+      if (this.$store.state.temp.signUpInfo.company.name.length > 0) {
         this.companySelected = true;
         this.$router.push('/signup/states');
       } else {

@@ -2,13 +2,13 @@
   <div class="signup__section">
     <h2 class="signup__section__heading">Choose Which Areas You Want Premium In</h2>
     <div class="signup__section__form__container">
-      <div v-for="state, stateIndex in $store.state.signUpInfo.chosenStates" class="signup__section__form__box">
+      <div v-for="state, stateIndex in $store.state.temp.signUpInfo.chosenStates" class="signup__section__form__box">
         <b class="signup__section__form__box--state">{{state.name}}</b>
         <div v-if="state.premiumAvailable">
           <input type="checkbox" :id="['toggleState' + stateIndex]" @click="addPremium(state, 'state')" class="signup__section__form__hide-checkbox" :checked="state.premium">
           <label v-bind:for="['toggleState' + stateIndex]" class="signup__section__form__switch-button"></label>
         </div>
-        <div v-for="(city, cityIndex) in $store.state.signUpInfo.chosenCities" v-if="city.state === state.name" class="signup__section__form__box">
+        <div v-for="(city, cityIndex) in $store.state.temp.signUpInfo.chosenCities" v-if="city.state === state.name" class="signup__section__form__box">
           <p>{{city.city}}</p>
           <div v-if="city.premiumAvailable">
             <input type="checkbox" :id="['toggleCity' + cityIndex]"  @click="addPremium(city, 'city')" class="signup__section__form__hide-checkbox" :checked="city.premium">
@@ -20,7 +20,7 @@
 
     <!-- link to next page in process -->
     <a v-on:click.prevent="updateAreasServed" class="signup__section__button">
-      <span v-if="this.$store.state.signUpInfo.totalPrice > 0">Continue</span>
+      <span v-if="this.$store.state.temp.signUpInfo.totalPrice > 0">Continue</span>
       <span v-else>Sign Up</span>
     </a>
 
@@ -28,16 +28,12 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const config = require('../../../config/appConfig.json');
-
 export default {
   name: 'premium',
   data() {
     return {
-      chosenStates: this.$store.state.signUpInfo.chosenStates,
-      chosenCities: this.$store.state.signUpInfo.chosenCities,
+      chosenStates: this.$store.state.temp.signUpInfo.chosenStates,
+      chosenCities: this.$store.state.temp.signUpInfo.chosenCities,
       basicPlans: 0,
       proPlans: 0,
       premiumPlans: 0,
@@ -46,9 +42,9 @@ export default {
   beforeMount() {
     /* Reset these before each mount to keep from doubling on reMount */
 
-    this.$store.state.signUpInfo.states.forEach((state) => {
+    this.$store.state.temp.signUpInfo.states.forEach((state) => {
       this.checkPremium(
-      this.$store.state.signUpInfo.company.name,
+      this.$store.state.temp.signUpInfo.company.name,
       state.name.abbr,
     ).then((stateResponse) => {
       const stateObject = {
@@ -62,10 +58,10 @@ export default {
         this.chosenStates.push(stateObject);
       }
 
-      this.$store.state.signUpInfo.cities.forEach((city) => {
+      this.$store.state.temp.signUpInfo.cities.forEach((city) => {
         if (city.state === state.name.name) {
           this.checkPremium(
-            this.$store.state.signUpInfo.company.name,
+            this.$store.state.temp.signUpInfo.company.name,
             state.name.abbr,
             city.city,
           ).then((cityResponse) => {
@@ -108,10 +104,10 @@ export default {
       /* Build the URL based on state or city */
       let url;
       if (city) {
-        url = `${config.api}/search/checkPremium?` +
+        url = `${this.$config.default.api}/search/checkPremium?` +
         `company=${encodeURI(company)}&state=${state}&city=${encodeURI(city)}`;
       } else {
-        url = `${config.api}/search/checkPremium?` +
+        url = `${this.$config.default.api}/search/checkPremium?` +
         `company=${encodeURI(company)}&state=${encodeURI(state)}`;
       }
 
@@ -135,17 +131,17 @@ export default {
     addPremium(item, type) {
       let priceToChange = 0;
       if (type === 'city') {
-        priceToChange = config.cityPrice;
+        priceToChange = this.$config.default.cityPrice;
       } else if (type === 'state') {
-        priceToChange = config.statePrice;
+        priceToChange = this.$config.default.statePrice;
       }
       /* eslint-disable */
       if(item.premium === true){
         item.premium = false;
-        this.$store.state.signUpInfo.totalPrice -= priceToChange;
+        this.$store.state.temp.signUpInfo.totalPrice -= priceToChange;
       } else{
         item.premium = true;
-        this.$store.state.signUpInfo.totalPrice += priceToChange;
+        this.$store.state.temp.signUpInfo.totalPrice += priceToChange;
       }
 
       /* Notify the store */
@@ -200,16 +196,16 @@ export default {
             cities,
           });
         });
-        this.$store.state.signUpInfo.company.areasServed = areasServed;
+        this.$store.state.temp.signUpInfo.company.areasServed = areasServed;
         resolve(areasServed);
       });
 
       setCompanies.then(() => {
         if (this.proPlans > 0 || this.premiumPlans > 0) {
           /* before redirecting to payment, add new info to store */
-          this.$store.state.signUpInfo.basicPlans = this.basicPlans;
-          this.$store.state.signUpInfo.proPlans = this.proPlans;
-          this.$store.state.signUpInfo.premiumPlans = this.premiumPlans;
+          this.$store.state.temp.signUpInfo.basicPlans = this.basicPlans;
+          this.$store.state.temp.signUpInfo.proPlans = this.proPlans;
+          this.$store.state.temp.signUpInfo.premiumPlans = this.premiumPlans;
 
           /* redirect to payment */
           this.$router.push('/signup/pay');
@@ -217,7 +213,7 @@ export default {
         } else {
           /* after the object is created redirect to /signup/pay */
           /* todo: also, add a reset on this page for back buton state */
-          const storeData = this.$store.state.signUpInfo;
+          const storeData = this.$store.state.temp.signUpInfo;
           const signUpInfo = {
             firstName: storeData.firstName,
             lastName: storeData.lastName,
@@ -231,7 +227,7 @@ export default {
             proPlans: this.proPlans,
             premiumPlans: this.premiumPlans,
           };
-          axios.post(`${config.api}/users/register`, signUpInfo)
+          this.axios.post(`${this.$config.default.api}/users/register`, signUpInfo)
             .then((response) => {
               if (response.data.success === true) {
                 this.resetState();
@@ -252,29 +248,29 @@ export default {
     Resets any sign up data back to normal after successful sign up
   */
   resetState() {
-    this.$store.state.signUpInfo.states = [];
-    this.$store.state.signUpInfo.cities = [];
-    this.$store.state.signUpInfo.totalPrice = 0;
-    this.$store.state.signUpInfo.firstName = '';
-    this.$store.state.signUpInfo.lastName = '';
-    this.$store.state.signUpInfo.emailAddress = '';
-    this.$store.state.signUpInfo.username = '';
-    this.$store.state.signUpInfo.password = '';
-    this.$store.state.signUpInfo.phoneNumber = '';
-    this.$store.state.signUpInfo.profilePicture = config.defaultProfileImage;
-    this.$store.state.signUpInfo.basicPlans = 0;
-    this.$store.state.signUpInfo.proPlans = 0;
-    this.$store.state.signUpInfo.premiumPlans = 0;
-    this.$store.state.signUpInfo.company.name = '';
-    this.$store.state.signUpInfo.company.aboutCompany = '';
-    this.$store.state.signUpInfo.company.aboutMe = '';
-    this.$store.state.signUpInfo.company.areasServed = [];
-    this.$store.state.signUpInfo.company.links.website = '';
-    this.$store.state.signUpInfo.company.links.facebook = '';
-    this.$store.state.signUpInfo.company.links.twitter = '';
-    this.$store.state.signUpInfo.company.links.instagram = '';
-    this.$store.state.signUpInfo.company.links.pinterest = '';
-    this.$store.state.signUpInfo.company.links.youtube = '';
+    this.$store.state.temp.signUpInfo.states = [];
+    this.$store.state.temp.signUpInfo.cities = [];
+    this.$store.state.temp.signUpInfo.totalPrice = 0;
+    this.$store.state.temp.signUpInfo.firstName = '';
+    this.$store.state.temp.signUpInfo.lastName = '';
+    this.$store.state.temp.signUpInfo.emailAddress = '';
+    this.$store.state.temp.signUpInfo.username = '';
+    this.$store.state.temp.signUpInfo.password = '';
+    this.$store.state.temp.signUpInfo.phoneNumber = '';
+    this.$store.state.temp.signUpInfo.profilePicture = this.$config.default.defaultProfileImage;
+    this.$store.state.temp.signUpInfo.basicPlans = 0;
+    this.$store.state.temp.signUpInfo.proPlans = 0;
+    this.$store.state.temp.signUpInfo.premiumPlans = 0;
+    this.$store.state.temp.signUpInfo.company.name = '';
+    this.$store.state.temp.signUpInfo.company.aboutCompany = '';
+    this.$store.state.temp.signUpInfo.company.aboutMe = '';
+    this.$store.state.temp.signUpInfo.company.areasServed = [];
+    this.$store.state.temp.signUpInfo.company.links.website = '';
+    this.$store.state.temp.signUpInfo.company.links.facebook = '';
+    this.$store.state.temp.signUpInfo.company.links.twitter = '';
+    this.$store.state.temp.signUpInfo.company.links.instagram = '';
+    this.$store.state.temp.signUpInfo.company.links.pinterest = '';
+    this.$store.state.temp.signUpInfo.company.links.youtube = '';
   },
 
 };

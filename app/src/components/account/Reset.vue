@@ -13,9 +13,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'reset',
@@ -37,7 +34,7 @@ export default {
 
       // Reset password API
       // todo: double check password confirmation
-      axios.post(`${config.api}/users/resetPassword`, this.credentials, { withCredentials: true })
+      this.axios.post(`${this.$config.default.api}/users/resetPassword`, this.credentials, { withCredentials: true })
         .then((response) => {
           /* eslint-disable */
           if (response.data.success === true) {

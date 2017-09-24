@@ -16,9 +16,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const config = require('../../../config/appConfig.json');
 
 export default {
   name: 'forgotPassword',
@@ -37,7 +34,7 @@ export default {
       e.preventDefault();
 
       // Forgot password API
-      axios.post(`${config.api}/users/forgotPassword`, { emailAddress: this.emailAddress }, { withCredentials: true })
+      this.axios.post(`${this.$config.default.api}/users/forgotPassword`, { emailAddress: this.emailAddress }, { withCredentials: true })
         .then((response) => {
           console.log(response);
           /* eslint-disable */

@@ -13,7 +13,7 @@
         <!-- Tabs -->
         <div class="filter-tabs">
           <ul class="filter-tabs__list">
-            <li v-for="tab in $store.state.filterTabs" @click="selectFilter(tab)" :class="[{ 'filter-tabs__list__item--active': tab.active },'filter-tabs__list__item']">{{tab.name}}</li>
+            <li v-for="tab in $store.state.temp.filterTabs" @click="selectFilter(tab)" :class="[{ 'filter-tabs__list__item--active': tab.active },'filter-tabs__list__item']">{{tab.name}}</li>
           </ul>
         </div>
       </div>
@@ -21,10 +21,10 @@
     </div>
 
     <!-- Filter Components -->
-    <State v-if="$store.state.filterTabs[0].active"/>
-    <City v-if="$store.state.filterTabs[1].active"/>
-    <Company v-if="$store.state.filterTabs[2].active"/>
-    <Industry v-if="$store.state.filterTabs[3].active"/>
+    <State v-if="$store.state.temp.filterTabs[0].active"/>
+    <City v-if="$store.state.temp.filterTabs[1].active"/>
+    <Company v-if="$store.state.temp.filterTabs[2].active"/>
+    <Industry v-if="$store.state.temp.filterTabs[3].active"/>
 
   </div>
 </template>
@@ -77,7 +77,7 @@ export default {
     */
     selectFilter(tab) {
       /* eslint-disable */
-      this.$store.state.filterTabs.forEach((tab) => {
+      this.$store.state.temp.filterTabs.forEach((tab) => {
         tab.active = false;
       });
       tab.active = true;
