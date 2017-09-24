@@ -23,17 +23,15 @@
 </template>
 
 <script>
+import * as types from '@/store/mutationTypes';
+import { mapMutations } from 'vuex';
+
 import PersonalInfo from './signup/PersonalInfo';
 
 export default {
-  name: 'signup',
-  data() {
-    return {
-    };
-  },
   components: { PersonalInfo },
   beforeMount() {
-    this.$store.state.temp.menuType = 'signup';
+    this.TOGGLE_MENU_TYPE(false);
   },
   mounted() {
     /* set the title of the page */
@@ -41,6 +39,9 @@ export default {
 
     /* remove gray body */
     document.body.classList.remove('g__body__gray');
+  },
+  methods: {
+    ...mapMutations([types.TOGGLE_MENU_TYPE]),
   },
 };
 </script>

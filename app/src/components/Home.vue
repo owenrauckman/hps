@@ -20,19 +20,22 @@
 </template>
 
 <script>
+import * as types from '@/store/mutationTypes';
+import { mapMutations } from 'vuex';
+
 import Search from './home/Search';
 import Results from './home/Results';
 
 export default {
   name: 'home',
   components: { Search, Results },
-  data() {
-    return {
-    };
+  methods: {
+    ...mapMutations([types.TOGGLE_MENU_TYPE]),
   },
-
   mounted() {
     document.body.classList.add('g__body__gray');
+
+    this.TOGGLE_MENU_TYPE(true);
 
     /* set the title of the page */
     document.title = 'Home Party Shows | Find and build your direct sales team.';

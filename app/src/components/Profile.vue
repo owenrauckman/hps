@@ -87,6 +87,9 @@
 </template>
 
 <script>
+import * as types from '@/store/mutationTypes';
+import { mapMutations } from 'vuex';
+
 export default {
   name: 'profile',
   data() {
@@ -98,12 +101,13 @@ export default {
   },
   beforeMount() {
     this.getUser(this.$route.params.username);
-    this.$store.state.temp.menuType = 'transparent';
+    this.types.TOGGLE_MENU_TYPE(true);
   },
   mounted() {
     document.body.classList.add('g__body__gray');
   },
   methods: {
+    ...mapMutations([types.TOGGLE_MENU_TYPE]),
     getUser(username) {
       fetch(
         `${this.$config.default.api}/users/u/${username}`,

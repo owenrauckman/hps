@@ -1,0 +1,5 @@
+// GLOBAL
+export const TOGGLE_MENU_TYPE = 'TOGGLE_MENU_TYPE';
+
+// SEARCH
+export const CHANGE_IS_LOGGED_IN = 'CHANGE_IS_LOGGED_IN';

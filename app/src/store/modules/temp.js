@@ -1,6 +1,5 @@
 const state = {
   isLoggedIn: false,
-  menuType: 'transparent',
   filtersVisible: false,
   loadingResults: false,
   results: [],
