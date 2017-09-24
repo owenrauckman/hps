@@ -16,11 +16,13 @@
         <img class="search__wrapper__button__image" src="../../../static/svg/search-white.svg" id="js__search__wrapper__button__image" />
       </button>
     </div>
-    <Filters :class="[{ 'filter--show': $store.state.temp.filtersVisible },'filter']"/>
+    <Filters :class="[{ 'filter--show': filtersVisible },'filter']"/>
   </div>
 </template>
 
 <script>
+import * as types from '@/store/mutationTypes';
+import { mapMutations, mapGetters } from 'vuex';
 import Filters from './Filters';
 
 export default {
@@ -41,7 +43,15 @@ export default {
   mounted() {
     this.performPremiumSearch();
   },
+  computed: {
+    ...mapGetters(['isLoggedIn', 'filtersVisible', 'loadingResults', 'results', 'isResults', 'hideBasicCards', 'filterQueries', 'filterTabs']),
+  },
   methods: {
+    ...mapMutations([
+      types.UPDATE_SEARCH_RESULTS,
+      types.TOGGLE_SEARCH_FILTERS,
+      types.SET_LOADING_STATE,
+      types.SET_RESULTS_STATUS, types.HIDE_BASIC_CARDS, types.ACTIVATE_CHOSEN_FILTER]),
     /*
       Toggles the filters overlay
       @param {e} - the event object
@@ -54,7 +64,7 @@ export default {
       } else {
         /* set the active filter based on click */
         this.activateChosenFilter(e);
-        this.$store.commit('toggleFilters', true);
+        this.types.TOGGLE_SEARCH_FILTERS(true);
         this.showFiltersLocation = !this.showFiltersLocation;
         document.body.classList.add('no-overflow');
         document.documentElement.scrollTop = 0; /* firefox */
@@ -67,23 +77,7 @@ export default {
       @param {e} - the event object
     */
     activateChosenFilter(e) {
-      /* eslint-disable */
-      this.$store.state.temp.filterTabs.forEach((tab)=>{
-        tab.active = false;
-      })
-      /* eslint-enable */
-      switch (e.target.id) {
-        case 'js__search-tab__state':
-          this.$store.state.temp.filterTabs[0].active = true; break;
-        case 'js__search-tab__city':
-          this.$store.state.temp.filterTabs[1].active = true; break;
-        case 'js__search-tab__company':
-          this.$store.state.temp.filterTabs[2].active = true; break;
-        case 'js__search-tab__industry':
-          this.$store.state.temp.filterTabs[3].active = true; break;
-        default:
-          this.$store.state.temp.filterTabs[0].active = true;
-      }
+      this.ACTIVATE_CHOSEN_FILTER(e.target.id);
     },
 
     /*
@@ -91,29 +85,29 @@ export default {
     */
     performSearch() {
       /* reset the 'show more' options */
-      this.$store.state.temp.hideBasicCards = true;
+      this.HIDE_BASIC_CARDS(true);
 
       /* empty these on each search so premium info updates in card */
-      this.$store.state.temp.results = [];
-      this.$store.state.temp.loadingResults = true;
-      this.$store.state.temp.isResults = false;
+      this.UPDATE_SEARCH_RESULTS([]);
+      this.SET_LOADING_STATE(true);
+      this.SET_RESULTS_STATUS(false);
       fetch(
         `${this.$config.default.api}/search` +
-        `?state=${encodeURIComponent(this.$store.state.temp.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.temp.filterQueries.city.name)}` +
-        `&company=${encodeURIComponent(this.$store.state.temp.filterQueries.company.name)}` +
-        `&industry=${encodeURIComponent(this.$store.state.temp.filterQueries.industry.name)}`,
+        `?state=${encodeURIComponent(this.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.filterQueries.industry.name)}`,
       ).then((data) => {
         data.json().then((users) => {
           /* check if there are users returned */
           if (users.users && (users.users.premiumStates.length > 0 ||
               users.users.premiumCities.length > 0 ||
               users.users.basic.length > 0)) {
-            this.$store.state.temp.isResults = true;
+            this.SET_RESULTS_STATUS(true);
           }
 
-          this.$store.state.temp.loadingResults = false;
-          this.$store.commit('updateResults', users);
+          this.SET_LOADING_STATE(false);
+          this.UPDATE_SEARCH_RESULTS(users);
         });
       });
     },
@@ -135,22 +129,22 @@ export default {
     performPremiumSearch() {
       let url = `${this.$config.default.api}/search/premium`;
       /* normally premium is searched, unless query already exists, we go back */
-      if (this.$store.state.temp.filterQueries.state.name !== '') {
+      if (this.filterQueries.state.name !== '') {
         url = `${this.$config.default.api}/search` +
-        `?state=${encodeURIComponent(this.$store.state.temp.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.temp.filterQueries.city.name)}` +
-        `&company=${encodeURIComponent(this.$store.state.temp.filterQueries.company.name)}` +
-        `&industry=${encodeURIComponent(this.$store.state.temp.filterQueries.industry.name)}`;
+        `?state=${encodeURIComponent(this.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.filterQueries.industry.name)}`;
       }
       /* empty these on each search so premium info updates in card */
-      this.$store.state.temp.results = [];
-      this.$store.state.temp.loadingResults = true;
+      this.UPDATE_SEARCH_RESULTS([]);
+      this.SET_LOADING_STATE(true);
       fetch(
         url,
       ).then((data) => {
         data.json().then((users) => {
-          this.$store.state.temp.loadingResults = false;
-          this.$store.commit('updateResults', users);
+          this.SET_LOADING_STATE(false);
+          this.UPDATE_SEARCH_RESULTS(users);
         });
       });
     },

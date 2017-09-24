@@ -52,11 +52,11 @@ export default {
         .then((response) => {
           if (response.data.status === true) {
             this.data = response.data.user;
-            this.$store.state.temp.isLoggedIn = true;
+            this.$store.state.search.isLoggedIn = true;
             this.message = 'YOU ARE LOGGED IN';
           } else {
             this.message = 'NOT AUTHORIZED';
-            this.$store.state.temp.isLoggedIn = false;
+            this.$store.state.search.isLoggedIn = false;
             this.$router.push('/login');
           }
         })

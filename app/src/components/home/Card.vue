@@ -6,8 +6,8 @@
       <h3 class="card__info__company">{{options.company.name}}</h3>
 
       <h4 class="card__info__location">
-        <span v-if="$store.state.temp.filterQueries.city.name.length > 0">{{$store.state.temp.filterQueries.city.name}},</span>
-        {{$store.state.temp.filterQueries.state.name}}
+        <span v-if="filterQueries.city.name.length > 0">{{filterQueries.city.name}},</span>
+        {{filterQueries.state.name}}
       </h4>
     </div>
     <a class="card__button" href=""></a>
@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'card',
   data() {
@@ -26,6 +28,9 @@ export default {
     };
   },
   props: ['options'],
+  computed: {
+    ...mapGetters(['loadingResults', 'results', 'isResults', 'hideBasicCards', 'filterQueries', 'filterTabs']),
+  },
   methods: {
     /*
       Checks for premium/premium type before mount and sets accordingly.
@@ -36,16 +41,16 @@ export default {
           checks for premium states
           (checks for === '' for the home page since only premium shows)
         */
-        if ((this.$store.state.temp.results.query.state === area.state && area.ownsPremium) || (this.$store.state.temp.results.query.state === '')) {
+        if ((this.results.query.state === area.state && area.ownsPremium) || (this.results.query.state === '')) {
           this.ownsPremiumState = true;
         }
         /* checks for premium cities */
         area.cities.forEach((city) => {
-          if (this.$store.state.temp.results.query.city === city.city
-            && this.$store.state.temp.results.query.state === area.state
+          if (this.results.query.city === city.city
+            && this.results.query.state === area.state
             && city.ownsPremium) {
             this.ownsPremiumCity = true;
-          } else if (city.ownsPremium && this.$store.state.temp.results.query.city === '' && area.state === this.$store.state.temp.results.query.state) {
+          } else if (city.ownsPremium && this.results.query.city === '' && area.state === this.results.query.state) {
             /* if they only search for state, we at least want the badge ^^ and city in state? */
             this.ownsPremiumCity = true;
           }

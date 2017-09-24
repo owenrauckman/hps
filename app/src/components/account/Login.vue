@@ -35,7 +35,7 @@ export default {
         .then((response) => {
           /* eslint-disable */
           if (response.data.success === true) {
-            this.$store.state.temp.isLoggedIn = true;
+            this.$store.state.search.isLoggedIn = true;
             this.$router.push('/account');
           } else {
             this.showError = true;

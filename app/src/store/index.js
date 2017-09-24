@@ -5,7 +5,8 @@ import createPersist from 'vuex-localstorage';
 /* import modules */
 import temp from '@/store/modules/temp'; // todo remove this after refactor
 import common from '@/store/modules/common';
-import search from '@/store/modules/search';
+import searchStore from '@/store/modules/search';
+import authStore from '@/store/modules/auth';
 
 Vue.use(Vuex);
 
@@ -13,7 +14,8 @@ export default new Vuex.Store({
   modules: {
     temp,
     common,
-    search,
+    searchStore,
+    authStore,
   },
   plugins: [createPersist({
     namespace: 'namespace-for-state',

@@ -4,14 +4,14 @@
 
         <div class="filters__section__input-container">
           <div class="filters__section__input-wrapper">
-            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="industrySearchPlaceholder" v-model="$store.state.temp.filterQueries.industry.name">
+            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="industrySearchPlaceholder" v-model="filterQueries.industry.name">
             <SearchButton/>
           </div>
         </div>
 
         <p v-if="needState" class="filter-required">{{needStateMessage}}</p>
         <ul class="filters__section__list filters--margin">
-          <li v-for="industry in filterBy(industries, $store.state.temp.filterQueries.industry.name, 'name')" @click="selectIndustry(industry)" :class="[{ 'filters__section__list__item--selected':industry.active },'filters__section__list__item']">{{industry.name}}</li>
+          <li v-for="industry in filterBy(industries, filterQueries.industry.name, 'name')" @click="selectIndustry(industry)" :class="[{ 'filters__section__list__item--selected':industry.active },'filters__section__list__item']">{{industry.name}}</li>
         </ul>
       </div>
     </div>
@@ -20,6 +20,9 @@
 </template>
 
 <script>
+import * as types from '@/store/mutationTypes';
+import { mapGetters, mapMutations } from 'vuex';
+
 import SearchButton from './SearchButton';
 
 export default {
@@ -34,15 +37,19 @@ export default {
   },
   components: { SearchButton },
   mounted() {
-    if (this.$store.state.temp.filterQueries.state.name.length === 0) {
+    if (this.filterQueries.state.name.length === 0) {
       this.needState = true;
     } else {
       this.getIndustries().then(() => {
-        this.selectIndustry(this.$store.state.temp.filterQueries.industry);
+        this.selectIndustry(this.filterQueries.industry);
       });
     }
   },
+  computed: {
+    ...mapGetters(['filterQueries']),
+  },
   methods: {
+    ...mapMutations([types.SET_SEARCH_QUERY]),
     /*
       Get list of state that a user can search by
     */
@@ -82,16 +89,16 @@ export default {
       });
 
       if (item.active) {
-        this.$store.commit('updateIndustryQuery', { name: item.name, active: true });
+        this.types.SET_SEARCH_QUERY('industry', { name: item.name, active: true });
       } else {
-        this.$store.commit('updateIndustryQuery', { name: '', active: false });
+        this.types.SET_SEARCH_QUERY('industry', { name: '', active: false });
       }
     },
     /*
       Checks if input is empty, if so, sets all cities to inactive class (removes check)
     */
     checkForEmptyInput() {
-      if (this.$store.state.temp.filterQueries.industry.name.length === 0) {
+      if (this.filterQueries.industry.name.length === 0) {
         this.industries.forEach((industry) => {
           /* eslint-disable */
           industry.active = false;

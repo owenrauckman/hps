@@ -3,23 +3,23 @@
     <!-- results, query and loading state -->
     <div class="results__results__info g__container" id="js__home__results">
       <div class="results__queries">
-        <button class="results__queries__query" @click="removeQuery" id="js__query__state" v-if="$store.state.temp.filterQueries.state.name.length > 0">{{$store.state.temp.filterQueries.state.name}}</button>
-        <button class="results__queries__query" @click="removeQuery" id="js__query__city" v-if="$store.state.temp.filterQueries.city.name.length > 0">{{$store.state.temp.filterQueries.city.name}}</button>
-        <button class="results__queries__query" @click="removeQuery" id="js__query__company" v-if="$store.state.temp.filterQueries.company.name.length > 0">{{$store.state.temp.filterQueries.company.name}}</button>
-        <button class="results__queries__query" @click="removeQuery" id="js__query__industry" v-if="$store.state.temp.filterQueries.industry.name.length > 0">{{$store.state.temp.filterQueries.industry.name}}</button>
+        <button class="results__queries__query" @click="removeQuery" id="js__query__state" v-if="filterQueries.state.name.length > 0">{{filterQueries.state.name}}</button>
+        <button class="results__queries__query" @click="removeQuery" id="js__query__city" v-if="filterQueries.city.name.length > 0">{{filterQueries.city.name}}</button>
+        <button class="results__queries__query" @click="removeQuery" id="js__query__company" v-if="filterQueries.company.name.length > 0">{{filterQueries.company.name}}</button>
+        <button class="results__queries__query" @click="removeQuery" id="js__query__industry" v-if="filterQueries.industry.name.length > 0">{{filterQueries.industry.name}}</button>
       </div>
-      <!-- <p v-if="$store.state.temp.results.users && $store.state.temp.isResults" class="results__results__info__text g__container">Showing {{$store.state.temp.results.users.length}} of {{$store.state.temp.results.users.length}} results</p> -->
+      <!-- <p v-if="results.users && isResults" class="results__results__info__text g__container">Showing {{results.users.length}} of {{results.users.length}} results</p> -->
     </div>
-    <div :class="[{ 'results__loading--active': $store.state.temp.loadingResults }, 'results__loading g__container']">
+    <div :class="[{ 'results__loading--active': loadingResults }, 'results__loading g__container']">
       <div class='results__loading__dot results__loading__dot__1'></div>
       <div class='results__loading__dot results__loading__dot__2'></div>
       <div class='results__loading__dot results__loading__dot__3'></div>
       <div class='results__loading__dot results__loading__dot__4'></div>
     </div>
-    <div v-if="$store.state.temp.isResults && $store.state.temp.results.users" class="results__card-container g__container" id="js__results__results">
-      <Card v-for="card in $store.state.temp.results.users.premiumStates" :key="card.plan" :options="card"/>
-      <Card v-for="card in $store.state.temp.results.users.premiumCities" :key="card.plan" :options="card"/>
-      <Card v-for="card in $store.state.temp.results.users.basic" :key="card.plan" :options="card" :class="[{ 'results__basic-cards--hidden': $store.state.temp.hideBasicCards }, 'results__basic-cards']" /></span>
+    <div v-if="isResults && results.users" class="results__card-container g__container" id="js__results__results">
+      <Card v-for="card in results.users.premiumStates" :key="card.plan" :options="card"/>
+      <Card v-for="card in results.users.premiumCities" :key="card.plan" :options="card"/>
+      <Card v-for="card in results.users.basic" :key="card.plan" :options="card" :class="[{ 'results__basic-cards--hidden': hideBasicCards }, 'results__basic-cards']" /></span>
     </div>
     <div v-else class="results__no-results-container g__container">
       <div>
@@ -28,9 +28,9 @@
       </div>
     </div>
     <!-- Button for showing non premium users -->
-    <div class="results__no-results-container g__container" v-if="$store.state.temp.results.users && $store.state.temp.results.users.basic && $store.state.temp.results.users.basic.length > 0">
+    <div class="results__no-results-container g__container" v-if="results.users && results.users.basic && results.users.basic.length > 0">
       <button @click="showBasic()" class="results__no-results-container__link">
-        <span v-if="$store.state.temp.hideBasicCards">View </span>
+        <span v-if="hideBasicCards">View </span>
         <span v-else>Hide </span>
         Non-Premium Users
       </button>
@@ -41,30 +41,31 @@
 </template>
 
 <script>
+import * as types from '@/store/mutationTypes';
+import { mapGetters, mapMutations } from 'vuex';
 import Card from './Card';
 
 export default {
   name: 'results',
   components: { Card },
-  data() {
-    return {
-      loading: 'Loading...',
-    };
+  computed: {
+    ...mapGetters(['loadingResults', 'results', 'isResults', 'hideBasicCards', 'filterQueries', 'filterTabs']),
   },
   methods: {
+    ...mapMutations([types.UPDATE_SEARCH_RESULTS]),
     /*
       Removes element from query and performs a new search
     */
     removeQuery(e) {
       switch (e.target.id) {
         case 'js__query__state':
-          this.$store.state.temp.filterQueries.state = { name: '', abbr: '', active: false }; break;
+          this.filterQueries.state = { name: '', abbr: '', active: false }; break;
         case 'js__query__city':
-          this.$store.state.temp.filterQueries.city = { name: '', active: false }; break;
+          this.filterQueries.city = { name: '', active: false }; break;
         case 'js__query__company':
-          this.$store.state.temp.filterQueries.company = { name: '', active: false }; break;
+          this.filterQueries.company = { name: '', active: false }; break;
         case 'js__query__industry':
-          this.$store.state.temp.filterQueries.industry = { name: '', active: false }; break;
+          this.filterQueries.industry = { name: '', active: false }; break;
         default:
           break;
       }
@@ -75,7 +76,7 @@ export default {
       On Click this shows the basic cards
     */
     showBasic() {
-      this.$store.state.temp.hideBasicCards = !this.$store.state.temp.hideBasicCards;
+      this.hideBasicCards = !this.hideBasicCards;
     },
 
     /*
@@ -83,18 +84,18 @@ export default {
     */
     performSearch() {
       /* reset the 'show more' options */
-      this.$store.state.temp.hideBasicCards = true;
+      this.hideBasicCards = true;
 
       /* empty these on each search so premium info updates in card */
-      this.$store.state.temp.results = [];
-      this.$store.state.temp.loadingResults = true;
-      this.$store.state.temp.isResults = false;
+      this.results = [];
+      this.loadingResults = true;
+      this.isResults = false;
       fetch(
         `${this.$config.default.api}/search` +
-        `?state=${encodeURIComponent(this.$store.state.temp.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.temp.filterQueries.city.name)}` +
-        `&company=${encodeURIComponent(this.$store.state.temp.filterQueries.company.name)}` +
-        `&industry=${encodeURIComponent(this.$store.state.temp.filterQueries.industry.name)}`,
+        `?state=${encodeURIComponent(this.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.filterQueries.industry.name)}`,
       )
       .then((data) => {
         data.json().then((users) => {
@@ -102,10 +103,10 @@ export default {
           if (users.users && (users.users.premiumStates.length > 0 ||
               users.users.premiumCities.length > 0 ||
               users.users.basic.length > 0)) {
-            this.$store.state.temp.isResults = true;
+            this.isResults = true;
           }
-          this.$store.state.temp.loadingResults = false;
-          this.$store.commit('updateResults', users);
+          this.loadingResults = false;
+          this.types.UPDATE_SEARCH_RESULTS(users);
         });
       });
     },

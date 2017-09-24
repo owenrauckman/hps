@@ -123,20 +123,20 @@ export default {
             this.user.company.areasServed.forEach((area) => {
               let isStateQuery = true;
               let isCityQuery = true;
-              if (this.$store.state.temp.filterQueries.state.name === '') {
+              if (this.$store.state.search.filterQueries.state.name === '') {
                 isStateQuery = false;
               }
-              if (this.$store.state.temp.filterQueries.city.name === '') {
+              if (this.$store.state.search.filterQueries.city.name === '') {
                 isCityQuery = false;
               }
               if (area.ownsPremium === true &&
-                (this.$store.state.temp.filterQueries.state.abbr === area.state
+                (this.$store.state.search.filterQueries.state.abbr === area.state
                 || isStateQuery === false)) {
                 this.ownsPremiumState = true;
               }
               area.cities.forEach((city) => {
                 if (city.ownsPremium === true &&
-                  (this.$store.state.temp.filterQueries.city.name === city.city
+                  (this.$store.state.search.filterQueries.city.name === city.city
                   || isCityQuery === false)) {
                   this.ownsPremiumCity = true;
                 }

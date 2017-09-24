@@ -6,6 +6,8 @@
 </template>
 
 <script>
+import * as types from '@/store/mutationTypes';
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'searchButton',
@@ -15,11 +17,12 @@ export default {
     };
   },
   methods: {
+    ...mapMutations([types.TOGGLE_SEARCH_FILTERS, types.UPDATE_SEARCH_RESULTS]),
     /*
       Hides the filter popup and removes the no-scroll class on the body
     */
     hideFilters() {
-      this.$store.commit('toggleFilters', false);
+      this.types.TOGGLE_SEARCH_FILTERS(false);
       document.body.classList = '';
       document.body.classList.add('g__body__gray');
     },
@@ -35,29 +38,29 @@ export default {
     */
     performSearch() {
       /* reset the 'show more' options */
-      this.$store.state.temp.hideBasicCards = true;
+      this.$store.state.search.hideBasicCards = true;
 
       /* empty these on each search so premium info updates in card */
-      this.$store.state.temp.results = [];
-      this.$store.state.temp.loadingResults = true;
-      this.$store.state.temp.isResults = false;
+      this.$store.state.search.results = [];
+      this.$store.state.search.loadingResults = true;
+      this.$store.state.search.isResults = false;
       this.hideFilters();
       fetch(
         `${this.$config.default.api}/search` +
-        `?state=${encodeURIComponent(this.$store.state.temp.filterQueries.state.abbr)}` +
-        `&city=${encodeURIComponent(this.$store.state.temp.filterQueries.city.name)}` +
-        `&company=${encodeURIComponent(this.$store.state.temp.filterQueries.company.name)}` +
-        `&industry=${encodeURIComponent(this.$store.state.temp.filterQueries.industry.name)}`,
+        `?state=${encodeURIComponent(this.$store.state.search.filterQueries.state.abbr)}` +
+        `&city=${encodeURIComponent(this.$store.state.search.filterQueries.city.name)}` +
+        `&company=${encodeURIComponent(this.$store.state.search.filterQueries.company.name)}` +
+        `&industry=${encodeURIComponent(this.$store.state.search.filterQueries.industry.name)}`,
       ).then((data) => {
         data.json().then((users) => {
           /* check if there are users returned */
           if (users.users && (users.users.premiumStates.length > 0 ||
               users.users.premiumCities.length > 0 ||
               users.users.basic.length > 0)) {
-            this.$store.state.temp.isResults = true;
+            this.$store.state.search.isResults = true;
           }
-          this.$store.state.temp.loadingResults = false;
-          this.$store.commit('updateResults', users);
+          this.$store.state.search.loadingResults = false;
+          this.types.UPDATE_SEARCH_RESULTS(users);
         });
       });
     },

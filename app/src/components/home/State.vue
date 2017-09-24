@@ -3,12 +3,12 @@
     <div class="filters__section">
       <div class="filters__section__input-container">
         <div class="filters__section__input-wrapper">
-          <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="stateSearchPlaceholder" v-model="$store.state.temp.filterQueries.state.name">
+          <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="stateSearchPlaceholder" v-model="filterQueries.state.name">
           <SearchButton/>
         </div>
       </div>
       <ul class="filters__section__list filters--margin">
-        <li v-for="state in filterBy(states, $store.state.temp.filterQueries.state.name, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected': state.active },'filters__section__list__item']">{{state.name}}</li>
+        <li v-for="state in filterBy(states, filterQueries.state.name, 'name')" @click="selectState(state)" :class="[{ 'filters__section__list__item--selected': state.active },'filters__section__list__item']">{{state.name}}</li>
       </ul>
     </div>
   </div>
@@ -16,6 +16,9 @@
 </template>
 
 <script>
+import * as types from '@/store/mutationTypes';
+import { mapGetters, mapMutations } from 'vuex';
+
 import SearchButton from './SearchButton';
 
 export default {
@@ -29,10 +32,14 @@ export default {
   components: { SearchButton },
   mounted() {
     this.getStates().then(() => {
-      this.selectState(this.$store.state.temp.filterQueries.state);
+      this.selectState(this.filterQueries.state);
     });
   },
+  computed: {
+    ...mapGetters(['filterQueries']),
+  },
   methods: {
+    ...mapMutations([types.SET_SEARCH_QUERY]),
     /*
       Get list of state that a user can search by
     */
@@ -70,9 +77,9 @@ export default {
         }
         /* eslint-enable */
         if (item.active) {
-          this.$store.commit('updateStateQuery', { name: item.name, abbr: item.abbr, active: true });
+          this.types.SET_SEARCH_QUERY('state', { name: item.name, abbr: item.abbr, active: true });
         } else {
-          this.$store.commit('updateStateQuery', { name: '', abbr: '', active: false });
+          this.types.SET_SEARCH_QUERY('state', { name: '', abbr: '', active: false });
         }
       });
     },
@@ -80,7 +87,7 @@ export default {
       Checks if input is empty, if so, sets all states to inactive class (removes check)
     */
     checkForEmptyInput() {
-      if (this.$store.state.temp.filterQueries.state.name.length === 0) {
+      if (this.filterQueries.state.name.length === 0) {
         this.states.forEach((state) => {
           /* eslint-disable */
           state.active = false;

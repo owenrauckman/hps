@@ -4,14 +4,14 @@
 
         <div class="filters__section__input-container">
           <div class="filters__section__input-wrapper">
-            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="citySearchPlaceholder" v-model="$store.state.temp.filterQueries.city.name">
+            <input class="filters__section__input" :keyup="checkForEmptyInput()" :placeholder="citySearchPlaceholder" v-model="filterQueries.city.name">
             <SearchButton/>
           </div>
         </div>
 
         <p v-if="needState" class="filter-required">{{needStateMessage}}</p>
         <ul class="filters__section__list filters--margin">
-          <li v-for="city in filterBy(cities, $store.state.temp.filterQueries.city.name, 'name')" @click="selectCity(city)" :class="[{ 'filters__section__list__item--selected':city.active },'filters__section__list__item']">{{city.name}}</li>
+          <li v-for="city in filterBy(cities, filterQueries.city.name, 'name')" @click="selectCity(city)" :class="[{ 'filters__section__list__item--selected':city.active },'filters__section__list__item']">{{city.name}}</li>
         </ul>
       </div>
     </div>
@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import * as types from '@/store/mutationTypes';
+import { mapGetters, mapMutations } from 'vuex';
 import SearchButton from './SearchButton';
 
 export default {
@@ -34,16 +36,20 @@ export default {
   },
   components: { SearchButton },
   mounted() {
-    if (this.$store.state.temp.filterQueries.state.name.length === 0) {
+    if (this.filterQueries.state.name.length === 0) {
       this.needState = true;
     } else {
       this.needState = false;
-      this.getCities(this.$store.state.temp.filterQueries.state.abbr).then(() => {
-        this.selectCity(this.$store.state.temp.filterQueries.city);
+      this.getCities(this.filterQueries.state.abbr).then(() => {
+        this.selectCity(this.filterQueries.city);
       });
     }
   },
+  computed: {
+    ...mapGetters(['filterQueries']),
+  },
   methods: {
+    ...mapMutations([types.SET_SEARCH_QUERY]),
     /*
       Get list of state that a user can search by
     */
@@ -83,16 +89,16 @@ export default {
       });
 
       if (item.active) {
-        this.$store.commit('updateCityQuery', { name: item.name, active: true });
+        this.types.SET_SEARCH_QUERY('city', { name: item.name, active: true });
       } else {
-        this.$store.commit('updateCityQuery', { name: '', active: false });
+        this.types.SET_SEARCH_QUERY('city', { name: '', active: false });
       }
     },
     /*
       Checks if input is empty, if so, sets all cities to inactive class (removes check)
     */
     checkForEmptyInput() {
-      if (this.$store.state.temp.filterQueries.city.name.length === 0) {
+      if (this.filterQueries.city.name.length === 0) {
         this.cities.forEach((city) => {
           /* eslint-disable */
           city.active = false;

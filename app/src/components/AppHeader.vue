@@ -12,10 +12,10 @@
       <router-link to="about" class="header__content__item"><li @click="toggleMenu">About</li></router-link>
       <router-link to="pricing" class="header__content__item"><li @click="toggleMenu">Pricing</li></router-link>
       <!-- login or out -->
-      <router-link v-if="$store.state.temp.isLoggedIn" to="login" class="header__content__item"><li @click="toggleMenu('logout')">Log Out</li></router-link>
+      <router-link v-if="isLoggedIn" to="login" class="header__content__item"><li @click="toggleMenu('logout')">Log Out</li></router-link>
       <router-link v-else to="login" class="header__content__item"><li @click="toggleMenu">Log In</li></router-link>
       <!-- end login or out -->
-      <router-link v-if="$store.state.temp.isLoggedIn" to="account" class="header__content__item"><li @click="toggleMenu">Account</li></router-link>
+      <router-link v-if="isLoggedIn" to="account" class="header__content__item"><li @click="toggleMenu">Account</li></router-link>
       <router-link v-else to="signup" class="header__content__item"><li @click="toggleMenu">Sign Up</li></router-link>
     </ul>
   </div>
@@ -53,7 +53,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['transparentMenu']),
+    ...mapGetters(['isLoggedIn', 'transparentMenu']),
   },
   methods: {
     /*
@@ -74,7 +74,7 @@ export default {
       this.axios.get(`${this.$config.default.api}/users/logout`, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
-            this.$store.state.temp.isLoggedIn = false;
+            this.isLoggedIn = false;
             this.$router.push('/login');
           } else {
             alert('something went wrong when logging out. Please try again.');
