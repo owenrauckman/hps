@@ -22,7 +22,7 @@ export default {
       Hides the filter popup and removes the no-scroll class on the body
     */
     hideFilters() {
-      this.types.TOGGLE_SEARCH_FILTERS(false);
+      this.TOGGLE_SEARCH_FILTERS(false);
       document.body.classList = '';
       document.body.classList.add('g__body__gray');
     },
@@ -60,7 +60,7 @@ export default {
             this.$store.state.search.isResults = true;
           }
           this.$store.state.search.loadingResults = false;
-          this.types.UPDATE_SEARCH_RESULTS(users);
+          this.UPDATE_SEARCH_RESULTS(users);
         });
       });
     },

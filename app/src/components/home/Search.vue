@@ -64,7 +64,7 @@ export default {
       } else {
         /* set the active filter based on click */
         this.activateChosenFilter(e);
-        this.types.TOGGLE_SEARCH_FILTERS(true);
+        this.TOGGLE_SEARCH_FILTERS(true);
         this.showFiltersLocation = !this.showFiltersLocation;
         document.body.classList.add('no-overflow');
         document.documentElement.scrollTop = 0; /* firefox */

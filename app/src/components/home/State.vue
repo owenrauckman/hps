@@ -68,19 +68,20 @@ export default {
       @param {object} - selected item
     */
     selectState(item) {
+      /* todo (for all types of these city etc): do
+      this locally, then push after...avoid extra pushes */
+      // this.SET_SEARCH_QUERY({ type: 'state', options: { name: '', abbr: '', active: false } });
       this.states.forEach((state) => {
         /* eslint-disable */
         if (state.name === item.name) {
           state.active = !state.active;
+          if(state.active){
+            this.SET_SEARCH_QUERY({type: 'state', options: { name: item.name, abbr: item.abbr, active: true }});
+          }
         } else {
           state.active = false;
         }
         /* eslint-enable */
-        if (item.active) {
-          this.types.SET_SEARCH_QUERY('state', { name: item.name, abbr: item.abbr, active: true });
-        } else {
-          this.types.SET_SEARCH_QUERY('state', { name: '', abbr: '', active: false });
-        }
       });
     },
     /*

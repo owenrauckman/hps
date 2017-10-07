@@ -19,9 +19,9 @@ const mutations = {
   [types.TOGGLE_SEARCH_FILTERS](state, filtersVisible) {
     state.filtersVisible = filtersVisible;
   },
-  [types.SET_SEARCH_QUERY](state, { type, newQuery }) {
-    if (type in ['state', 'city', 'company', 'industry']) {
-      state.filterQueries[type] = newQuery;
+  [types.SET_SEARCH_QUERY](state, newQuery) {
+    if (['state', 'city', 'company', 'industry'].includes(newQuery.type)) {
+      state.filterQueries[newQuery.type] = newQuery.options;
     }
   },
   [types.SET_FILTER_TAB](state, selectedTab) {

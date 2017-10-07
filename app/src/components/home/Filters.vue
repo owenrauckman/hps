@@ -58,7 +58,7 @@ export default {
       Hides the filter popup and removes the no-scroll class on the body
     */
     hideFilters() {
-      this.types.TOGGLE_SEARCH_FILTERS(false);
+      this.TOGGLE_SEARCH_FILTERS(false);
       document.body.classList = '';
       document.body.classList.add('g__body__gray');
     },
@@ -73,16 +73,16 @@ export default {
       Clear Filters for all components and remove selected classes for them
     */
     clearFilters() {
-      this.types.SET_SEARCH_QUERY('state', { name: '', abbr: '', active: false });
-      this.types.SET_SEARCH_QUERY('city', { name: '', abbr: '', active: false });
-      this.types.SET_SEARCH_QUERY('company', { name: '', abbr: '', active: false });
-      this.types.SET_SEARCH_QUERY('industry', { name: '', abbr: '', active: false });
+      this.SET_SEARCH_QUERY('state', { name: '', abbr: '', active: false });
+      this.SET_SEARCH_QUERY('city', { name: '', abbr: '', active: false });
+      this.SET_SEARCH_QUERY('company', { name: '', abbr: '', active: false });
+      this.SET_SEARCH_QUERY('industry', { name: '', abbr: '', active: false });
     },
     /*
       Makes selected tab active which mounts the component based on v-if
     */
     selectFilter(tab) {
-      this.types.SET_FILTER_TAB(tab);
+      this.SET_FILTER_TAB(tab);
     },
   },
 };
