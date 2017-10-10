@@ -11,10 +11,6 @@ body{
   -webkit-overflow-scrolling: touch;
 }
 
-.g__body__gray{
-  background: transparentize($dark-blue, 0.9);
-}
-
 /* global container */
 .g__container{
   position: relative;
@@ -22,28 +18,6 @@ body{
   margin: 0 auto;
 }
 
-/* Disable Scrolling for full screen pop ups */
-.no-overflow{
-  overflow: hidden;
-}
-
-/* Toggle Styles for Filters */
-.filter{
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.25s ease-out;
-  &--show{
-    visibility: visible;
-    opacity: 1;
-  }
-}
-
-/* Filtering Required Message*/
-.filter-required{
-  padding: 2rem;
-  letter-spacing: 0.5px;
-  color: $gray-medium;
-}
 
 /* Various Settings */
 $border-radius: 5px;

@@ -1,72 +1,96 @@
 import * as types from '@/store/mutationTypes';
-import config from '@/config/';
+import config from '@/config';
+import axios from 'axios';
 
 const state = {
-  filtersVisible: false,
   loadingResults: false,
-  results: [],
+  results: {},
   isResults: true,
   hideBasicCards: true, // todo turn to toggle
-  filterQueries: config.defaultFilterQueries,
-  filterTabs: config.defaultFilterTabs,
+  searchQuery: {
+    state: null,
+    city: null,
+    companyIndustry: null,
+  },
+  states: [],
+  cities: [],
+  companyIndustries: [],
 };
 
 /* eslint-disable no-shadow, no-param-reassign */
 const mutations = {
+  [types.UPDATE_SEARCH_QUERY](state, query) {
+    switch (query) {
+      case 'STATE':
+        state.searchQuery.state = query; break;
+      case 'CITY':
+        state.searchQuery.city = query; break;
+      case 'COMPANY_INDUSTRY':
+        state.searchQuery.companyIndustry = query; break;
+      default:
+        break;
+    }
+  },
+  [types.UPDATE_STATES](state, states) {
+    state.states = states;
+  },
+  [types.UPDATE_CITIES](state, cities) {
+    state.cities = cities;
+  },
   [types.UPDATE_SEARCH_RESULTS](state, results) {
     state.results = results;
   },
-  [types.TOGGLE_SEARCH_FILTERS](state, filtersVisible) {
-    state.filtersVisible = filtersVisible;
-  },
-  [types.SET_SEARCH_QUERY](state, newQuery) {
-    if (['state', 'city', 'company', 'industry'].includes(newQuery.type)) {
-      state.filterQueries[newQuery.type] = newQuery.options;
-    }
-  },
-  [types.SET_FILTER_TAB](state, selectedTab) {
-    state.filterTabs.forEach((tab) => {
-      tab.active = false;
+};
+
+const actions = {
+  fetchStates({ commit, dispatch }) {
+    axios.get(`${config.api}/search/states`).then((response) => {
+      commit(types.UPDATE_STATES, response.data);
+      dispatch('fetchCities');
+    }).catch((err) => {
+      console.log(`${err}: Something went wrong, add flash message`);
     });
-    // todo: double check that this works, probably need to compare whole object
-    state[selectedTab].active = true;
   },
-  [types.ACTIVATE_CHOSEN_FILTER](state, chosenFilter) {
-    state.filterTabs.forEach((tab) => {
-      tab.active = false;
+  fetchCities({ commit, state }) {
+    axios.get(`${config.api}/search/cities?state=${state.searchQuery.state}`).then((response) => {
+      commit(types.UPDATE_CITIES, response.data);
+    }).catch((err) => {
+      console.log(`${err}: Something went wrong, add flash message`);
     });
-    switch (chosenFilter) {
-      case 'js__search-tab__state':
-        state.filterTabs[0].active = true; break;
-      case 'js__search-tab__city':
-        state.filterTabs[1].active = true; break;
-      case 'js__search-tab__company':
-        state.filterTabs[2].active = true; break;
-      case 'js__search-tab__industry':
-        state.filterTabs[3].active = true; break;
-      default:
-        state.filterTabs[0].active = true;
-    }
   },
-  [types.SET_LOADING_STATE](state, loadingResults) {
-    state.loadingResults = loadingResults;
-  },
-  [types.SET_RESULTS_STATUS](state, isResults) {
-    state.isResults = isResults;
-  },
-  [types.HIDE_BASIC_CARDS](state, hideBasicCards) {
-    state.hideBasicCards = hideBasicCards;
+  // todo fetch company and industry
+
+  performSearch({ commit, state }) {
+    state.hideBasicCards = true;
+    state.results = [];
+    state.loadingResults = true;
+    state.isResults = false;
+    axios.get(`${config.api}/search` +
+      `?state=${encodeURIComponent(state.searchQuery.state)}` +
+      `&city=${encodeURIComponent(state.searchQuery.city)}` +
+      `&company=${encodeURIComponent('')}` +
+      `&industry=${encodeURIComponent('')}`).then((users) => {
+        /* check if there are users returned */
+        if (users.users && (users.users.premiumStates.length > 0 ||
+           users.users.premiumCities.length > 0 ||
+           users.users.basic.length > 0)) {
+          state.isResults = true;
+        }
+        state.loadingResults = false;
+        commit(types.UPDATE_SEARCH_RESULTS, users);
+      });
   },
 };
 
 const getters = {
-  filtersVisible: state => state.filtersVisible,
   loadingResults: state => state.loadingResults,
   results: state => state.results,
   isResults: state => state.isResults,
   hideBasicCards: state => state.hideBasicCards,
-  filterQueries: state => state.filterQueries,
-  filterTabs: state => state.filterTabs,
+  searchQuery: state => state.searchQuery,
+  searchQueryState: state => state.searchQuery.state,
+  states: state => state.states,
+  cities: state => state.cities,
 };
 /* eslint-enable */
 
@@ -74,4 +98,5 @@ export default {
   state,
   mutations,
   getters,
+  actions,
 };
