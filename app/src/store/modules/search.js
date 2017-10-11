@@ -8,8 +8,8 @@ const state = {
   isResults: true,
   hideBasicCards: true, // todo turn to toggle
   searchQuery: {
-    state: '',
-    city: '',
+    state: null,
+    city: null,
     companyIndustry: null,
   },
   states: [],
@@ -79,22 +79,6 @@ const actions = {
         state.loadingResults = false;
         commit(types.UPDATE_SEARCH_RESULTS, users);
       });
-  },
-
-  // premium search todo nice comments
-  premiumSearch({ commit, state }) {
-    state.hideBasicCards = true;
-    state.results = [];
-    state.loadingResults = true;
-    state.isResults = false;
-    axios.get(`${config.api}/search/premium`).then((users) => {
-      /* check if there are users returned */
-      if (users.users) {
-        state.isResults = true;
-      }
-      state.loadingResults = false;
-      commit(types.UPDATE_SEARCH_RESULTS, users);
-    });
   },
 };
 

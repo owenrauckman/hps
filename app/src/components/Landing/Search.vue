@@ -25,7 +25,6 @@
         autocomplete
         class="h__search__item"
       ></v-select>
-
       <button class="h__search__item h__search__button" @click="performSearch()">Search</button>
     </div>
   </div>
@@ -102,9 +101,9 @@ export default {
       padding: 1rem;
       width: 100%;
       font-size: 1rem;
-      max-width: 150px;
       @include breakpoint('tablet'){
         width: auto;
+        max-width: 150px;
       }
       &:hover{
         transition: all 0.25s ease-in-out;
