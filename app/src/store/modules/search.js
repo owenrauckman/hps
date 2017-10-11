@@ -5,7 +5,7 @@ import axios from 'axios';
 const state = {
   loadingResults: false,
   results: {},
-  isResults: true,
+  isResults: false,
   hideBasicCards: true, // todo turn to toggle
   searchQuery: {
     state: null,
@@ -64,21 +64,37 @@ const actions = {
     state.hideBasicCards = true;
     state.results = [];
     state.loadingResults = true;
-    state.isResults = false;
     axios.get(`${config.api}/search` +
       `?state=${encodeURIComponent(state.searchQuery.state)}` +
       `&city=${encodeURIComponent(state.searchQuery.city)}` +
       `&company=${encodeURIComponent('')}` +
       `&industry=${encodeURIComponent('')}`).then((users) => {
         /* check if there are users returned */
-        if (users.users && (users.users.premiumStates.length > 0 ||
-           users.users.premiumCities.length > 0 ||
-           users.users.basic.length > 0)) {
+        if (users.data.users === undefined) {
+          alert('ga');
+        } else if (users.data.users.premiumStates.length > 0 ||
+           users.data.users.premiumCities.length > 0 ||
+           users.data.users.basic.length > 0) {
           state.isResults = true;
         }
         state.loadingResults = false;
         commit(types.UPDATE_SEARCH_RESULTS, users);
       });
+  },
+
+  // premium search todo nice comments
+  premiumSearch({ commit, state }) {
+    state.hideBasicCards = true;
+    state.results = [];
+    state.loadingResults = true;
+    axios.get(`${config.api}/search/premium`).then((users) => {
+      /* check if there are users returned */
+      if (users.data.users) {
+        state.isResults = true;
+      }
+      state.loadingResults = false;
+      commit(types.UPDATE_SEARCH_RESULTS, users);
+    });
   },
 };
 
