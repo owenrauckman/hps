@@ -1,29 +1,44 @@
 <template>
   <div>
     <div class="h__search-container">
-      <!-- todo add hint that this must be selected -->
+
+
       <v-select
         v-bind:items="states"
         v-model="searchQueryState"
         label="State"
-        autocomplete
+        v-bind:autocomplete="true"
         class="h__search__item"
+        v-bind:clearable="true"
+        color="pink lighten-1"
       ></v-select>
 
       <v-select
         v-bind:items="cities"
         v-model="searchQueryCity"
         label="City"
-        autocomplete
+        v-bind:autocomplete="true"
         class="h__search__item"
+        v-bind:disabled="!isStateSelected"
+        v-bind:persistent-hint="true"
+        v-bind:clearable="true"
+        v-bind:hint="!isStateSelected ? 'Please select a state first' : ''"
+        color="pink lighten-1"
       ></v-select>
 
       <v-select
-        v-bind:items="companiesIndustries"
-        v-model="searchQuery.CompanyIndustry"
+        v-bind:items="companyIndustries"
+        v-model="searchQueryCompanyIndustry"
         label="Company/Industry"
-        autocomplete
+        v-bind:autocomplete="true"
         class="h__search__item"
+        item-text="name"
+        return-object
+        v-bind:disabled="!isStateSelected"
+        v-bind:persistent-hint="true"
+        v-bind:clearable="true"
+        v-bind:hint="!isStateSelected ? 'Please select a state first' : ''"
+        color="pink lighten-1"
       ></v-select>
       <button class="h__search__item h__search__button" @click="performSearch()">Search</button>
     </div>
@@ -31,13 +46,12 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import * as types from '@/store/mutationTypes';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
 
 export default {
   data() {
     return {
-      selectedCompanyIndustry: null,
-      companiesIndustries: ['Silpada', 'Advocare'],
     };
   },
   computed: {
@@ -45,28 +59,39 @@ export default {
       searchQuery: 'searchQuery',
       states: 'states',
       cities: 'cities',
+      companyIndustries: 'companyIndustries',
     }),
     searchQueryState: {
       get() { return this.searchQuery.state; },
       set(state) {
-        this.searchQuery.state = state;
+        this.UPDATE_SEARCH_QUERY({ type: 'STATE', value: state });
         this.fetchCities();
       },
     },
     searchQueryCity: {
       get() { return this.searchQuery.city; },
-      set(city) { this.searchQuery.city = city; },
+      set(city) { this.UPDATE_SEARCH_QUERY({ type: 'CITY', value: city }); },
+    },
+    searchQueryCompanyIndustry: {
+      get() { return this.searchQuery.companyIndustry; },
+      set(companyIndustry) { this.UPDATE_SEARCH_QUERY({ type: 'COMPANY_INDUSTRY', value: companyIndustry }); },
+    },
+    isStateSelected() {
+      return this.searchQuery.state !== null;
     },
   },
   methods: {
     ...mapActions({
       fetchStates: 'fetchStates',
       fetchCities: 'fetchCities',
+      fetchCompanyIndustry: 'fetchCompanyIndustry',
       performSearch: 'performSearch',
     }),
+    ...mapMutations([types.UPDATE_SEARCH_QUERY]),
   },
   mounted() {
     this.fetchStates();
+    this.fetchCompanyIndustry();
   },
 };
 </script>
@@ -88,8 +113,9 @@ export default {
       }
     }
     &__item{
-      margin: 1rem;
+      margin: 0 1rem;
       flex: 1;
+      // white-space: nowrap;
     }
     &__button{
       background: $purple;

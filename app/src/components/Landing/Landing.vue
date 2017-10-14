@@ -1,10 +1,10 @@
 <template>
-  <div>
-    <div class="m__landing-top">
+  <div class="m__landing">
+    <div class="m__landing-top m__landing--box">
       <Hero/>
       <Search/>
     </div>
-    <Results/>
+    <Results class="m__landing--box"/>
   </div>
 </template>
 
@@ -24,10 +24,19 @@ export default {
 <style scoped lang="scss">
 @import '../../sass/main.scss';
 .m{
-  &__landing-top{
-    padding: 0 2rem;
-    margin: 0 auto;
-    max-width: 1200px;
+  &__landing{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    &-top{
+      padding: 0 2rem;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 1200px;
+    }
+    &--box{
+      flex: 1;
+    }
   }
 }
 
