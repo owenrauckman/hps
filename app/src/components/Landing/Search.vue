@@ -2,7 +2,6 @@
   <div>
     <div class="h__search-container">
 
-
       <v-select
         v-bind:items="states"
         v-model="searchQueryState"

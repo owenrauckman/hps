@@ -34,6 +34,7 @@ import('../node_modules/vuetify/dist/vuetify.min.css');
 
 Vue.config.productionTip = false; // todo make this env aware
 
+
 /* eslint-disable no-new */
 new Vue({
   store,

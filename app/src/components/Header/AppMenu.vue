@@ -15,7 +15,7 @@ export default {
         { title: 'About', link: '/about' },
         { title: 'Pricing', link: '/pricing' },
         { title: 'Log In', link: '/login' },
-        { title: 'Sign Up', link: '/signup' },
+        { title: 'Sign Up', link: '/create' },
       ],
     };
   },

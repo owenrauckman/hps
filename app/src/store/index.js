@@ -4,12 +4,14 @@ import Vuex from 'vuex';
 
 /* import modules */
 import search from '@/store/modules/search';
+import create from '@/store/modules/create';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   modules: {
     search,
+    create,
   },
   // plugins: [createPersist({
   //   namespace: 'namespace-for-state',
