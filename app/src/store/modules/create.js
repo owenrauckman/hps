@@ -4,42 +4,11 @@ import axios from 'axios';
 
 const state = {
   progressBar: 25,
-  currentFee: 'free',
   companies: [],
   states: [],
   cities: [],
   selectedState: '',
-  signUpInfo: {
-    states: [],
-    cities: [],
-    // account info
-    firstName: '',
-    lastName: '',
-    emailAddress: '',
-    username: '',
-    password: '',
-    phoneNumber: '',
-    profilePicture: config.defaultProfileImage,
-    totalPrice: '', // todo fill currentFee?
-    basicPlans: '', // todo fill
-    pro: '', // todo fill
-    premium: '', // todo fill
-    // company info
-    company: {
-      name: '',
-      aboutCompany: '',
-      aboutMe: '',
-      areasServed: [], // todo fill
-      links: {
-        website: '',
-        facebook: '',
-        twitter: '',
-        instagram: '',
-        pinterest: '',
-        youtube: '',
-      },
-    },
-  },
+  signUpInfo: config.signUpInfo,
 };
 
 /* eslint-disable no-shadow, no-param-reassign */
@@ -82,6 +51,16 @@ const mutations = {
         state.signUpInfo.company.links.pinterest = info.value; break;
       case 'COMPANY_YOUTUBE':
         state.signUpInfo.company.links.youtube = info.value; break;
+      case 'CURRENT_FEE':
+        state.signUpInfo.currentFee = info.value; break;
+      case 'AREAS_SERVED':
+        state.signUpInfo.areasServed = info.value; break;
+      case 'BASIC_PLANS':
+        state.signUpInfo.basicPlans = info.value; break;
+      case 'PRO_PLANS':
+        state.signUpInfo.proPlans = info.value; break;
+      case 'PREMIUM_PLANS':
+        state.signUpInfo.premiumPlans = info.value; break;
       default:
         break;
     }
@@ -188,11 +167,46 @@ const actions = {
         });
     });
   },
+
+  /*
+    POST to create a user's proflie
+  */
+  createProfile({ state }) {
+    // const storeData = this.$store.state.signUpInfo;
+    // const signUpInfo = {
+    //   firstName: storeData.firstName,
+    //   lastName: storeData.lastName,
+    //   username: storeData.username,
+    //   password: storeData.password,
+    //   emailAddress: storeData.emailAddress,
+    //   phoneNumber: storeData.phoneNumber,
+    //   profilePicture: storeData.profilePicture,
+    //   company: storeData.company,
+    //   basicPlans: this.basicPlans,
+    //   proPlans: this.proPlans,
+    //   premiumPlans: this.premiumPlans,
+    // };
+    return new Promise((resolve) => {
+      axios.post(`${config.api}/users/register`, state.signUpInfo)
+        .then((response) => {
+          if (response.data.success === true) {
+            // reset the state back to default values
+            state.signUpInfo = config.signUpInfo;
+            resolve(true);
+          }
+        })
+        .catch((err) => {
+          throw new Error(`${err}: Something went wrong, add flash message`);
+        });
+    });
+  },
+
+
 };
 
 const getters = {
   progressBar: state => state.progressBar,
-  currentFee: state => state.currentFee,
+  currentFee: state => state.signUpInfo.currentFee,
   companies: state => state.companies,
   signUpInfo: state => state.signUpInfo,
   signUpStates: state => state.states,

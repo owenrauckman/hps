@@ -7,6 +7,8 @@ import SelectCities from '@/components/Create/SelectCities';
 import About from '@/components/Create/About';
 import Account from '@/components/Create/Account';
 import Premium from '@/components/Create/Premium';
+import Pay from '@/components/Create/Pay';
+import Success from '@/components/Create/Success';
 
 Vue.use(Router);
 
@@ -26,6 +28,8 @@ export default new Router({
         { path: 'about', component: About, alias: '/create' },
         { path: 'account', component: Account, alias: '/create' },
         { path: 'premium', component: Premium, alias: '/create' },
+        { path: 'pay', component: Pay, alias: '/create' },
+        { path: 'success', component: Success, alias: '/create' },
       ],
     },
   ],

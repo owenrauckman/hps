@@ -8,8 +8,8 @@
         {{state.text}}
       </v-chip>
     </div>
-
-    <div v-for="state in signUpCities">
+ 
+    <div v-for="state in signUpCities" :key="state.name">
       <v-select
         v-bind:items="state.cities"
         v-model="selectedCities"
