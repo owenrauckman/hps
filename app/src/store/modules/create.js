@@ -54,13 +54,17 @@ const mutations = {
       case 'CURRENT_FEE':
         state.signUpInfo.currentFee = info.value; break;
       case 'AREAS_SERVED':
-        state.signUpInfo.areasServed = info.value; break;
+        state.signUpInfo.company.areasServed = info.value; break;
       case 'BASIC_PLANS':
         state.signUpInfo.basicPlans = info.value; break;
       case 'PRO_PLANS':
         state.signUpInfo.proPlans = info.value; break;
       case 'PREMIUM_PLANS':
         state.signUpInfo.premiumPlans = info.value; break;
+      case 'STRIPE_TOKEN':
+        state.signUpInfo.stripeToken = info.value; break;
+      case 'RESET':
+        state.signUpInfo = info.value; break;
       default:
         break;
     }
@@ -171,28 +175,16 @@ const actions = {
   /*
     POST to create a user's proflie
   */
-  createProfile({ state }) {
-    // const storeData = this.$store.state.signUpInfo;
-    // const signUpInfo = {
-    //   firstName: storeData.firstName,
-    //   lastName: storeData.lastName,
-    //   username: storeData.username,
-    //   password: storeData.password,
-    //   emailAddress: storeData.emailAddress,
-    //   phoneNumber: storeData.phoneNumber,
-    //   profilePicture: storeData.profilePicture,
-    //   company: storeData.company,
-    //   basicPlans: this.basicPlans,
-    //   proPlans: this.proPlans,
-    //   premiumPlans: this.premiumPlans,
-    // };
+  createProfile({ commit }) {
     return new Promise((resolve) => {
       axios.post(`${config.api}/users/register`, state.signUpInfo)
         .then((response) => {
           if (response.data.success === true) {
             // reset the state back to default values
-            state.signUpInfo = config.signUpInfo;
+            commit(types.UPDATE_COMPANIES, { type: 'RESET', value: config.signUpInfo });
             resolve(true);
+          } else {
+            resolve(false);
           }
         })
         .catch((err) => {

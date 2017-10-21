@@ -50,7 +50,9 @@ export default {
   },
   methods: {
     ...mapMutations([types.UPDATE_PROGRESS_BAR, types.UPDATE_SIGN_UP_INFO]),
-    ...mapActions('createProfile'),
+    ...mapActions({
+      createProfile: 'createProfile',
+    }),
     /*
       checks to see if premium is available for a city/state
       this method is here instead of the store bc it is only referencing
@@ -201,14 +203,15 @@ export default {
         this.UPDATE_SIGN_UP_INFO({ type: 'PRO_PLANS', value: this.proPlans });
         this.UPDATE_SIGN_UP_INFO({ type: 'PREMIUM_PLANS', value: this.premiumPlans });
         /* redirect to payment */
-        this.$router.push('/pay');
+        this.$router.push('/create/pay');
         /* otherwise go ahead and sign them up */
       } else {
         this.UPDATE_SIGN_UP_INFO({ type: 'BASIC_PLANS', value: this.basicPlans });
         this.createProfile().then((success) => {
           if (success) {
-            this.$router.push('/success');
+            this.$router.push('/create/success');
           }
+          // todo flash message error
         });
       }
     },
