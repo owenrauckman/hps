@@ -77,7 +77,7 @@ export default {
       Performs validation before continuing
     */
     submit() {
-      this.$router.push('/create/company-info');
+      this.$router.push('/create/account');
     },
   },
   beforeMount() {

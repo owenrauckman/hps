@@ -66,8 +66,8 @@ export default {
   computed: {
     ...mapGetters(['currentFee', 'signUpInfo', 'companies', 'signUpStates']),
     selectedCompany: {
-      get() { return this.signUpInfo.company; },
-      set(company) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY', value: company }); },
+      get() { return this.signUpInfo.company.name; },
+      set(company) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_NAME', value: company }); },
     },
     selectedStates: {
       get() { return this.signUpInfo.states; },

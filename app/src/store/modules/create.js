@@ -10,9 +10,35 @@ const state = {
   cities: [],
   selectedState: '',
   signUpInfo: {
-    company: null,
     states: [],
     cities: [],
+    // account info
+    firstName: '',
+    lastName: '',
+    emailAddress: '',
+    username: '',
+    password: '',
+    phoneNumber: '',
+    profilePicture: config.defaultProfileImage,
+    totalPrice: '', // todo fill currentFee?
+    basicPlans: '', // todo fill
+    pro: '', // todo fill
+    premium: '', // todo fill
+    // company info
+    company: {
+      name: '',
+      aboutCompany: '',
+      aboutMe: '',
+      areasServed: [], // todo fill
+      links: {
+        website: '',
+        facebook: '',
+        twitter: '',
+        instagram: '',
+        pinterest: '',
+        youtube: '',
+      },
+    },
   },
 };
 
@@ -20,12 +46,42 @@ const state = {
 const mutations = {
   [types.UPDATE_SIGN_UP_INFO](state, info) {
     switch (info.type) {
-      case 'COMPANY':
-        state.signUpInfo.company = info.value; break;
+      case 'COMPANY_NAME':
+        state.signUpInfo.company.name = info.value; break;
       case 'STATES':
         state.signUpInfo.states = info.value; break;
       case 'CITIES':
         state.signUpInfo.cities = info.value; break;
+      case 'FIRST_NAME':
+        state.signUpInfo.firstName = info.value; break;
+      case 'LAST_NAME':
+        state.signUpInfo.lastName = info.value; break;
+      case 'EMAIL_ADDRESS':
+        state.signUpInfo.emailAddress = info.value; break;
+      case 'USERNAME':
+        state.signUpInfo.username = info.value; break;
+      case 'PASSWORD':
+        state.signUpInfo.password = info.value; break;
+      case 'PHONE_NUMBER':
+        state.signUpInfo.phoneNumber = info.value; break;
+      case 'PROFILE_PICTURE':
+        state.signUpInfo.profilePicture = info.value; break;
+      case 'COMPANY_ABOUT_ME':
+        state.signUpInfo.company.aboutMe = info.value; break;
+      case 'COMPANY_ABOUT_COMPANY':
+        state.signUpInfo.company.aboutCompany = info.value; break;
+      case 'COMPANY_WEBSITE':
+        state.signUpInfo.company.links.website = info.value; break;
+      case 'COMPANY_FACEBOOK':
+        state.signUpInfo.company.links.facebook = info.value; break;
+      case 'COMPANY_TWITTER':
+        state.signUpInfo.company.links.twitter = info.value; break;
+      case 'COMPANY_INSTAGRAM':
+        state.signUpInfo.company.links.instagram = info.value; break;
+      case 'COMPANY_PINTEREST':
+        state.signUpInfo.company.links.pinterest = info.value; break;
+      case 'COMPANY_YOUTUBE':
+        state.signUpInfo.company.links.youtube = info.value; break;
       default:
         break;
     }
@@ -99,6 +155,38 @@ const actions = {
     // Set the default state that will be selected as well
     commit(types.UPDATE_SIGN_UP_SELECTED_STATE, state.signUpInfo.states[0] ? state.signUpInfo.states[0].value : '');
     commit(types.UPDATE_SIGN_UP_CITIES, possibleCities);
+  },
+
+  /*
+    Checks to make sure a users username aren't already in use
+  */
+  isUsernameAvailable({ state }) {
+    return new Promise((resolve) => {
+      axios.get(`${config.api}/users/u/u/${encodeURIComponent(state.signUpInfo.username)}`)
+        .then((response) => {
+          if (response.data.userExists) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        });
+    });
+  },
+
+  /*
+    Checks to make sure a users email isn't already in use
+  */
+  isEmailAvailable({ state }) {
+    return new Promise((resolve) => {
+      axios.get(`${config.api}/users/u/e/${encodeURIComponent(state.signUpInfo.emailAddress)}`)
+        .then((response) => {
+          if (response.data.userExists) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
+        });
+    });
   },
 };
 
