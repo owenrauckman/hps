@@ -9,6 +9,7 @@ import Account from '@/components/Create/Account';
 import Premium from '@/components/Create/Premium';
 import Pay from '@/components/Create/Pay';
 import Success from '@/components/Create/Success';
+import Profile from '@/components/Profile/Profile';
 
 Vue.use(Router);
 
@@ -32,5 +33,8 @@ export default new Router({
         { path: 'success', component: Success, alias: '/create' },
       ],
     },
+
+    // PROFILE PAGE
+    { path: '/:username', component: Profile },
   ],
 });

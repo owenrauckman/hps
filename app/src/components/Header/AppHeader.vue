@@ -1,6 +1,8 @@
 <template>
   <div class="m__header">
-    <HeaderLogo/>
+    <router-link to="/">
+      <HeaderLogo/>
+    </router-link>
     <AppMenu/>
   </div>
 </template>
