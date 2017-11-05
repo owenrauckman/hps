@@ -48,7 +48,7 @@
 
     <div class="m__create__navigation">
       <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p>
-      <button class="m__create__button" @click="submit()">Continue</button>
+      <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
     </div>
 
   </div>

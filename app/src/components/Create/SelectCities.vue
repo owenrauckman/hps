@@ -8,7 +8,7 @@
         {{state.text}}
       </v-chip>
     </div>
- 
+
     <div v-for="state in signUpCities" :key="state.name">
       <v-select
         v-bind:items="state.cities"
@@ -30,8 +30,8 @@
 
     <div class="m__create__navigation">
       <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p>
-      <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('select-company-and-states')}">Back</button>
-      <button class="m__create__button" @click="submit()">Continue</button>
+      <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('select-company-and-states')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
+      <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
     </div>
 
   </div>

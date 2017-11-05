@@ -20,8 +20,8 @@
 
     <div class="m__create__navigation">
       <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p>
-      <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('premium')}">Back</button>
-      <button class="m__create__button" @click="submitStripe">Pay Now</button>
+      <button class="m__create__button m__create__button--ghost" v-scroll-to="{element: '.m__header', duration: 1000}" @click="()=>{$router.push('premium')}">Back</button>
+      <button class="m__create__button" v-scroll-to="{element: '.m__header', duration: 1000}" @click="submitStripe">Pay Now</button>
     </div>
 
   </div>

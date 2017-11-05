@@ -15,8 +15,8 @@
 
     <div class="m__create__navigation">
       <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p>
-      <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('about')}">Back</button>
-      <button class="m__create__button" @click.prevent="updateAreasServed">
+      <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('about')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
+      <button class="m__create__button" @click.prevent="updateAreasServed" v-scroll-to="{element: '.m__header', duration: 1000}">
         <span v-if="currentFee > 0">Continue</span>
         <span v-else>Sign Up</span>
       </button>

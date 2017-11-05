@@ -2,7 +2,6 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
 import Vuetify from 'vuetify';
-import Vue2Filters from 'vue2-filters';
 import VeeValidate from 'vee-validate';
 import VueConfig from 'vue-config';
 import axios from 'axios';
@@ -23,7 +22,6 @@ const configs = {
   default: config,
 };
 
-Vue.use(Vue2Filters);
 Vue.use(VueScrollTo);
 Vue.use(VeeValidate);
 Vue.use(VueAxios, axios);

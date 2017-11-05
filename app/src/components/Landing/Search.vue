@@ -39,7 +39,7 @@
         v-bind:hint="!isStateSelected ? 'Please select a state first' : ''"
         color="pink lighten-1"
       ></v-select>
-      <button class="h__search__item h__search__button" @click="performSearch()">Search</button>
+      <button class="h__search__item h__search__button" @click="performSearch()" v-scroll-to="{element: '.m__results', duration: 1000}">Search</button>
     </div>
   </div>
 </template>
@@ -126,6 +126,7 @@ export default {
       padding: 1rem;
       width: 100%;
       font-size: 1rem;
+      margin-top: 2rem;
       @include breakpoint('tablet'){
         width: auto;
         max-width: 150px;

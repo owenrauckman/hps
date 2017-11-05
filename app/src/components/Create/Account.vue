@@ -119,8 +119,8 @@
       <p class="m__create__account__error" v-if="emailTaken">The email address you selected is already in use. Please choose another one.</p>
 
 
-      <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('select-cities')}">Back</button>
-      <button class="m__create__button" @click="submit()">Continue</button>
+      <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('select-cities')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
+      <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
     </div>
 
   </div>
