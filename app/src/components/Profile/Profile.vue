@@ -47,7 +47,7 @@
       <h3 class="p__about__heading">Areas Served</h3>
       <div class="p__about__areas" v-for="area in user.company.areasServed">
         <v-chip class="p__about__areas__chip">{{area.state}}</v-chip>
-        <v-chip v-for="city in area.cities">{{city.city}}</v-chip>
+        <v-chip v-for="city in area.cities" :key="city.city">{{city.city}}</v-chip>
       </div>
     </div>
   </div>
