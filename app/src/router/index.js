@@ -10,6 +10,9 @@ import Premium from '@/components/Create/Premium';
 import Pay from '@/components/Create/Pay';
 import Success from '@/components/Create/Success';
 import Profile from '@/components/Profile/Profile';
+import Login from '@/components/Account/Login';
+import Dashboard from '@/components/Account/Dashboard';
+
 
 Vue.use(Router);
 
@@ -18,6 +21,10 @@ export default new Router({
   routes: [
     // LANDING PAGE
     { path: '/', component: Landing },
+
+    // ACCOUNT PAGES
+    { path: '/login', component: Login },
+    { path: '/account', component: Dashboard },
 
     // CREATE ACCOUNT
     { path: '/create',

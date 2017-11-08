@@ -5,6 +5,8 @@ export default {
   cityPrice: 5,
   statePrice: 50,
   defaultProfileImage,
+  genericLoginErrorMessage: 'Whoops, something went wrong. Please try agian.',
+  genericLogoutErrorMessage: 'Something went wrong when logging out. Please try again.',
   signUpInfo: {
     currentFee: 0,
     states: [],

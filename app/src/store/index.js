@@ -5,6 +5,7 @@ import Vuex from 'vuex';
 /* import modules */
 import search from '@/store/modules/search';
 import create from '@/store/modules/create';
+import auth from '@/store/modules/auth';
 
 Vue.use(Vuex);
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
   modules: {
     search,
     create,
+    auth,
   },
   // plugins: [createPersist({
   //   namespace: 'namespace-for-state',

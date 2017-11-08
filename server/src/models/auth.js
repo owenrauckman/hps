@@ -26,7 +26,7 @@ module.exports = class Auth{
         return next(err);
       }
       if(!user){
-        return res.send({ success : false, message : config.auth.loginFailed });
+        return res.send({ success : false, message : info.message });
       }
       req.logIn(user, (err) => {
         if(err) return next(err);
