@@ -193,7 +193,6 @@ const actions = {
     });
   },
 
-
 };
 
 const getters = {

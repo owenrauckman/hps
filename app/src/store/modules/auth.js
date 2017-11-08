@@ -105,6 +105,28 @@ const actions = {
     });
   },
 
+  /*
+    Resets a users password if they have a token
+    @param { credentials } - Contains the token from the emailed link and the new password
+  */
+  resetPassword({ state }, credentials) {
+    return new Promise((resolve) => {
+      axios.post(`${config.api}/users/resetPassword`, credentials, { withCredentials: true })
+        .then((response) => {
+          if (response.data.success === true) {
+            resolve({ status: true, showError: false });
+          } else {
+            resolve({ status: false, showError: true });
+          }
+        })
+        .catch((error) => {
+          if (error) {
+            throw new Error(error);
+          }
+        });
+    });
+  },
+
 };
 
 const getters = {

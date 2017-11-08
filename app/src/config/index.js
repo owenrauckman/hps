@@ -19,7 +19,6 @@ export default {
     password: '',
     phoneNumber: '',
     profilePicture: defaultProfileImage,
-    totalPrice: '', // todo fill currentFee?
     basicPlans: 0,
     proPlans: 0,
     premiumPlans: 0,

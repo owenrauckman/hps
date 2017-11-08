@@ -15,9 +15,6 @@ import Results from '@/components/Landing/Results';
 
 export default {
   components: { Search, Hero, Results },
-  mounted() {
-
-  },
 };
 </script>
 
