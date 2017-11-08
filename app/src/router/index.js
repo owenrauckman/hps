@@ -12,6 +12,8 @@ import Success from '@/components/Create/Success';
 import Profile from '@/components/Profile/Profile';
 import Login from '@/components/Account/Login';
 import Dashboard from '@/components/Account/Dashboard';
+import ForgotPassword from '@/components/Account/ForgotPassword';
+import ResetPassword from '@/components/Account/ResetPassword';
 
 
 Vue.use(Router);
@@ -25,6 +27,9 @@ export default new Router({
     // ACCOUNT PAGES
     { path: '/login', component: Login },
     { path: '/account', component: Dashboard },
+    { path: '/forgot-password', component: ForgotPassword },
+    { path: '/reset-password', component: ResetPassword },
+
 
     // CREATE ACCOUNT
     { path: '/create',

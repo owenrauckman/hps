@@ -84,6 +84,27 @@ const actions = {
     });
   },
 
+  /*
+    Sends a reset password link to a given email
+  */
+  sendResetPasswordLink({ state }, emailAddress) {
+    return new Promise((resolve) => {
+      axios.post(`${config.api}/users/forgotPassword`, { emailAddress }, { withCredentials: true })
+        .then((response) => {
+          if (response.data.success === true) {
+            resolve({ showError: false, showCheckEmailMessage: true });
+          } else {
+            resolve({ showError: true, showCheckEmailMessage: false });
+          }
+        })
+        .catch((error) => {
+          if (error) {
+            throw new Error(error);
+          }
+        });
+    });
+  },
+
 };
 
 const getters = {

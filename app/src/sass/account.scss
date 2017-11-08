@@ -1,0 +1,25 @@
+.m{
+  &__login{
+    &__container{
+      max-width: 400px;
+      margin: 2rem auto;
+    }
+    &__button{
+      display: block;
+      margin: 1rem 0;
+      width: 100%;
+      max-width: none;
+    }
+    &__error{
+      &--message{
+        font-size: 0.9rem;
+        font-family: $rubik;
+        color: $pink;
+      }
+      &--forgot{
+        font-size: 0.9rem;
+        color: $medium-grey;
+      }
+    }
+  }
+}

@@ -31,7 +31,7 @@
       </div>
       <div v-if="showError" class="m__login__error">
         <p class="m__login__error--message">{{errorMessage}}</p>
-        <router-link to="account/forgot-password" class="m__login__error--forgot">Forgot your password?</router-link>
+        <router-link to="/forgot-password" class="m__login__error--forgot">Forgot your password?</router-link>
       </div>
       <button class="m__create__button m__login__button" type="submit" @click="login">Login</button>
     </form>
@@ -81,29 +81,4 @@ export default {
 </script>
 <style scoped lang="scss">
 @import '../../sass/main.scss';
-.m{
-  &__login{
-    &__container{
-      max-width: 400px;
-      margin: 2rem auto;
-    }
-    &__button{
-      display: block;
-      margin: 1rem 0;
-      width: 100%;
-      max-width: none;
-    }
-    &__error{
-      &--message{
-        font-size: 0.9rem;
-        font-family: $rubik;
-        color: $pink;
-      }
-      &--forgot{
-        font-size: 0.9rem;
-        color: $medium-grey;
-      }
-    }
-  }
-}
 </style>

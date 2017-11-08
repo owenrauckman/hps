@@ -158,11 +158,11 @@ module.exports = class Auth{
     createCrypto.then((token)=>{
       return new Promise((resolve, reject)=>{
         UserModel.findOne({emailAddress: req.body.emailAddress}, (err, user)=>{
-          if(!user || user == null){
-            reject({success: false, message: config.errors.userDoesNotExist});
+          if(!user || user === null){
+            return resolve({success: false, message: config.errors.userDoesNotExist});
           }
           if(err){
-            reject({success: false, message: config.errors.general});
+            return resolve({success: false, message: config.errors.general});
           }
 
           user.resetPasswordToken = token;
@@ -170,7 +170,7 @@ module.exports = class Auth{
 
           user.save((err)=>{
             if(err){
-              reject({success: false, message: config.errors.general});
+              return reject({success: false, message: config.errors.general});
             }
             resolve({token: token, user: user});
           });
@@ -250,7 +250,6 @@ module.exports = class Auth{
   */
   sendMail(emailAddress, subject, message, req, res){
 
-    console.log(user);
     /* todo send as a good looking template */
     const data = {
       from: config.mail.fromAddress,
@@ -261,6 +260,7 @@ module.exports = class Auth{
 
     mailgun.messages().send(data, (error, body)=> {
       if(error){
+        console.log(error);
         return res.json({success: false, message: config.errors.general});
       }
       return res.json({success: true, message: config.mail.success});
