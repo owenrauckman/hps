@@ -5,24 +5,24 @@
         <HeaderLogo/>
       </router-link>
       <ul :class="[{ 'm__menu--active': menuVisible }, 'm__menu']">
-        <router-link class="m__menu__item" to="about">
+        <a class="m__menu__item" @click="routeTo('about')">
           <li class="m__menu__item__test">About</li>
-        </router-link>
-        <router-link class="m__menu__item" to="/pricing">
+        </a>
+        <a class="m__menu__item" to="/pricing" @click="routeTo('pricing')">
           <li class="m__menu__item__test">Pricing</li>
-        </router-link>
+        </a>
         <a class="m__menu__item" @click="logout" v-if="authStatus">
           <li class="m__menu__item__test">Log Out</li>
         </a>
-        <router-link class="m__menu__item" to="/account" v-if="authStatus" exact>
+        <a class="m__menu__item" to="/account" v-if="authStatus" exact @click="routeTo('account')">
           <li class="m__menu__item__test">Dashboard</li>
-        </router-link>
-        <router-link class="m__menu__item" to="/login" v-if="!authStatus">
+        </a>
+        <a class="m__menu__item" to="/login" v-if="!authStatus" @click="routeTo('login')">
           <li class="m__menu__item__test">Log In</li>
-        </router-link>
-        <router-link class="m__menu__item" to="/create" v-if="!authStatus">
+        </a>
+        <a class="m__menu__item" to="/create" v-if="!authStatus" @click="routeTo('create')">
           <li class="m__menu__item__test">Sign Up</li>
-        </router-link>
+        </a>
       </ul>
       <div :class="[{ 'm__menu__close--active': menuVisible }, 'm__menu__close']" @click="toggleMenu"></div>
       <div class="m__menu__hamburger-container" @click="toggleMenu"><Hamburger/></div>
@@ -73,10 +73,19 @@ export default {
     toggleMenu() {
       this.menuVisible = !this.menuVisible;
     },
+
+    /*
+      Pushes to new route and toggles the menu (for mobile)
+    */
+    routeTo(route) {
+      this.menuVisible = false;
+      this.$router.push(route);
+    },
     /*
       Logs a user out and routes them to the home page or displays error dialog
     */
     logout() {
+      this.menuVisible = false;
       this.logoutUser().then((response) => {
         if (response) {
           this.$router.push('/login');
