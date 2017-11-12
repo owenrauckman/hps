@@ -28,7 +28,9 @@
 		"cardDeleteFailure": "There was an issue removing your card, please try again.",
 		"cardDeleteSuccess": "Card successfully removed!",
 		"cardDefaultFailure": "There was an issue setting your default card, please try again.",
-		"cardDefaultSuccess": "New Default Card Set Successfully!"
+		"cardDefaultSuccess": "New Default Card Set Successfully!",
+		"usernameExists": "The username you selected is already in use. Please choose another one.",
+		"emailAddressExists": "The email address you selected is already in use. Please choose another one."
   },
   "errors": {
     "userDoesNotExist": "That user does not exist",

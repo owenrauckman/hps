@@ -3,7 +3,7 @@
     <h1 class="m__create__heading">Login</h1>
 
     <form class="m__create__account m__login__container">
-      <div class="m__create__account--half">
+      <div class="m__create__account--full">
         <v-text-field
           label="Username"
           v-model="credentials.username"
@@ -16,7 +16,7 @@
         ></v-text-field>
       </div>
 
-      <div class="m__create__account--half">
+      <div class="m__create__account--full">
         <v-text-field
           label="Password"
           type="password"
@@ -81,4 +81,5 @@ export default {
 </script>
 <style scoped lang="scss">
 @import '../../sass/main.scss';
+
 </style>

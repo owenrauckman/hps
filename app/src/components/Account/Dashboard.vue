@@ -8,7 +8,7 @@
       <div class="p__info">
         <div>
           <h1 class="p__info__name">{{user.firstName}} {{user.lastName}}</h1>
-          <h2 class="p__info__company" v-if="user.company.name">{{user.company.name}}</h2>
+          <h2 class="p__info__company" v-if="user.company">{{user.company.name}}</h2>
         </div>
         <div class="p__info__image" :style="{ 'background-image': `url('${user.profilePicture}')` }">
           <div class="p__info__image--badge" v-if="ownsPremiumCity || ownsPremiumState">Premium</div>
@@ -18,7 +18,7 @@
 
     <div class="d__options">
       <div class="d__options-container">
-        <router-link class="d__options__card" to="/account/profile">
+        <router-link class="d__options__card" to="/account/info">
           <h2 class="d__options__card__heading">Profile</h2>
           <p class="d__options__card__copy">Edit your basic information such as name, email address, phone number, and password</p>
         </router-link>
@@ -35,18 +35,19 @@
           <p class="d__options__card__copy">We would be sad to see you go! Click here to delete your account. This cannot be undone.</p>
         </router-link>
       </div>
+      <router-view></router-view>
+
     </div>
 
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   data() {
     return {
-      user: {},
       ownsPremiumCity: false,
       ownsPremiumState: false,
     };
@@ -54,12 +55,14 @@ export default {
   beforeMount() {
     this.checkAuth().then((response) => {
       if (response.status) {
-        this.user = response.data; // todo, make computed or omsething
         this.checkPremium();
       } else {
         this.$router.push('/login');
       }
     });
+  },
+  computed: {
+    ...mapGetters(['user']),
   },
   methods: {
     ...mapActions({ checkAuth: 'checkAuth' }),

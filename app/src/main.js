@@ -25,6 +25,7 @@ const configs = {
 Vue.use(VueScrollTo);
 Vue.use(VeeValidate);
 Vue.use(VueAxios, axios);
+axios.defaults.withCredentials = true;  // enable axios post cookie, default false
 Vue.use(VueConfig, configs);
 Vue.use(Vuetify);
 import('../node_modules/vuetify/dist/vuetify.min.css');

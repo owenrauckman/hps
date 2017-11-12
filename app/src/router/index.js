@@ -14,21 +14,33 @@ import Login from '@/components/Account/Login';
 import Dashboard from '@/components/Account/Dashboard';
 import ForgotPassword from '@/components/Account/ForgotPassword';
 import ResetPassword from '@/components/Account/ResetPassword';
+import EditProfileInfo from '@/components/Account/EditProfileInfo';
+import EditProfile from '@/components/Account/Profile';
+import EditAbout from '@/components/Account/About';
 
 
 Vue.use(Router);
 
 export default new Router({
   mode: 'history',
+  base: '/',
   routes: [
     // LANDING PAGE
     { path: '/', component: Landing },
 
     // ACCOUNT PAGES
     { path: '/login', component: Login },
-    { path: '/account', component: Dashboard },
     { path: '/forgot-password', component: ForgotPassword },
     { path: '/reset-password', component: ResetPassword },
+    { path: '/account', component: Dashboard },
+    { path: '/account/info',
+      component: EditProfileInfo,
+      children: [
+        { path: 'about', component: EditAbout },
+        { path: 'profile', component: EditProfile }, // default to profile
+        { path: '', component: EditProfile }, // default to profile
+      ],
+    },
 
 
     // CREATE ACCOUNT

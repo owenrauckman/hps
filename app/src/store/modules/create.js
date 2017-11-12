@@ -142,10 +142,11 @@ const actions = {
 
   /*
     Checks to make sure a users username aren't already in use
+    @param { username } - Username to check
   */
-  isUsernameAvailable({ state }) {
+  isUsernameAvailable({ state }, username) {
     return new Promise((resolve) => {
-      axios.get(`${config.api}/users/u/u/${encodeURIComponent(state.signUpInfo.username)}`)
+      axios.get(`${config.api}/users/u/u/${encodeURIComponent(username)}`)
         .then((response) => {
           if (response.data.userExists) {
             resolve(false);
@@ -158,10 +159,11 @@ const actions = {
 
   /*
     Checks to make sure a users email isn't already in use
+    @param { emailAddress } - Email to check
   */
-  isEmailAvailable({ state }) {
+  isEmailAvailable({ state }, emailAddress) {
     return new Promise((resolve) => {
-      axios.get(`${config.api}/users/u/e/${encodeURIComponent(state.signUpInfo.emailAddress)}`)
+      axios.get(`${config.api}/users/u/e/${encodeURIComponent(emailAddress)}`)
         .then((response) => {
           if (response.data.userExists) {
             resolve(false);

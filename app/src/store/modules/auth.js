@@ -4,12 +4,29 @@ import axios from 'axios';
 
 const state = {
   authStatus: false,
+  user: {},
 };
 
 /* eslint-disable no-shadow, no-param-reassign */
 const mutations = {
   [types.UPDATE_AUTH_STATUS](state, authStatus) {
     state.authStatus = authStatus;
+  },
+  [types.SET_USER_DATA](state, user) {
+    state.user = user;
+  },
+
+  // UPDATE PROFILE INFORMATION
+  [types.UPDATE_USER_DATA](state, data) {
+    state.user = data;
+    // switch (info.type) {
+    //   case 'FIRST_NAME':
+    //     state.user.firstName = info.value; break;
+    //   case 'LAST_NAME':
+    //     state.user.lastName = info.value; break;
+    //   default:
+    //     break;
+    // }
   },
 };
 
@@ -23,6 +40,7 @@ const actions = {
         .then((response) => {
           if (response.data.status) {
             commit(types.UPDATE_AUTH_STATUS, true);
+            commit(types.SET_USER_DATA, response.data.user);
             resolve({ status: true, data: response.data.user });
           } else {
             commit(types.UPDATE_AUTH_STATUS, false);
@@ -127,10 +145,31 @@ const actions = {
     });
   },
 
+  /*
+    Replaces the global user object and hits the API to update a users profile information
+    @param { user } - A new user object to replace the current one
+  */
+  updateUser({ state, commit }, user) {
+    return new Promise((resolve, reject) => {
+      axios.put(`${config.api}/users/edit/${user.username}`, user, { widthCredentials: true })
+      .then((response) => {
+        if (response.data.success === true) {
+          commit(types.UPDATE_USER_DATA, user);
+          resolve({ status: true, message: 'Profile Saved Successfully' });
+        } else {
+          reject({ status: false, message: response.data.message });
+        }
+      }).catch((error) => {
+        throw new Error(error);
+      });
+    });
+  },
+
 };
 
 const getters = {
   authStatus: state => state.authStatus,
+  user: state => state.user,
 };
 /* eslint-enable */
 

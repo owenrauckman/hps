@@ -17,7 +17,7 @@
         <a class="m__menu__item" to="/account" v-if="authStatus" exact @click="routeTo('account')">
           <li class="m__menu__item__test">Dashboard</li>
         </a>
-        <a class="m__menu__item" to="/login" v-if="!authStatus" @click="routeTo('login')">
+        <a class="m__menu__item" :to="{path: 'login'}" v-if="!authStatus" @click="routeTo('login')">
           <li class="m__menu__item__test">Log In</li>
         </a>
         <a class="m__menu__item" to="/create" v-if="!authStatus" @click="routeTo('create')">

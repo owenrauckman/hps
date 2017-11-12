@@ -129,58 +129,104 @@ module.exports = class User{
   */
   editUser(req, res, next){
 
-    if(req.user && req.user.username === req.params.username){
-      UserSchema.findOne({username: req.params.username}, (err, user) => {
-        /* todo: edit full object */
-        user.firstName = req.body.firstName;
-        user.lastName = req.body.lastName;
+    // define these at the top of the promise so that we can access globally
+    let usernameExistsError = null;
+    let emailExistsError = null;
 
-        /* Only update this section if they are updating their subscriptions */
-        if(req.body.subscriptions){
-          for(let plan of user.subscriptionItems){
-            for(let [index, subscription] of req.body.subscriptions.entries()){
-              if(plan.plan.id == subscription.plan && subscription.update == true){
-                stripe.subscriptionItems.update(
-                  plan.id,
-                  {
-                    quantity: parseInt(subscription.quantity),
-                  },
-                  (err, transfer) => {
-                    if(err){
-                      return res.json({sucess: false, message: config.auth.editError});
-                    }
-                    else{
-                      user.subscriptionItems.set(index, transfer);
-                      user.save((err)=>{
-                        if(err){
-                          return res.json({sucess: false, message: config.auth.editError});
-                        }
-                      });
-                    }
-                  }
-                )
-              }
-            }
+    if(req.isAuthenticated()){
+      UserSchema.findOne({_id: req.session.passport.user}, (err, user) => {
+
+        /* return errors if the username/email exists (unless it matches the current data) */
+        this.checkExistanceByUsername(req.body.username).then((checkUser)=>{
+          if(checkUser.userExists && user.username !== req.body.username){
+            usernameExistsError = {success: false, message: config.auth.usernameExists};
           }
-        }
-        /* If The User Applies a discount code, apply it here */
-        if(req.body.coupon){
-          stripe.customers.update(user.stripeId, {
-            coupon: req.body.coupon
-          }, (err, customer) => {
-            if(err){
-              return res.json({success: false, message: config.auth.couponFailure});
+        }).then(()=>{
+          this.checkExistanceByEmail(req.body.emailAddress).then((checkUser)=>{
+            if(checkUser.userExists && user.emailAddress !== req.body.emailAddress){
+              emailExistsError = {success: false, message: config.auth.emailExists};
             }
-            return res.json({success: true, message: config.auth.couponSuccess});
+          }).then(()=>{
+
+            /* only proceed if username/email are valid */
+            if(usernameExistsError !== null){
+              return res.json(usernameExistsError);
+            } else if(emailExistsError !== null){
+              return res.json(emailExistsError);
+            }
+
+            /* if we reach this point, it is safe to update a user */
+            /* todo: edit full object */
+            // Update all of the top level values of a user object
+            user.firstName = req.body.firstName;
+            user.lastName = req.body.lastName;
+            user.username = req.body.username;
+            user.password = req.body.password;
+            user.emailAddress = req.body.emailAddress;
+            user.phoneNumber = req.body.phoneNumber;
+            user.company = req.body.company;
+            user.profilePicture = req.body.profilePicture;
+            user.stripeId = req.body.stripeId;
+            user.subscriptionItems = req.body.subscriptionItems;
+
+            /* Only update this section if they are updating their subscriptions */
+
+            // if(req.body.subscriptions){
+            //   for(let plan of user.subscriptionItems){
+            //     for(let [index, subscription] of req.body.subscriptions.entries()){
+            //       if(plan.plan.id == subscription.plan && subscription.update == true){
+            //         stripe.subscriptionItems.update(
+            //           plan.id,
+            //           {
+            //             quantity: parseInt(subscription.quantity),
+            //           },
+            //           (err, transfer) => {
+            //             if(err){
+            //               return res.json({success: false, message: config.auth.editError});
+            //             }
+            //             else{
+            //               user.subscriptionItems.set(index, transfer);
+            //               user.save((err)=>{
+            //                 if(err){
+            //                   return res.json({success: false, message: config.auth.editError});
+            //                 }
+            //               });
+            //             }
+            //           }
+            //         )
+            //       }
+            //     }
+            //   }
+            // }
+            /* If The User Applies a discount code, apply it here */
+            if(req.body.coupon){
+              stripe.customers.update(user.stripeId, {
+                coupon: req.body.coupon
+              }, (err, customer) => {
+                if(err){
+                  return res.json({success: false, message: config.auth.couponFailure});
+                }
+                return res.json({success: true, message: config.auth.couponSuccess});
+              });
+            }
+            else{
+              user.save((err)=>{
+                if(err){
+                  console.log('err save');
+                  console.log(err);
+                  return res.json({success: false, message: config.auth.editError});
+                } else{
+                  console.log('sdfjlksfdj');
+                  return res.json({success: true, message: config.auth.editSuccess});
+                }
+              });
+            }
           });
-        }
-        else{
-          return res.json({sucess: true, message: config.auth.editSuccess});
-        }
+        });
       });
     }
     else{
-      return res.json({sucess: false, message: config.auth.editNotAuthorized});
+      return res.json({success: false, message: config.auth.editNotAuthorized});
     }
   }
 
