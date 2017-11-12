@@ -86,7 +86,7 @@
       v-model="showSnackbar"
     >
       {{ snackbarText }}
-      <v-btn dark flat @click.native="snackbar = false">Close</v-btn>
+      <v-btn dark flat @click.native="showSnackbar = false">Close</v-btn>
     </v-snackbar>
 
   </div>

@@ -144,7 +144,7 @@ module.exports = class User{
         }).then(()=>{
           this.checkExistanceByEmail(req.body.emailAddress).then((checkUser)=>{
             if(checkUser.userExists && user.emailAddress !== req.body.emailAddress){
-              emailExistsError = {success: false, message: config.auth.emailExists};
+              emailExistsError = {success: false, message: config.auth.emailAddressExists};
             }
           }).then(()=>{
 
@@ -212,11 +212,8 @@ module.exports = class User{
             else{
               user.save((err)=>{
                 if(err){
-                  console.log('err save');
-                  console.log(err);
                   return res.json({success: false, message: config.auth.editError});
                 } else{
-                  console.log('sdfjlksfdj');
                   return res.json({success: true, message: config.auth.editSuccess});
                 }
               });
