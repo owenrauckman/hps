@@ -5,10 +5,10 @@
 
     <div v-for="state, stateIndex in chosenStates">
       <div v-if="state.premiumAvailable" @click="addPremium(state, 'state')"><v-switch v-bind:label="`${state.name}`" v-model="state.premium" color="pink lighten-1"></v-switch></div>
-      <div v-else><v-switch v-bind:label="`${state.name} - not already taken`" disabled></v-switch></div>
+      <div v-else><v-switch v-bind:label="`${state.name} - already taken`" disabled></v-switch></div>
       <div v-for="(city, cityIndex) in chosenCities" v-if="city.state === state.name" class="signup__section__form__box">
         <div v-if="city.premiumAvailable" @click="addPremium(city, 'city')"><v-switch v-bind:label="`${city.city}`" v-model="city.premium" color="pink lighten-1"></v-switch></div>
-        <div v-else><v-switch v-bind:label="`${city.city} - not already taken`" disabled></v-switch></div>
+        <div v-else><v-switch v-bind:label="`${city.city} - already taken`" disabled></v-switch></div>
       </div>
     </div>
 

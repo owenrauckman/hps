@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <v-text-field
        label="About You"
        textarea

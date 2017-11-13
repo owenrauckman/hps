@@ -144,11 +144,29 @@ const actions = {
   */
   updateUser({ state, commit }, user) {
     return new Promise((resolve, reject) => {
-      axios.put(`${config.api}/users/edit/${user.username}`, user, { widthCredentials: true })
+      axios.put(`${config.api}/users/edit/${user.username}`, user, { withCredentials: true })
       .then((response) => {
         if (response.data.success === true) {
           commit(types.UPDATE_USER_DATA, user);
           resolve({ status: true, message: 'Profile Saved Successfully' });
+        } else {
+          reject({ status: false, message: response.data.message });
+        }
+      }).catch((error) => {
+        throw new Error(error);
+      });
+    });
+  },
+
+  /*
+    Hits the delete route for a user
+  */
+  deleteUser() {
+    return new Promise((resolve, reject) => {
+      axios.delete(`${config.api}/users/delete`, { withCredentials: true })
+      .then((response) => {
+        if (response.data.success === true) {
+          resolve({ status: true, message: 'Your account has been deleted.' });
         } else {
           reject({ status: false, message: response.data.message });
         }

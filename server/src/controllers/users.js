@@ -68,7 +68,7 @@ router.get('/dashboard', Auth.checkAuth, (req, res, next) =>{
   User.getProfile(req.user.username, true).then( res.send.bind(res) );
 });
 
-router.delete('/delete/:username', User.deleteUser, (req, res) =>{})
+router.delete('/delete', User.deleteUser, (req, res) =>{})
 
 /*
   CARD ROUTES

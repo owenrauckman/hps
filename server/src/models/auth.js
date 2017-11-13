@@ -104,6 +104,7 @@ module.exports = class Auth{
             ]
           }).then((subscription, err) =>{
             if(err){
+              console.log('NEWWWWW STRIPE ERRRAR');
               return res.json({message: config.errors.stripeError});
             }
 

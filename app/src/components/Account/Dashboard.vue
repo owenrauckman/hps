@@ -34,14 +34,38 @@
           <h2 class="d__options__card__heading">Password</h2>
           <p class="d__options__card__copy">Change your current password</p>
         </router-link>
-        <router-link class="d__options__card" to="/account/delete">
+        <a class="d__options__card" @click.prevent.stop="showDeleteDialog = true">
           <h2 class="d__options__card__heading">Delete Account</h2>
           <p class="d__options__card__copy">We would be sad to see you go! Click here to delete your account. This cannot be undone.</p>
-        </router-link>
+        </a>
       </div>
       <router-view></router-view>
 
     </div>
+
+    <!-- delete confirm -->
+    <v-dialog v-model="showDeleteDialog">
+      <v-card>
+        <v-card-title class="headline">Are you sure you want to delete your account?</v-card-title>
+        <v-card-text>This action cannot be undone. You will immediately lose all of your subscriptions and data. Your credit card will stop being billed starting on your next cycle.</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey darken-1" flat="flat" @click.native="showDeleteDialog = false">Cancel</v-btn>
+          <v-btn color="pink lighten-1" flat="flat" @click.native="deleteAccount()">Agree</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- snackbar -->
+    <v-snackbar
+      :timeout="snackbarTimeout"
+      :color="snackbarColor"
+      :multi-line="true"
+      v-model="showSnackbar"
+    >
+      {{ snackbarText }}
+      <v-btn dark flat @click.native="showSnackbar = false">Close</v-btn>
+    </v-snackbar>
 
   </div>
 </template>
@@ -54,6 +78,11 @@ export default {
     return {
       ownsPremiumCity: false,
       ownsPremiumState: false,
+      showDeleteDialog: false,
+      showSnackbar: false,
+      snackbarTimeout: 6000,
+      snackbarColor: 'pink lighten-1',
+      snackbarText: 'success',
     };
   },
   beforeMount() {
@@ -69,8 +98,11 @@ export default {
     ...mapGetters(['user']),
   },
   methods: {
-    ...mapActions({ checkAuth: 'checkAuth' }),
+    ...mapActions({ checkAuth: 'checkAuth', deleteUser: 'deleteUser' }),
 
+    /*
+      Checks to see if the premium badge should be displayed for a user.
+    */
     checkPremium() {
       // check to see if user owns premium city or state
       this.user.company.areasServed.forEach((area) => {
@@ -84,6 +116,25 @@ export default {
         });
       });
     },
+
+    /*
+      Deletes a user's account
+    */
+    deleteAccount() {
+      this.showDeleteDialog = false;
+      this.deleteUser().then((response) => {
+        if (response.status) {
+          this.$router.push('/');
+        } else {
+          this.showSnackbar = true;
+          this.snackbarText = response.message;
+        }
+      }).catch((error) => {
+        this.showSnackbar = true;
+        this.snackbarText = error.message;
+      });
+    },
+
   },
 };
 </script>
@@ -199,6 +250,7 @@ export default {
          text-decoration: none;
        }
        &:hover{
+         cursor: pointer;
          transform: scale(0.975);
        }
        &__heading{

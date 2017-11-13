@@ -234,10 +234,10 @@ module.exports = class User{
   deleteUser(req,res){
 
     /* make sure the delete route is the logged in user */
-    if(req.user && req.user.username == req.params.username){
-      UserSchema.findOne({username: req.params.username}, (err, user) => {
+    if(req.user && req.user._id.toString() === req.session.passport.user){
+      UserSchema.findOne({_id: req.session.passport.user}, (err, user) => {
         user.remove({
-          username: user.username
+          _id: user._id
         },
         (err,user) =>{
           if(err){
@@ -248,16 +248,16 @@ module.exports = class User{
             user.stripeId,
             (err, confirmation)=> {
               if(err){
-                return res.json({sucess: false, message: config.auth.deleteError});
+                return res.json({success: false, message: config.auth.deleteError});
               }
             }
           );
-          return res.json({sucess: true, message: config.auth.userDeleted});
+          return res.json({success: true, message: config.auth.userDeleted});
         });
       });
     }
     else{
-      return res.json({sucess: false, message: config.auth.deleteNotAuthorized});
+      return res.json({success: false, message: config.auth.deleteNotAuthorized});
     }
   }
 
