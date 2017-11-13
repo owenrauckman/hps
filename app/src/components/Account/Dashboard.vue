@@ -20,7 +20,7 @@
       <div class="d__options-container">
         <router-link class="d__options__card" to="/account/info">
           <h2 class="d__options__card__heading">Profile</h2>
-          <p class="d__options__card__copy">Edit your basic information such as name, email address, phone number, and password</p>
+          <p class="d__options__card__copy">Edit your basic information such as name, email address, phone number, about, and links</p>
         </router-link>
         <router-link class="d__options__card" to="/account/subscriptions">
           <h2 class="d__options__card__heading">Locations/Subscriptions</h2>
@@ -29,6 +29,10 @@
         <router-link class="d__options__card" to="/account/billing">
           <h2 class="d__options__card__heading">Billing</h2>
           <p class="d__options__card__copy">View your billing history, current payment information, update your payment information, or apply a coupon code.</p>
+        </router-link>
+        <router-link class="d__options__card" to="/account/password">
+          <h2 class="d__options__card__heading">Password</h2>
+          <p class="d__options__card__copy">Change your current password</p>
         </router-link>
         <router-link class="d__options__card" to="/account/delete">
           <h2 class="d__options__card__heading">Delete Account</h2>

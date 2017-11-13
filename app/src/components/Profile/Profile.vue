@@ -11,22 +11,22 @@
     </div>
     <div class="p__connect">
       <div class="p__connect__social">
-        <a v-if="user.company.links.facebook.url" class="p__connect__social__icon" :href="user.company.links.facebook.url">
+        <a v-if="user.company.links.facebook" class="p__connect__social__icon" :href="user.company.links.facebook">
           <img src="../../../static/svg/facebook.svg"/>
         </a>
-        <a v-if="user.company.links.instagram.url" class="p__connect__social__icon" :href="user.company.links.instagram.url">
+        <a v-if="user.company.links.instagram" class="p__connect__social__icon" :href="user.company.links.instagram">
           <img src="../../../static/svg/instagram.svg"/>
         </a>
-        <a v-if="user.company.links.twitter.url" class="p__connect__social__icon" :href="user.company.links.twitter.url">
+        <a v-if="user.company.links.twitter" class="p__connect__social__icon" :href="user.company.links.twitter">
           <img src="../../../static/svg/twitter.svg"/>
         </a>
-        <a v-if="user.company.links.pinterest.url" class="p__connect__social__icon" :href="user.company.links.pinterest.url">
+        <a v-if="user.company.links.pinterest" class="p__connect__social__icon" :href="user.company.links.pinterest">
           <img src="../../../static/svg/pinterest.svg"/>
         </a>
-        <a v-if="user.company.links.youtube.url" class="p__connect__social__icon" :href="user.company.links.youtube.url">
+        <a v-if="user.company.links.youtube" class="p__connect__social__icon" :href="user.company.links.youtube">
           <img src="../../../static/svg/youtube.svg"/>
         </a>
-        <a v-if="user.company.links.website.url" class="p__connect__social__icon" :href="user.company.links.website.url">
+        <a v-if="user.company.links.website" class="p__connect__social__icon" :href="user.company.links.website">
           <img src="../../../static/svg/website.svg"/>
         </a>
       </div>

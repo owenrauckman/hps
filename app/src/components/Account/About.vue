@@ -1,46 +1,110 @@
 <template>
   <div>
-      Yo, this the about apge
 
-    <div class="m__create__account--half">
-      <v-text-field
-        label="Last Name"
-        v-model="lastName"
-        v-validate="'required'"
-        data-vv-name="lastName"
-        data-vv-as="Last Name"
+    <v-text-field
+       label="About You"
+       textarea
+       color="indigo darken-2"
+       v-model="user.company.aboutMe"
+     ></v-text-field>
+
+     <v-text-field
+        label="About Your Company"
+        textarea
         color="indigo darken-2"
-        v-bind:error-messages="errors.collect('lastName')"
-        required
+        v-model="user.company.aboutCompany"
       ></v-text-field>
-    </div>
+
+      <div class="m__create__about">
+        <div class="m__create__about--half">
+          <v-text-field label="Website" v-model="user.company.links.website" color="indigo darken-2"></v-text-field>
+        </div>
+        <div class="m__create__about--half">
+          <v-text-field label="Facebook" v-model="user.company.links.facebook" color="indigo darken-2"></v-text-field>
+        </div>
+        <div class="m__create__about--half">
+          <v-text-field label="Twitter" v-model="user.company.links.twitter" color="indigo darken-2"></v-text-field>
+        </div>
+        <div class="m__create__about--half">
+          <v-text-field label="Instagram" v-model="user.company.links.instagram" color="indigo darken-2"></v-text-field>
+        </div>
+        <div class="m__create__about--half">
+          <v-text-field label="Pinterest" v-model="user.company.links.pinterest" color="indigo darken-2"></v-text-field>
+        </div>
+        <div class="m__create__about--half">
+          <v-text-field label="Youtube" v-model="user.company.links.youtube" color="indigo darken-2"></v-text-field>
+        </div>
+      </div>
+
+      <!-- save -->
+      <div class="m__create__navigation">
+        <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('/account')}" v-scroll-to="{element: '.m__header', duration: 1000}">Dashboard</button>
+        <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Save</button>
+      </div>
+
+      <!-- snackbar -->
+      <v-snackbar
+        :timeout="snackbarTimeout"
+        :color="snackbarColor"
+        :multi-line="true"
+        v-model="showSnackbar"
+      >
+        {{ snackbarText }}
+        <v-btn dark flat @click.native="showSnackbar = false">Close</v-btn>
+      </v-snackbar>
+
   </div>
 </template>
 
 <script>
 import * as types from '@/store/mutationTypes';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 
-// todo, if user exists, just populate, else, check auth, else redirect to login page
 export default{
+  beforeMount() {
+    this.checkAuth().then((response) => {
+      if (!response.status) {
+        this.$router.push('/login');
+      }
+    });
+  },
   data() {
     return {
-
+      showSnackbar: false,
+      snackbarTimeout: 6000,
+      snackbarColor: 'pink lighten-1',
+      snackbarText: 'success',
+      snackbarSuccess: false,
     };
   },
   computed: {
     ...mapGetters(['user']),
-    firstName: {
-      get() { return this.user.firstName; },
-      set(firstName) { this.UPDATE_USER_DATA({ type: 'FIRST_NAME', value: firstName }); },
-    },
-    lastName: {
-      get() { return this.user.lastName; },
-      set(lastName) { this.UPDATE_USER_DATA({ type: 'LAST_NAME', value: lastName }); },
-    },
   },
   methods: {
     ...mapMutations([types.UPDATE_USER_DATA]),
+    ...mapActions(['checkAuth', 'updateUser']),
+    /*
+      Performs validation before continuing
+    */
+    submit() {
+      /* if there are 0 veeValidate errors (and everything is filled out), contintue the route */
+      this.$validator.validateAll().then((isValidated) => {
+        if (isValidated === true) {
+          /* check if username and email address are already in use on server */
+          this.updateUser(this.user).then((response) => {
+            this.showSnackbar = true;
+            this.snackbarSuccess = response.status;
+            this.snackbarText = response.message;
+            this.snackbarColor = 'success';
+          }).catch((err) => {
+            this.showSnackbar = true;
+            this.snackbarSuccess = err.status;
+            this.snackbarText = err.message;
+            this.snackbarColor = 'pink lighten-1';
+          });
+        }
+      });
+    },
   },
 };
 </script>

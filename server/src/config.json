@@ -14,7 +14,7 @@
     "registerThanks": "Thanks for signing up,",
     "notAuthenticated": "You can't view this page because you are not logged in",
     "loggedOut": "You are now logged out",
-		"editNotAuthorized": "You are not authorized to edit that user!",
+		"editNotAuthorized": "You are not authorized to edit. Please try logging in again.",
 		"editSuccess": "Profile Updated Successfully",
 		"editError": "There was an error updating your profile. Please try again",
 		"userDeleted": "Your account has been deleted",

@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const state = {
   authStatus: false,
+  // authCookieExists:
   user: {},
 };
 
@@ -19,14 +20,6 @@ const mutations = {
   // UPDATE PROFILE INFORMATION
   [types.UPDATE_USER_DATA](state, data) {
     state.user = data;
-    // switch (info.type) {
-    //   case 'FIRST_NAME':
-    //     state.user.firstName = info.value; break;
-    //   case 'LAST_NAME':
-    //     state.user.lastName = info.value; break;
-    //   default:
-    //     break;
-    // }
   },
 };
 

@@ -29,10 +29,10 @@ export default new Router({
     { path: '/', component: Landing },
 
     // ACCOUNT PAGES
-    { path: '/login', component: Login },
+    { path: '/login', component: Login, name: 'login' },
     { path: '/forgot-password', component: ForgotPassword },
     { path: '/reset-password', component: ResetPassword },
-    { path: '/account', component: Dashboard },
+    { path: '/account', component: Dashboard, name: 'account' },
     { path: '/account/info',
       component: EditProfileInfo,
       children: [

@@ -14,12 +14,12 @@
         <a class="m__menu__item" @click="logout" v-if="authStatus">
           <li class="m__menu__item__test">Log Out</li>
         </a>
-        <a class="m__menu__item" to="/account" v-if="authStatus" exact @click="routeTo('account')">
+        <router-link class="m__menu__item" :to="{name: 'account'}" v-if="authStatus">
           <li class="m__menu__item__test">Dashboard</li>
-        </a>
-        <a class="m__menu__item" :to="{path: 'login'}" v-if="!authStatus" @click="routeTo('login')">
+        </router-link>
+        <router-link class="m__menu__item" :to="{name: 'login'}" v-if="!authStatus">
           <li class="m__menu__item__test">Log In</li>
-        </a>
+        </router-link>
         <a class="m__menu__item" to="/create" v-if="!authStatus" @click="routeTo('create')">
           <li class="m__menu__item__test">Sign Up</li>
         </a>

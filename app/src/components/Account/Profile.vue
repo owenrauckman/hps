@@ -97,7 +97,12 @@ import * as types from '@/store/mutationTypes';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 
 export default{
-  mounted() {
+  beforeMount() {
+    this.checkAuth().then((response) => {
+      if (!response.status) {
+        this.$router.push('/login');
+      }
+    });
   },
   data() {
     return {
@@ -113,7 +118,7 @@ export default{
   },
   methods: {
     ...mapMutations([types.UPDATE_USER_DATA]),
-    ...mapActions(['updateUser']),
+    ...mapActions(['checkAuth', 'updateUser']),
     /*
       Performs validation before continuing
     */
@@ -189,7 +194,7 @@ export default{
           /* draw the new canvas image and assign it to the store */
           ctx.drawImage(img, 0, 0, width, height, 0, 0, width, height);
           const compressedBase64 = canvas.toDataURL('image/png');
-          this.profilePicture = compressedBase64;
+          this.user.profilePicture = compressedBase64;
         };
       };
       reader.readAsDataURL(file);

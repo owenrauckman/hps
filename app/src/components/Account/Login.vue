@@ -43,6 +43,14 @@
 import { mapActions } from 'vuex';
 
 export default {
+  beforeMount() {
+    // if the user clicks this and is already logged in, take them to their account
+    this.checkAuth().then((response) => {
+      if (response.status) {
+        this.$router.push('/account');
+      }
+    });
+  },
   data() {
     return {
       credentials: {
@@ -54,7 +62,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions({ loginUser: 'loginUser' }),
+    ...mapActions({ loginUser: 'loginUser', checkAuth: 'checkAuth' }),
 
     /*
       Log a user in and route or show error message accordingly

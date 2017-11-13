@@ -11,6 +11,8 @@ import router from './router';
 import store from './store';
 import config from './config/';
 
+const VueCookie = require('vue-cookie');
+
 /* allows for use of fetch in IE and Safari todo remove this after switch to axios */
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
@@ -28,6 +30,7 @@ Vue.use(VueAxios, axios);
 axios.defaults.withCredentials = true;  // enable axios post cookie, default false
 Vue.use(VueConfig, configs);
 Vue.use(Vuetify);
+Vue.use(VueCookie);
 import('../node_modules/vuetify/dist/vuetify.min.css');
 
 
