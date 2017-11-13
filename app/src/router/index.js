@@ -17,6 +17,7 @@ import ResetPassword from '@/components/Account/ResetPassword';
 import EditProfileInfo from '@/components/Account/EditProfileInfo';
 import EditProfile from '@/components/Account/Profile';
 import EditAbout from '@/components/Account/About';
+import AccountPassword from '@/components/Account/Password';
 
 
 Vue.use(Router);
@@ -33,6 +34,7 @@ export default new Router({
     { path: '/forgot-password', component: ForgotPassword },
     { path: '/reset-password', component: ResetPassword },
     { path: '/account', component: Dashboard, name: 'account' },
+    { path: '/account/password', component: AccountPassword },
     { path: '/account/info',
       component: EditProfileInfo,
       children: [

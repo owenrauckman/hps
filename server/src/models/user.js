@@ -123,6 +123,54 @@ module.exports = class User{
   }
 
   /*
+    Edit a user's password
+    @param {req, res, next} - data to compare user with
+    @param {req} - the 3 passwords (current, new, and confirmed new)
+  */
+  editPassword(req, res, next){
+    if(req.isAuthenticated()){
+      // double check the two passwords server side
+      if(req.body.newPassword === req.body.newPasswordConfirmation){
+
+        // Bcrypt/save need to be in a promise for sufficient time before returning.
+        const findUser = new Promise((resolve, reject)=>{
+          UserSchema.findOne({_id: req.session.passport.user}, (err, user)=> {
+              if (err) {
+                reject({success: false, message: config.errors.general});
+              } else{
+                /* bcrypt the password and unset the token/expiration */
+                bcrypt.genSalt(10, (err, salt) =>{
+                  bcrypt.hash(req.body.newPassword, salt, (err, hash) =>{
+                    user.password = hash;
+                    /* save the new user */
+                    user.save((error)=>{
+                      if(error){
+                        reject({success: false, message: config.errors.general});
+                      }
+                      resolve({success: true, message: config.auth.editSuccess});
+                    });
+                  });
+                });
+              }
+            });
+        }).catch((err)=>{
+          console.log(err);
+        });
+
+        findUser.then((responseObject, err)=>{
+          return res.json(responseObject);
+        }).catch((err)=>{
+          return res.json({success: false, message: config.errors.general});
+        });
+      } else{
+        return res.json({success: false, message: config.auth.editError});
+      }
+    } else{
+      return res.json({success: false, message: config.auth.editNotAuthorized});
+    }
+  }
+
+  /*
     Edit a user. Test against the API with the user session info
     @param {req, res, next} - data to compare user with
     @param {req} - username, password, profile info, plan to edit, and quantity (for stripe ) -- in request include all 3 plans
@@ -161,7 +209,6 @@ module.exports = class User{
             user.firstName = req.body.firstName;
             user.lastName = req.body.lastName;
             user.username = req.body.username;
-            user.password = req.body.password;
             user.emailAddress = req.body.emailAddress;
             user.phoneNumber = req.body.phoneNumber;
             user.company = req.body.company;

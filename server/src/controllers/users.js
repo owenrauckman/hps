@@ -46,7 +46,7 @@ router.post('/register', (req, res) =>{
   Auth.registerUser(req, res);
 });
 
-router.put('/edit/:username', (req, res, next) =>{
+router.put('/edit/:username', Auth.checkAuth, (req, res, next) =>{
   User.editUser(req, res, next);
 });
 
@@ -68,7 +68,13 @@ router.get('/dashboard', Auth.checkAuth, (req, res, next) =>{
   User.getProfile(req.user.username, true).then( res.send.bind(res) );
 });
 
+// todo, add checkAuth here
 router.delete('/delete', User.deleteUser, (req, res) =>{})
+
+// todo, make these organized again :/
+router.put('/editPassword', Auth.checkAuth, (req, res, next) => {
+  User.editPassword(req, res, next);
+});
 
 /*
   CARD ROUTES
