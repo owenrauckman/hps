@@ -37,7 +37,10 @@ import { mapGetters, mapActions } from 'vuex';
 export default {
   components: { Card },
   mounted() {
-    this.premiumSearch();
+    // if results already exist, don't serach again. Leave them up for caching/UX purposes
+    if (!this.isResults) {
+      this.premiumSearch();
+    }
   },
   computed: {
     ...mapGetters({
