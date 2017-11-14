@@ -11,22 +11,22 @@
     </div>
     <div class="p__connect">
       <div class="p__connect__social">
-        <a v-if="user.company.links.facebook" class="p__connect__social__icon" :href="user.company.links.facebook">
+        <a v-if="user.company.links.facebook" class="p__connect__social__icon" :href="user.company.links.facebook.startsWith('http') ? user.company.links.facebook : `https://${user.company.links.facebook}`">
           <img src="../../../static/svg/facebook.svg"/>
         </a>
-        <a v-if="user.company.links.instagram" class="p__connect__social__icon" :href="user.company.links.instagram">
+        <a v-if="user.company.links.instagram" class="p__connect__social__icon" :href="user.company.links.instagram.startsWith('http') ? user.company.links.instagram : `https://${user.company.links.instagram}`">
           <img src="../../../static/svg/instagram.svg"/>
         </a>
-        <a v-if="user.company.links.twitter" class="p__connect__social__icon" :href="user.company.links.twitter">
+        <a v-if="user.company.links.twitter" class="p__connect__social__icon" :href="user.company.links.twitter.startsWith('http') ? user.company.links.twitter : `https://${user.company.links.twitter}`">
           <img src="../../../static/svg/twitter.svg"/>
         </a>
-        <a v-if="user.company.links.pinterest" class="p__connect__social__icon" :href="user.company.links.pinterest">
+        <a v-if="user.company.links.pinterest" class="p__connect__social__icon" :href="user.company.links.pinterest.startsWith('http') ? user.company.links.pinterest : `https://${user.company.links.pinterest}`">
           <img src="../../../static/svg/pinterest.svg"/>
         </a>
-        <a v-if="user.company.links.youtube" class="p__connect__social__icon" :href="user.company.links.youtube">
+        <a v-if="user.company.links.youtube" class="p__connect__social__icon" :href="user.company.links.youtube.startsWith('http') ? user.company.links.youtube : `https://${user.company.links.youtube}`">
           <img src="../../../static/svg/youtube.svg"/>
         </a>
-        <a v-if="user.company.links.website" class="p__connect__social__icon" :href="user.company.links.website">
+        <a v-if="user.company.links.website" class="p__connect__social__icon" :href="user.company.links.website.startsWith('http') ? user.company.links.website : `https://${user.company.links.website}`">
           <img src="../../../static/svg/website.svg"/>
         </a>
       </div>
