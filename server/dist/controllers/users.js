@@ -27,6 +27,15 @@ router.get('/u/:username', function (req, res) {
   User.getProfile(req.params.username).then(res.send.bind(res));
 });
 
+/* check if user exists by either email or username */
+router.get('/u/e/:email', function (req, res) {
+  User.checkExistanceByEmail(decodeURIComponent(req.params.email)).then(res.send.bind(res));
+});
+
+router.get('/u/u/:username', function (req, res) {
+  User.checkExistanceByUsername(decodeURIComponent(req.params.username)).then(res.send.bind(res));
+});
+
 /*
   AUTH ROUTES
   # Login
@@ -34,6 +43,8 @@ router.get('/u/:username', function (req, res) {
   # Register
   # Edit
   # Delete
+  # Forgot Password
+  # Reset Password
 */
 router.post('/login', function (req, res, next) {
   Auth.login(req, res, next);
@@ -47,11 +58,34 @@ router.post('/register', function (req, res) {
   Auth.registerUser(req, res);
 });
 
-router.put('/edit/:username', function (req, res, next) {
+router.put('/edit/:username', Auth.checkAuth, function (req, res, next) {
   User.editUser(req, res, next);
 });
 
-router.delete('/delete/:username', User.deleteUser, function (req, res) {});
+router.post('/forgotPassword', function (req, res, next) {
+  Auth.forgotPassword(req, res, next);
+});
+
+router.post('/resetPassword', function (req, res, next) {
+  Auth.resetPassword(req, res, next);
+});
+
+/*
+  PROTECTED ROUTES
+  # Dashboard
+*/
+
+router.get('/dashboard', Auth.checkAuth, function (req, res, next) {
+  User.getProfile(req.user.username, true).then(res.send.bind(res));
+});
+
+// todo, add checkAuth here
+router.delete('/delete', User.deleteUser, function (req, res) {});
+
+// todo, make these organized again :/
+router.put('/editPassword', Auth.checkAuth, function (req, res, next) {
+  User.editPassword(req, res, next);
+});
 
 /*
   CARD ROUTES
@@ -80,12 +114,5 @@ router.get('/setDefaultCreditCard', function (req, res) {
 });
 
 router.get('/invoices', User.getInvoices, function (req, res, next) {});
-
-/*
-  Secret Route -- Temporary, Base Auth Routes off of this
-  */
-router.get('/secret', Auth.checkAuth, function (req, res, next) {
-  res.json('YOU ARE IN MY MAN'); // add returned data here specific to what route to hit
-});
 
 module.exports = router;

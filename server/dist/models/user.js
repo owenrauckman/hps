@@ -1,7 +1,5 @@
 'use strict';
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _bcrypt = require('bcrypt');
@@ -26,14 +24,20 @@ module.exports = function () {
   /*
     Get A User's Profile Information
     @param {string} - The Username for the profile to retrieve
+    @param {bool} - Whether or not we should include private user data
   */
 
 
   _createClass(User, [{
     key: 'getProfile',
-    value: function getProfile(username) {
+    value: function getProfile(username, privateData) {
+      /* Decide which items to exclude */
+      var exclude = { _id: 0, password: 0, stripeId: 0, subscriptionItems: 0, __v: 0 };
+      if (privateData) {
+        exclude = { __v: 0 };
+      }
       return new Promise(function (resolve, reject) {
-        UserSchema.findOne({ "username": username }, function (err, user) {
+        UserSchema.findOne({ "username": username }, exclude, function (err, user) {
           if (err) {
             reject({ err: err.message });
           } else if (user == null) {
@@ -56,6 +60,52 @@ module.exports = function () {
     value: function getUserByUsername(username, callback) {
       var query = { username: username };
       UserSchema.findOne(query, callback);
+    }
+
+    /*
+      Check if a user exists based on their email address
+      @param {string} - The email for the profile to retrieve
+    */
+
+  }, {
+    key: 'checkExistanceByEmail',
+    value: function checkExistanceByEmail(emailAddress) {
+      return new Promise(function (resolve, reject) {
+        var query = { emailAddress: emailAddress };
+        UserSchema.find(query, function (err, user) {
+          if (err) {
+            reject({ status: false, err: err.message });
+          }
+          if (user.length > 0) {
+            resolve({ status: true, userExists: true });
+          } else {
+            resolve({ status: true, userExists: false });
+          }
+        });
+      });
+    }
+
+    /*
+      Check if a user exists based on their email address
+      @param {string} - The email for the profile to retrieve
+    */
+
+  }, {
+    key: 'checkExistanceByUsername',
+    value: function checkExistanceByUsername(username) {
+      return new Promise(function (resolve, reject) {
+        var query = { username: username };
+        UserSchema.find(query, function (err, user) {
+          if (err) {
+            reject({ status: false, err: err.message });
+          }
+          if (user.length > 0) {
+            resolve({ status: true, userExists: true });
+          } else {
+            resolve({ status: true, userExists: false });
+          }
+        });
+      });
     }
 
     /*
@@ -103,6 +153,57 @@ module.exports = function () {
     }
 
     /*
+      Edit a user's password
+      @param {req, res, next} - data to compare user with
+      @param {req} - the 3 passwords (current, new, and confirmed new)
+    */
+
+  }, {
+    key: 'editPassword',
+    value: function editPassword(req, res, next) {
+      if (req.isAuthenticated()) {
+        // double check the two passwords server side
+        if (req.body.newPassword === req.body.newPasswordConfirmation) {
+
+          // Bcrypt/save need to be in a promise for sufficient time before returning.
+          var findUser = new Promise(function (resolve, reject) {
+            UserSchema.findOne({ _id: req.session.passport.user }, function (err, user) {
+              if (err) {
+                reject({ success: false, message: _config2.default.errors.general });
+              } else {
+                /* bcrypt the password and unset the token/expiration */
+                _bcrypt2.default.genSalt(10, function (err, salt) {
+                  _bcrypt2.default.hash(req.body.newPassword, salt, function (err, hash) {
+                    user.password = hash;
+                    /* save the new user */
+                    user.save(function (error) {
+                      if (error) {
+                        reject({ success: false, message: _config2.default.errors.general });
+                      }
+                      resolve({ success: true, message: _config2.default.auth.editSuccess });
+                    });
+                  });
+                });
+              }
+            });
+          }).catch(function (err) {
+            console.log(err);
+          });
+
+          findUser.then(function (responseObject, err) {
+            return res.json(responseObject);
+          }).catch(function (err) {
+            return res.json({ success: false, message: _config2.default.errors.general });
+          });
+        } else {
+          return res.json({ success: false, message: _config2.default.auth.editError });
+        }
+      } else {
+        return res.json({ success: false, message: _config2.default.auth.editNotAuthorized });
+      }
+    }
+
+    /*
       Edit a user. Test against the API with the user session info
       @param {req, res, next} - data to compare user with
       @param {req} - username, password, profile info, plan to edit, and quantity (for stripe ) -- in request include all 3 plans
@@ -111,99 +212,100 @@ module.exports = function () {
   }, {
     key: 'editUser',
     value: function editUser(req, res, next) {
+      var _this = this;
 
-      if (req.user && req.user.username === req.params.username) {
-        UserSchema.findOne({ username: req.params.username }, function (err, user) {
-          /* todo: edit full object */
-          user.firstName = req.body.firstName;
-          user.lastName = req.body.lastName;
+      // define these at the top of the promise so that we can access globally
+      var usernameExistsError = null;
+      var emailExistsError = null;
 
-          /* Only update this section if they are updating their subscriptions */
-          if (req.body.subscriptions) {
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+      if (req.isAuthenticated()) {
+        UserSchema.findOne({ _id: req.session.passport.user }, function (err, user) {
 
-            try {
-              for (var _iterator = user.subscriptionItems[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                var plan = _step.value;
-                var _iteratorNormalCompletion2 = true;
-                var _didIteratorError2 = false;
-                var _iteratorError2 = undefined;
-
-                try {
-                  var _loop = function _loop() {
-                    var _step2$value = _slicedToArray(_step2.value, 2),
-                        index = _step2$value[0],
-                        subscription = _step2$value[1];
-
-                    if (plan.plan.id == subscription.plan && subscription.update == true) {
-                      stripe.subscriptionItems.update(plan.id, {
-                        quantity: parseInt(subscription.quantity)
-                      }, function (err, transfer) {
-                        if (err) {
-                          return res.json({ sucess: false, message: _config2.default.auth.editError });
-                        } else {
-                          user.subscriptionItems.set(index, transfer);
-                          user.save(function (err) {
-                            if (err) {
-                              return res.json({ sucess: false, message: _config2.default.auth.editError });
-                            }
-                          });
-                        }
-                      });
-                    }
-                  };
-
-                  for (var _iterator2 = req.body.subscriptions.entries()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                    _loop();
-                  }
-                } catch (err) {
-                  _didIteratorError2 = true;
-                  _iteratorError2 = err;
-                } finally {
-                  try {
-                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                      _iterator2.return();
-                    }
-                  } finally {
-                    if (_didIteratorError2) {
-                      throw _iteratorError2;
-                    }
-                  }
-                }
-              }
-            } catch (err) {
-              _didIteratorError = true;
-              _iteratorError = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion && _iterator.return) {
-                  _iterator.return();
-                }
-              } finally {
-                if (_didIteratorError) {
-                  throw _iteratorError;
-                }
-              }
+          /* return errors if the username/email exists (unless it matches the current data) */
+          _this.checkExistanceByUsername(req.body.username).then(function (checkUser) {
+            if (checkUser.userExists && user.username !== req.body.username) {
+              usernameExistsError = { success: false, message: _config2.default.auth.usernameExists };
             }
-          }
-          /* If The User Applies a discount code, apply it here */
-          if (req.body.coupon) {
-            stripe.customers.update(user.stripeId, {
-              coupon: req.body.coupon
-            }, function (err, customer) {
-              if (err) {
-                return res.json({ success: false, message: _config2.default.auth.couponFailure });
+          }).then(function () {
+            _this.checkExistanceByEmail(req.body.emailAddress).then(function (checkUser) {
+              if (checkUser.userExists && user.emailAddress !== req.body.emailAddress) {
+                emailExistsError = { success: false, message: _config2.default.auth.emailAddressExists };
               }
-              return res.json({ success: true, message: _config2.default.auth.couponSuccess });
+            }).then(function () {
+
+              /* only proceed if username/email are valid */
+              if (usernameExistsError !== null) {
+                return res.json(usernameExistsError);
+              } else if (emailExistsError !== null) {
+                return res.json(emailExistsError);
+              }
+
+              /* if we reach this point, it is safe to update a user */
+              /* todo: edit full object */
+              // Update all of the top level values of a user object
+              user.firstName = req.body.firstName;
+              user.lastName = req.body.lastName;
+              user.username = req.body.username;
+              user.emailAddress = req.body.emailAddress;
+              user.phoneNumber = req.body.phoneNumber;
+              user.company = req.body.company;
+              user.profilePicture = req.body.profilePicture;
+              user.stripeId = req.body.stripeId;
+              user.subscriptionItems = req.body.subscriptionItems;
+
+              /* Only update this section if they are updating their subscriptions */
+
+              // if(req.body.subscriptions){
+              //   for(let plan of user.subscriptionItems){
+              //     for(let [index, subscription] of req.body.subscriptions.entries()){
+              //       if(plan.plan.id == subscription.plan && subscription.update == true){
+              //         stripe.subscriptionItems.update(
+              //           plan.id,
+              //           {
+              //             quantity: parseInt(subscription.quantity),
+              //           },
+              //           (err, transfer) => {
+              //             if(err){
+              //               return res.json({success: false, message: config.auth.editError});
+              //             }
+              //             else{
+              //               user.subscriptionItems.set(index, transfer);
+              //               user.save((err)=>{
+              //                 if(err){
+              //                   return res.json({success: false, message: config.auth.editError});
+              //                 }
+              //               });
+              //             }
+              //           }
+              //         )
+              //       }
+              //     }
+              //   }
+              // }
+              /* If The User Applies a discount code, apply it here */
+              if (req.body.coupon) {
+                stripe.customers.update(user.stripeId, {
+                  coupon: req.body.coupon
+                }, function (err, customer) {
+                  if (err) {
+                    return res.json({ success: false, message: _config2.default.auth.couponFailure });
+                  }
+                  return res.json({ success: true, message: _config2.default.auth.couponSuccess });
+                });
+              } else {
+                user.save(function (err) {
+                  if (err) {
+                    return res.json({ success: false, message: _config2.default.auth.editError });
+                  } else {
+                    return res.json({ success: true, message: _config2.default.auth.editSuccess });
+                  }
+                });
+              }
             });
-          } else {
-            return res.json({ sucess: true, message: _config2.default.auth.editSuccess });
-          }
+          });
         });
       } else {
-        return res.json({ sucess: false, message: _config2.default.auth.editNotAuthorized });
+        return res.json({ success: false, message: _config2.default.auth.editNotAuthorized });
       }
     }
 
@@ -217,10 +319,10 @@ module.exports = function () {
     value: function deleteUser(req, res) {
 
       /* make sure the delete route is the logged in user */
-      if (req.user && req.user.username == req.params.username) {
-        UserSchema.findOne({ username: req.params.username }, function (err, user) {
+      if (req.user && req.user._id.toString() === req.session.passport.user) {
+        UserSchema.findOne({ _id: req.session.passport.user }, function (err, user) {
           user.remove({
-            username: user.username
+            _id: user._id
           }, function (err, user) {
             if (err) {
               return res.status(500).json({ err: err.message });
@@ -228,14 +330,14 @@ module.exports = function () {
             /* delete the user's stripe info also */
             stripe.customers.del(user.stripeId, function (err, confirmation) {
               if (err) {
-                return res.json({ sucess: false, message: _config2.default.auth.deleteError });
+                return res.json({ success: false, message: _config2.default.auth.deleteError });
               }
             });
-            return res.json({ sucess: true, message: _config2.default.auth.userDeleted });
+            return res.json({ success: true, message: _config2.default.auth.userDeleted });
           });
         });
       } else {
-        return res.json({ sucess: false, message: _config2.default.auth.deleteNotAuthorized });
+        return res.json({ success: false, message: _config2.default.auth.deleteNotAuthorized });
       }
     }
 

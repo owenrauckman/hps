@@ -57,16 +57,19 @@ module.exports = function () {
           (aggregate) is a duplicate of the one below, will need to refactor late to be DRY
         */
         if (params.industry) {
+          var companyList = []; //define up here first
           _this.getCompaniesByIndustry(params.industry).then(function (companies) {
             searchParameters.push({ "company.name": { $in: companies } });
+            companyList = companies;
           }).then(function (companies) {
             /* Set a number of users, and get the count to use in aggregate for random sorting */
-            User.count({ $and: searchParameters }, function (err, users, userCount) {
+            User.count({ $or: [{ $and: searchParameters }, { $and: [{ "company.areasServed.ownsPremium": true }, { "company.areasServed": { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }, { "company.name": { $in: companyList } }] }] }, function (err, users, userCount) {
+
               if (err) {
                 reject({ err: err.message });
               }
             }).then(function (userCount, companies) {
-              User.aggregate({ $match: { $and: searchParameters } }, { $sample: { size: userCount } }, { $sort: { "company.areasServed.ownsPremium": -1 } }, { $sort: { "company.areasServed.cities.ownsPremium": -1 } }, function (err, users) {
+              User.aggregate({ $match: { $or: [{ $and: searchParameters }, { $and: [{ "company.areasServed.ownsPremium": true }, { "company.areasServed": { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }, { "company.name": { $in: companyList } }] }] } }, { $sample: { size: userCount } }, { $sort: { "company.areasServed.ownsPremium": -1 } }, { $sort: { "company.areasServed.cities.ownsPremium": -1 } }, function (err, users) {
                 if (err) {
                   reject({ err: err.message });
                 }
@@ -84,13 +87,20 @@ module.exports = function () {
         }
         /* Else, no promise to check for companies, just execute the query, todo: refactor DRY */
         else {
+            /* FYI this whole query thing is disgusting, will need to refactor in the future */
+            var finalQuery = { $or: [{ $and: searchParameters }, { $and: [{ "company.areasServed.ownsPremium": true }, { "company.areasServed": { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }] }] };
+            /* double check for company if chosen */
+            if (params.company) {
+              finalQuery = { $or: [{ $and: searchParameters }, { $and: [{ "company.areasServed.ownsPremium": true }, { "company.areasServed": { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }, { "company.name": { $regex: params.company, $options: 'i' } }] }] };
+            }
             /* Set a number of users, and get the count to use in aggregate for random sorting */
-            User.count({ $and: searchParameters }, function (err, users, userCount) {
+            /* We are checking for the search params ***OR just premium state owners with no company/industry */
+            User.count(finalQuery, function (err, users, userCount) {
               if (err) {
                 reject({ err: err.message });
               }
             }).then(function (userCount) {
-              User.aggregate({ $match: { $and: searchParameters } }, { $sample: { size: userCount } }, { $sort: { "company.areasServed.ownsPremium": -1 } }, { $sort: { "company.areasServed.cities.ownsPremium": -1 } }, function (err, users) {
+              User.aggregate({ $match: finalQuery }, { $sample: { size: userCount } }, { $sort: { "company.areasServed.ownsPremium": -1 } }, { $sort: { "company.areasServed.cities.ownsPremium": -1 } }, function (err, users) {
                 if (err) {
                   reject({ err: err.message });
                 }
@@ -123,6 +133,23 @@ module.exports = function () {
     }
 
     /*
+      Shuffles an array of results before returning
+      @param {array} - list of items to shuffle
+    */
+
+  }, {
+    key: 'shuffleArray',
+    value: function shuffleArray(array) {
+      for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+      return array;
+    }
+
+    /*
       Breaks apart the returned data from the mongo query and sorts based on membership type
       @param {array} - list of users from mongo query
       @param {array} - the params from the request
@@ -147,20 +174,30 @@ module.exports = function () {
           }
           /* check cities next */
           area.cities.forEach(function (city) {
-            if (city.ownsPremium === true && city.city == params.city) {
+            if (city.ownsPremium === true && city.city === params.city) {
               if (!_this2.userExists(states, user) && !_this2.userExists(cities, user) && !_this2.userExists(base, user)) {
                 cities.push(user);
               }
             }
+
+            /* otherwise, after the loops finish push into the base array (assuming the city matches)*/
+            if (!_this2.userExists(states, user) && !_this2.userExists(cities, user) && !_this2.userExists(base, user) && city.city === params.city) {
+              base.push(user);
+            }
           });
         });
-        /* otherwise, after the loops finish push into the base array */
-        if (!_this2.userExists(states, user) && !_this2.userExists(cities, user) && !_this2.userExists(base, user)) {
-          base.push(user);
-        }
       });
 
-      return states.concat(cities).concat(base);
+      /* Shuffle the arrays */
+      states = this.shuffleArray(states);
+      cities = this.shuffleArray(cities);
+      base = this.shuffleArray(base);
+
+      return {
+        premiumStates: states,
+        premiumCities: cities,
+        basic: base
+      };
     }
 
     /*
@@ -178,7 +215,9 @@ module.exports = function () {
           }
 
           resolve({
-            users: users,
+            users: {
+              premiumStates: users
+            },
             query: { state: '', city: '', company: '' }
           });
         });
@@ -418,7 +457,7 @@ module.exports = function () {
   }, {
     key: 'getStates',
     value: function getStates() {
-      return [{ name: "Alabama", abbr: "AL" }, { name: "Alaska", abbr: "AK" }, { name: "Arizona", abbr: "AZ" }, { name: "Arkansas", abbr: "AR" }, { name: "California", abbr: "CA" }, { name: "Colorado", abbr: "CO" }, { name: "Connecticut", abbr: "CT" }, { name: "Delaware", abbr: "DE" }, { name: "Florida", abbr: "FL" }, { name: "Georgia", abbr: "GA" }, { name: "Hawaii", abbr: "HI" }, { name: "Idaho", abbr: "ID" }, { name: "Illinois", abbr: "IL" }, { name: "Indiana", abbr: "IN" }, { name: "Iowa", abbr: "IA" }, { name: "Kansas", abbr: "KS" }, { name: "Kentucky", abbr: "KY" }, { name: "Louisiana", abbr: "LA" }, { name: "Maine", abbr: "ME" }, { name: "Maryland", abbr: "MD" }, { name: "Massachusetts", abbr: "MA" }, { name: "Michigan", abbr: "MI" }, { name: "Minnesota", abbr: "MN" }, { name: "Mississippi", abbr: "MS" }, { name: "Missouri", abbr: "MO" }, { name: "Montana", abbr: "MT" }, { name: "Nebraska", abbr: "NE" }, { name: "Nevada", abbr: "NV" }, { name: "New Hampshire", abbr: "NH" }, { name: "New Jersey", abbr: "NJ" }, { name: "New Mexico", abbr: "NM" }, { name: "New York", abbr: "NY" }, { name: "North Carolina", abbr: "NC" }, { name: "North Dakota", abbr: "ND" }, { name: "Ohio", abbr: "OH" }, { name: "Oklahoma", abbr: "OK" }, { name: "Oregon", abbr: "OR" }, { name: "Pennsylvania", abbr: "PA" }, { name: "Rhode Island", abbr: "RI" }, { name: "South Carolina", abbr: "SC" }, { name: "South Dakota", abbr: "SD" }, { name: "Tennessee", abbr: "TN" }, { name: "Texas", abbr: "TX" }, { name: "Utah", abbr: "UT" }, { name: "Vermont", abbr: "VT" }, { name: "Virginia", abbr: "VA" }, { name: "Washington", abbr: "WA" }, { name: "West Virginia", abbr: "WV" }, { name: "Wisconsin", abbr: "WI" }, { name: "Wyoming", abbr: "WY" }];
+      return [{ text: "Alabama", value: "AL" }, { text: "Alaska", value: "AK" }, { text: "Arizona", value: "AZ" }, { text: "Arkansas", value: "AR" }, { text: "California", value: "CA" }, { text: "Colorado", value: "CO" }, { text: "Connecticut", value: "CT" }, { text: "Delaware", value: "DE" }, { text: "Florida", value: "FL" }, { text: "Georgia", value: "GA" }, { text: "Hawaii", value: "HI" }, { text: "Idaho", value: "ID" }, { text: "Illinois", value: "IL" }, { text: "Indiana", value: "IN" }, { text: "Iowa", value: "IA" }, { text: "Kansas", value: "KS" }, { text: "Kentucky", value: "KY" }, { text: "Louisiana", value: "LA" }, { text: "Maine", value: "ME" }, { text: "Maryland", value: "MD" }, { text: "Massachusetts", value: "MA" }, { text: "Michigan", value: "MI" }, { text: "Minnesota", value: "MN" }, { text: "Mississippi", value: "MS" }, { text: "Missouri", value: "MO" }, { text: "Montana", value: "MT" }, { text: "Nebraska", value: "NE" }, { text: "Nevada", value: "NV" }, { text: "New Hampshire", value: "NH" }, { text: "New Jersey", value: "NJ" }, { text: "New Mexico", value: "NM" }, { text: "New York", value: "NY" }, { text: "North Carolina", value: "NC" }, { text: "North Dakota", value: "ND" }, { text: "Ohio", value: "OH" }, { text: "Oklahoma", value: "OK" }, { text: "Oregon", value: "OR" }, { text: "Pennsylvania", value: "PA" }, { text: "Rhode Island", value: "RI" }, { text: "South Carolina", value: "SC" }, { text: "South Dakota", value: "SD" }, { text: "Tennessee", value: "TN" }, { text: "Texas", value: "TX" }, { text: "Utah", value: "UT" }, { text: "Vermont", value: "VT" }, { text: "Virginia", value: "VA" }, { text: "Washington", value: "WA" }, { text: "West Virginia", value: "WV" }, { text: "Wisconsin", value: "WI" }, { text: "Wyoming", value: "WY" }];
     }
 
     /*

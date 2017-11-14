@@ -2,6 +2,14 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _async = require('async');
+
+var _async2 = _interopRequireDefault(_async);
+
+var _crypto = require('crypto');
+
+var _crypto2 = _interopRequireDefault(_crypto);
+
 var _user = require('../models/schemas/user');
 
 var _user2 = _interopRequireDefault(_user);
@@ -27,6 +35,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var User = new _user4.default();
+var mailgun = require('mailgun-js')({ apiKey: _config2.default.mail.key, domain: _config2.default.mail.domain });
 var stripe = require("stripe")(_config2.default.stripeTestKey);
 
 module.exports = function () {
@@ -48,7 +57,7 @@ module.exports = function () {
           return next(err);
         }
         if (!user) {
-          return res.send({ success: false, message: _config2.default.auth.loginFailed });
+          return res.send({ success: false, message: info.message });
         }
         req.logIn(user, function (err) {
           if (err) return next(err);
@@ -116,10 +125,6 @@ module.exports = function () {
             });
             return customer;
           }).then(function (customer) {
-            /* todo remove these */
-            console.log('basic: ' + req.body.basicPlans);
-            console.log('pro: ' + req.body.proPlans);
-            console.log('premium: ' + req.body.premiumPlans);
             stripe.subscriptions.create({
               customer: customer.id,
               /* This is Generated from the stripe.js form */
@@ -130,6 +135,7 @@ module.exports = function () {
               { plan: "premium", quantity: req.body.premiumPlans }]
             }).then(function (subscription, err) {
               if (err) {
+                console.log('NEWWWWW STRIPE ERRRAR');
                 return res.json({ message: _config2.default.errors.stripeError });
               }
 
@@ -177,6 +183,144 @@ module.exports = function () {
             });
           });
         }
+      });
+    }
+
+    /*
+      Forgot Password - Generates a random token used for reset link and stored in mongo temporarily
+      @params {req, res, next} - Request Data
+    */
+
+  }, {
+    key: 'forgotPassword',
+    value: function forgotPassword(req, res, next) {
+      var _this = this;
+
+      /* generate token */
+      var createCrypto = new Promise(function (resolve, reject) {
+        _crypto2.default.randomBytes(20, function (err, buf) {
+          if (err) {
+            reject({ success: false, message: _config2.default.errors.general });
+          }
+          var token = buf.toString('hex');
+          resolve(token);
+        });
+      }).catch(function () {
+        return res.json({ success: false, message: _config2.default.errors.general });
+      });
+
+      /* set token and expiration (save to mongo) */
+      createCrypto.then(function (token) {
+        return new Promise(function (resolve, reject) {
+          _user2.default.findOne({ emailAddress: req.body.emailAddress }, function (err, user) {
+            if (!user || user === null) {
+              return resolve({ success: false, message: _config2.default.errors.userDoesNotExist });
+            }
+            if (err) {
+              return resolve({ success: false, message: _config2.default.errors.general });
+            }
+
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = Date.now() + 1800 * 1000; // 30min (in millis)
+
+            user.save(function (err) {
+              if (err) {
+                return reject({ success: false, message: _config2.default.errors.general });
+              }
+              resolve({ token: token, user: user });
+            });
+          });
+        }).catch(function (err) {
+          return res.json({ success: false, message: _config2.default.errors.general });
+        })
+        /* Send email once token is generated and saved */
+        .then(function (response) {
+          var emailMessage = 'you are receiving this because you have requested the reset of the password for your account. </br></br> Please click the following link, or paste it into your browser to complete the process: </br></br>\n         ' + _config2.default.mail.resetRootUrl + '?token=' + response.token + ' </br></br> If you did not request this, please ignore this email and your password will remain unchanged.';
+
+          _this.sendMail(response.user.emailAddress, _config2.default.mail.passwordResetSubject, emailMessage, req, res);
+        }).catch(function (err) {
+          if (err) {
+            return res.json({ success: false, message: _config2.default.errors.general });
+          }
+        });
+      });
+    }
+
+    /*
+      Reset Password from the reset password page
+      @params {req, res, next} - Request Data
+    */
+
+  }, {
+    key: 'resetPassword',
+    value: function resetPassword(req, res, next) {
+      var _this2 = this;
+
+      var findUser = new Promise(function (resolve, reject) {
+        _user2.default.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }, function (err, user) {
+          if (!user || user === null || err) {
+            reject({ success: false, message: _config2.default.errors.general });
+          } else {
+            /* bcrypt the password and unset the token/expiration */
+            _bcrypt2.default.genSalt(10, function (err, salt) {
+              _bcrypt2.default.hash(req.body.password, salt, function (err, hash) {
+                user.password = hash;
+                user.resetPasswordToken = undefined;
+                user.resetPasswordExpires = undefined;
+                /* save the new user */
+                user.save(function (error) {
+                  if (error) {
+                    reject({ success: false, message: _config2.default.errors.general });
+                  }
+                  resolve(user);
+                });
+              });
+            });
+          }
+        });
+      }).catch(function (err) {
+        console.log(_config2.default.errors.general);
+      });
+
+      findUser.then(function (user, err) {
+        if (!user || user === undefined || err) {
+          return res.json({ success: false, message: _config2.default.errors.general });
+        }
+
+        /* Send new email */
+        var emailMessage = 'Hello, ' + user.firstName + ', This is a confirmation that the password for your account ' + user.emailAddress + ' has been changed.';
+        _this2.sendMail(user.emailAddress, _config2.default.mail.passwordConfirmSubject, emailMessage, req, res);
+      }).catch(function (err) {
+        return res.json({ success: false, message: _config2.default.errors.general });
+      });
+    }
+
+    /*
+      Send Email - Utilizes mailgun API to send an email
+      @param {String} Email Address
+      @param {String} subject
+      @param {String} message (HTML)
+      @params {Object} req, res
+    */
+
+  }, {
+    key: 'sendMail',
+    value: function sendMail(emailAddress, subject, message, req, res) {
+
+      /* todo send as a good looking template */
+      var data = {
+        from: _config2.default.mail.fromAddress,
+        to: emailAddress,
+        subject: subject,
+        html: message
+      };
+
+      mailgun.messages().send(data, function (error, body) {
+        if (error) {
+          console.log(error);
+          return res.json({ success: false, message: _config2.default.errors.general });
+        }
+        return res.json({ success: true, message: _config2.default.mail.success });
       });
     }
 

@@ -12,8 +12,6 @@ var _bcrypt2 = _interopRequireDefault(_bcrypt);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var mongooseHidden = require('mongoose-hidden')({ defaultHidden: { password: true, __v: true } });
-
 var UserSchema = _mongoose2.default.Schema({
   firstName: {
     type: String
@@ -26,8 +24,7 @@ var UserSchema = _mongoose2.default.Schema({
     index: true
   },
   password: {
-    type: String,
-    hide: true
+    type: String
   },
   emailAddress: {
     type: String
@@ -44,14 +41,16 @@ var UserSchema = _mongoose2.default.Schema({
   profilePicture: {
     type: String
   },
-  profileViews: {
-    type: Number
-  },
   company: {
     type: Object
+  },
+  //for password reset
+  resetPasswordExpires: {
+    type: Number
+  },
+  resetPasswordToken: {
+    type: String
   }
 });
 
-// Hide Fields Specified in mongooseHidden from public API and export module
-UserSchema.plugin(mongooseHidden);
 var User = module.exports = _mongoose2.default.model('User', UserSchema);

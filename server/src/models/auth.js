@@ -91,20 +91,23 @@ module.exports = class Auth{
           });
           return customer;
         }).then((customer) =>{
-          stripe.subscriptions.create({
+          // define this stripe object up here so we can conditionally set the source
+          /* By default sign them up for all plans (quantity 0) */
+          let stripeCustomer = {
             customer: customer.id,
-            /* This is Generated from the stripe.js form */
-            source: req.body.stripeToken,
-
-            /* By default sign them up for all plans (quantity 0) */
             items: [
               { plan: "basic", quantity: req.body.basicPlans },
-              { plan: "pro", quantity: req.body.proPlans,}, //todo pass these in the user object!!!!!
+              { plan: "pro", quantity: req.body.proPlans,},
               { plan: "premium", quantity: req.body.premiumPlans}
             ]
-          }).then((subscription, err) =>{
+          };
+          if(req.body.stripeToken){
+            /* This is Generated from the stripe.js form */
+            stripeCustomer.source = req.body.stripeToken;
+          }
+
+          stripe.subscriptions.create(stripeCustomer).then((subscription, err) =>{
             if(err){
-              console.log('NEWWWWW STRIPE ERRRAR');
               return res.json({message: config.errors.stripeError});
             }
 
@@ -116,7 +119,6 @@ module.exports = class Auth{
             newUser.subscriptionItems = subscriptionItems;
             /* real quick add the subscription ID before creating the user */
             newUser.subscriptionId = subscription.id;
-            newUser.save();
 
             User.createUser(newUser, (err, user) =>{
               /* 1100 handles duplicate keys */
