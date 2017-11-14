@@ -29,12 +29,22 @@
           required
         ></v-text-field>
       </div>
-      <div v-if="showError" class="m__login__error">
-        <p class="m__login__error--message">{{errorMessage}}</p>
+      <div v-if="snackbarText.length > 0" class="m__login__error">
         <router-link to="/forgot-password" class="m__login__error--forgot">Forgot your password?</router-link>
       </div>
       <button class="m__create__button m__login__button" type="submit" @click="login">Login</button>
     </form>
+
+    <!-- snackbar -->
+    <v-snackbar
+      :timeout="snackbarTimeout"
+      :color="snackbarColor"
+      :multi-line="true"
+      v-model="showSnackbar"
+    >
+      {{ snackbarText }}
+      <v-btn dark flat @click.native="showSnackbar = false">Close</v-btn>
+    </v-snackbar>
 
   </div>
 </template>
@@ -57,8 +67,10 @@ export default {
         username: '',
         password: '',
       },
-      showError: false,
-      errorMessage: '',
+      showSnackbar: false,
+      snackbarTimeout: 6000,
+      snackbarColor: 'pink lighten-1',
+      snackbarText: '',
     };
   },
   methods: {
@@ -74,11 +86,10 @@ export default {
         if (isValidated) {
           this.loginUser(this.credentials).then((response) => {
             if (response.status) {
-              this.showError = response.showError;
               this.$router.push('/account');
             } else {
-              this.showError = response.showError;
-              this.errorMessage = response.errorMessage;
+              this.showSnackbar = true;
+              this.snackbarText = response.errorMessage;
             }
           });
         }
