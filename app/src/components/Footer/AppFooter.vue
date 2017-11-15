@@ -22,15 +22,25 @@ export default{
 @import '../../sass/main.scss';
 
 .f{
-  padding: 2rem;
+  padding: 2rem 4rem;
   display: flex;
   flex-direction: column;
   &__links{
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: center;
+    @include breakpoint('phone'){
+      flex-direction: row;
+      justify-content: space-between;
+    }
     &__menu{
       display: inline-flex;
-      padding: 0;
+      padding: 2rem 0;
+      justify-content: center;
+      @include breakpoint('phone'){
+        justify-content: flex-start;
+        padding: 0;
+      }
       &__item{
         list-style: none;
         margin: 0 0.5rem;
