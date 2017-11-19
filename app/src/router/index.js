@@ -21,6 +21,7 @@ import AccountPassword from '@/components/Account/Password';
 import EditSubscriptions from '@/components/Account/EditSubscriptions';
 import EditStates from '@/components/Account/EditStates';
 import EditCities from '@/components/Account/EditCities';
+import EditPremium from '@/components/Account/EditPremium';
 
 
 Vue.use(Router);
@@ -51,6 +52,7 @@ export default new Router({
       children: [
         { path: 'states', component: EditStates },
         { path: 'cities', component: EditCities },
+        { path: 'premium', component: EditPremium },
         { path: '', component: EditStates },
       ],
     },
