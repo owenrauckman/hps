@@ -92,23 +92,4 @@ export default {
 <style scoped lang="scss">
 @import '../../sass/main.scss';
 
-.m{
-  &__create{
-    &__select{
-      display: none;
-      &--show{
-        display: block;
-      }
-    }
-    &__chip{
-      &--active{
-        background: $purple !important; // vuetify override
-        color: $white !important; // vuetify override
-      }
-    }
-    &__state-container{
-      margin: 2rem 0 1rem 0;
-    }
-  }
-}
 </style>

@@ -5,7 +5,8 @@ import axios from 'axios';
 const state = {
   authStatus: false,
   editProgressBar: 0,
-  possibleCities: [],
+  possibleEditStates: [],
+  possibleEditCities: [],
   editInfo: {
     states: [],
     cities: [],
@@ -34,6 +35,9 @@ const mutations = {
   [types.SET_USER_DATA](state, user) {
     state.user = user;
   },
+  [types.UPDATE_EDIT_STATES](state, states) {
+    state.possibleEditStates = states;
+  },
 
   // UPDATE PROFILE INFORMATION
   [types.UPDATE_USER_DATA](state, data) {
@@ -45,6 +49,7 @@ const mutations = {
     state.editProgressBar = data;
   },
 };
+
 
 const actions = {
   /*
@@ -200,6 +205,17 @@ const actions = {
   },
 
   /*
+    Fetches a list of states for the sign up process
+  */
+  fetchEditStates({ commit }) {
+    axios.get(`${config.api}/search/states`).then((response) => {
+      commit(types.UPDATE_EDIT_STATES, response.data);
+    }).catch((err) => {
+      throw new Error(`${err}: Something went wrong, add flash message`);
+    });
+  },
+
+  /*
     Generates the two lists of locations based on the user's data
   */
   generateLocations({ state }) {
@@ -213,42 +229,51 @@ const actions = {
   /*
     Generates a list of cities for a user's chosen states
   */
+  // todo go through and create COMMITS for any of the direct stte mutations
   generateAccountCities({ state, commit }) {
-    // const possibleCities = [];
-    // THE SAME AS ABOVE, CHECKING IF THE CITIES EXIST //
-    state.user.company.areasServed.forEach((area) => {
-      area.cities.forEach((city) => {
-        state.editInfo.cities.push(city.city);
-      });
-    });
-
-    // OTHER STUFF
-    const generateCities = new Promise((resolve) => {
-      state.editInfo.states.forEach((selectedState) => {
-        /* if its an object (aka a new value), grab the state value */
-        let stateToSearch;
-        if (typeof (selectedState) === 'object') {
-          stateToSearch = selectedState.value;
-        } else {
-          stateToSearch = selectedState;
-        }
+    const cityPromises = [];
+    state.editInfo.states.forEach((stateToSearch) => {
+      const cityPromise = new Promise((resolve) => {
         axios.get(`${config.api}/search/cities?state=${stateToSearch}`).then((response) => {
-          /* add a new city */
-          state.possibleCities.push({
+          // before resolving, add the associated state with the city
+          const cities = [];
+          response.data.forEach((city) => {
+            cities.push({
+              state: stateToSearch,
+              city,
+            });
+          });
+          resolve({
             abbr: stateToSearch,
-            cities: response.data,
-            // name: '', // todo add the pretty name for the city (maybe just a json file)
+            cities,
           });
         });
       });
-      resolve();
+      cityPromises.push(cityPromise);
     });
 
-    generateCities.then(() => {
-      // set the default selected state (first one)
-      console.log('sdoifjsdfj');
-      console.log(state.possibleCities[0]);
-      commit(types.UPDATE_EDIT_INFO, { type: 'SELECTED_STATE', value: state.possibleCities[0].abbr });
+    // Once all of the cities have been updated proceed
+    // TODO: once this is fixed add CATCH and err handling...
+    Promise.all(cityPromises).then((data) => {
+      // set the possible state
+      state.possibleEditCities = data;
+
+      // set the first state as default selected
+      commit(types.UPDATE_EDIT_INFO, { type: 'SELECTED_STATE', value: state.possibleEditCities[0].abbr });
+
+      // and also set the current selected states for a user based on their obj...
+      // TODO: think about associating premium for state AND city like before you get to prem page
+      const selectedCities = [];
+      state.user.company.areasServed.forEach((area) => {
+        area.cities.forEach((city) => {
+          // selectedCities.push(city.city);
+          selectedCities.push({
+            state: area.state,
+            city: city.city,
+          });
+        });
+      });
+      state.editInfo.cities = selectedCities;
     });
   },
 
@@ -259,7 +284,23 @@ const getters = {
   user: state => state.user,
   editInfo: state => state.editInfo,
   editProgressBar: state => state.editProgressBar,
-  editPossibleCities: state => state.possibleCities,
+  possibleEditStates: state => state.possibleEditStates,
+  possibleEditCities: state => state.possibleEditCities,
+  userCurrentFee: (state) => {
+    let total = 0;
+    if (state.user.subscriptionItems) {
+      state.user.subscriptionItems.forEach((subItem) => {
+        if (subItem.plan.id === 'pro') {
+          total += (config.cityPrice * subItem.quantity);
+        }
+        if (subItem.plan.id === 'premium') {
+          total += (config.statePrice * subItem.quantity);
+        }
+      });
+    }
+    return total;
+  },
+
 };
 /* eslint-enable */
 

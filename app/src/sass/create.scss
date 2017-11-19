@@ -63,5 +63,20 @@
     &__hidden-input{
       display: none !important;
     }
+    &__select{
+      display: none !important;
+      &--show{
+        display: block !important;
+      }
+    }
+    &__chip{
+      &--active{
+        background: $purple !important; // vuetify override
+        color: $white !important; // vuetify override
+      }
+    }
+    &__state-container{
+      margin: 2rem 0 1rem 0;
+    }
   }
 }

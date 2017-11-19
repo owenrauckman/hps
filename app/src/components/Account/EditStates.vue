@@ -4,7 +4,7 @@
       <h1 class="m__create__heading">States</h1>
 
       <v-select
-        v-bind:items="signUpStates"
+        v-bind:items="possibleEditStates"
         v-model="selectedStates"
         label="States"
         v-bind:autocomplete="true"
@@ -13,7 +13,6 @@
         v-bind:chips="true"
         color="indigo darken-2"
         v-bind:error-messages="errors.collect('selectedStates')"
-        return-object
         required
       ></v-select>
 
@@ -27,7 +26,7 @@
       ></v-text-field>
 
       <div class="m__create__navigation">
-        <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p>
+        <p class="m__create__navigation__rate">Your current monthly fee is {{userCurrentFee}}</p>
         <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
       </div>
 
@@ -47,7 +46,7 @@ export default{
     // Grab the user
     this.checkAuth().then((response) => {
       if (response.status) {
-        this.fetchStates();
+        this.fetchEditStates();
         this.generateLocations();
       } else {
         this.$router.push('/login');
@@ -55,7 +54,7 @@ export default{
     });
   },
   computed: {
-    ...mapGetters(['currentFee', 'user', 'signUpStates', 'editInfo']),
+    ...mapGetters(['userCurrentFee', 'user', 'possibleEditStates', 'editInfo']),
     selectedStates: {
       get() { return this.editInfo.states; },
       set(states) { this.UPDATE_EDIT_INFO({ type: 'STATES', value: states }); },
@@ -63,7 +62,7 @@ export default{
   },
   methods: {
     ...mapMutations([types.UPDATE_EDIT_PROGRESS_BAR, types.UPDATE_EDIT_INFO]),
-    ...mapActions(['checkAuth', 'fetchStates', 'generateLocations']),
+    ...mapActions(['checkAuth', 'fetchEditStates', 'generateLocations']),
     /*
       Performs validation before continuing
     */

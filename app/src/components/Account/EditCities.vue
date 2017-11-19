@@ -2,30 +2,31 @@
   <div>
     <div class="m__create">
       <h1 class="m__create__heading">Cities</h1>
-
       <div class="m__create__state-container">
-        <v-chip v-for="state in editPossibleCities" @click="toggleState(state)" :class="[{ 'm__create__chip--active': state.abbr === selectedState }, 'm__create__chip']">
-          {{state.abbr}}
+        <v-chip v-for="state in possibleEditCities" @click="toggleState(state)" :class="[{ 'm__create__chip--active': state.abbr === selectedState }, 'm__create__chip']">
+          {{config.states[state.abbr]}}
         </v-chip>
       </div>
 
-      <div v-for="state in editPossibleCities" :key="state.abbr">
+      <div v-for="(state, stateIndex) in possibleEditCities" :key="stateIndex">
         <v-select
-          v-bind:items="state.cities"
+          v-bind:items="possibleEditCities[stateIndex].cities"
           v-model="selectedCities"
-          v-bind:label="`${state.abbr} Cities`"
+          v-bind:label="`${config.states[state.abbr]} Cities`"
           v-bind:autocomplete="true"
           v-bind:clearable="true"
           v-bind:multiple="true"
           v-bind:chips="true"
           color="indigo darken-2"
+          item-text="city"
           return-object
           :class="[{ 'm__create__select--show': state.abbr === selectedState }, 'm__create__select']"
         ></v-select>
       </div>
 
       <div class="m__create__navigation">
-        <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p> <!-- todo update this -->
+        <p class="m__create__navigation__rate">Your current monthly fee is {{userCurrentFee}}</p>
+        <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('states')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
         <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
       </div>
 
@@ -34,6 +35,7 @@
 </template>
 
 <script>
+import config from '@/config';
 import * as types from '@/store/mutationTypes';
 import { mapMutations, mapActions, mapGetters } from 'vuex';
 
@@ -51,17 +53,19 @@ export default{
       }
     });
   },
+  data() {
+    return {
+      config,
+    };
+  },
   computed: {
-    ...mapGetters(['currentFee', 'user', 'signUpCities', 'editInfo', 'editPossibleCities']),
-    selectedStates() {
-      return this.editInfo.states;
-    },
+    ...mapGetters(['user', 'signUpCities', 'editInfo', 'possibleEditCities', 'userCurrentFee']),
     selectedCities: {
       get() { return this.editInfo.cities; },
       set(cities) { this.UPDATE_EDIT_INFO({ type: 'CITIES', value: cities }); },
     },
     selectedState: {
-      get() { return this.editInfo.SelectedState; },
+      get() { return this.editInfo.selectedState; },
       set(newState) { this.UPDATE_EDIT_INFO({ type: 'SELECTED_STATE', value: newState }); },
     },
   },
@@ -73,7 +77,7 @@ export default{
       Toggles the cities for a given state
     */
     toggleState(state) {
-      this.selectedState = state.value;
+      this.selectedState = state.abbr;
     },
 
     /*
