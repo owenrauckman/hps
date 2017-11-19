@@ -4,12 +4,30 @@ import axios from 'axios';
 
 const state = {
   authStatus: false,
-  // authCookieExists:
+  editProgressBar: 0,
+  possibleCities: [],
+  editInfo: {
+    states: [],
+    cities: [],
+    selectedState: '',
+  },
   user: {},
 };
 
 /* eslint-disable no-shadow, no-param-reassign */
 const mutations = {
+  [types.UPDATE_EDIT_INFO](state, info) {
+    switch (info.type) {
+      case 'STATES':
+        state.editInfo.states = info.value; break;
+      case 'CITIES':
+        state.editInfo.cities = info.value; break;
+      case 'SELECTED_STATE':
+        state.editInfo.selectedState = info.value; break;
+      default:
+        break;
+    }
+  },
   [types.UPDATE_AUTH_STATUS](state, authStatus) {
     state.authStatus = authStatus;
   },
@@ -20,6 +38,11 @@ const mutations = {
   // UPDATE PROFILE INFORMATION
   [types.UPDATE_USER_DATA](state, data) {
     state.user = data;
+  },
+
+  // PROGRESS BAR
+  [types.UPDATE_EDIT_PROGRESS_BAR](state, data) {
+    state.editProgressBar = data;
   },
 };
 
@@ -176,11 +199,67 @@ const actions = {
     });
   },
 
+  /*
+    Generates the two lists of locations based on the user's data
+  */
+  generateLocations({ state }) {
+    /* only generate from the user object if this doesn't exist locally */
+    if (state.editInfo.states.length === 0) {
+      state.user.company.areasServed.forEach((area) => {
+        state.editInfo.states.push(area.state);
+      });
+    }
+  },
+  /*
+    Generates a list of cities for a user's chosen states
+  */
+  generateAccountCities({ state, commit }) {
+    // const possibleCities = [];
+    // THE SAME AS ABOVE, CHECKING IF THE CITIES EXIST //
+    state.user.company.areasServed.forEach((area) => {
+      area.cities.forEach((city) => {
+        state.editInfo.cities.push(city.city);
+      });
+    });
+
+    // OTHER STUFF
+    const generateCities = new Promise((resolve) => {
+      state.editInfo.states.forEach((selectedState) => {
+        /* if its an object (aka a new value), grab the state value */
+        let stateToSearch;
+        if (typeof (selectedState) === 'object') {
+          stateToSearch = selectedState.value;
+        } else {
+          stateToSearch = selectedState;
+        }
+        axios.get(`${config.api}/search/cities?state=${stateToSearch}`).then((response) => {
+          /* add a new city */
+          state.possibleCities.push({
+            abbr: stateToSearch,
+            cities: response.data,
+            // name: '', // todo add the pretty name for the city (maybe just a json file)
+          });
+        });
+      });
+      resolve();
+    });
+
+    generateCities.then(() => {
+      // set the default selected state (first one)
+      console.log('sdoifjsdfj');
+      console.log(state.possibleCities[0]);
+      commit(types.UPDATE_EDIT_INFO, { type: 'SELECTED_STATE', value: state.possibleCities[0].abbr });
+    });
+  },
+
 };
 
 const getters = {
   authStatus: state => state.authStatus,
   user: state => state.user,
+  editInfo: state => state.editInfo,
+  editProgressBar: state => state.editProgressBar,
+  editPossibleCities: state => state.possibleCities,
 };
 /* eslint-enable */
 

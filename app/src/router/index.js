@@ -18,6 +18,9 @@ import EditProfileInfo from '@/components/Account/EditProfileInfo';
 import EditProfile from '@/components/Account/Profile';
 import EditAbout from '@/components/Account/About';
 import AccountPassword from '@/components/Account/Password';
+import EditSubscriptions from '@/components/Account/EditSubscriptions';
+import EditStates from '@/components/Account/EditStates';
+import EditCities from '@/components/Account/EditCities';
 
 
 Vue.use(Router);
@@ -41,6 +44,14 @@ export default new Router({
         { path: 'about', component: EditAbout },
         { path: 'profile', component: EditProfile }, // default to profile
         { path: '', component: EditProfile }, // default to profile
+      ],
+    },
+    { path: '/account/subscriptions',
+      component: EditSubscriptions,
+      children: [
+        { path: 'states', component: EditStates },
+        { path: 'cities', component: EditCities },
+        { path: '', component: EditStates },
       ],
     },
 
