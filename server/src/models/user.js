@@ -175,6 +175,8 @@ module.exports = class User{
     @param {req, res, next} - data to compare user with
     @param {req} - username, password, profile info, plan to edit, and quantity (for stripe ) -- in request include all 3 plans
   */
+
+  // todo: refactor this so that it is only iplied that we are editing a user's personal info
   editUser(req, res, next){
 
     // define these at the top of the promise so that we can access globally
@@ -272,6 +274,53 @@ module.exports = class User{
     else{
       return res.json({success: false, message: config.auth.editNotAuthorized});
     }
+  }
+
+  /*
+    Update a User's subscriptions (and not any other info associated with them)
+    @params {req, res, next} - Request Data contains user info
+  */
+  // todo remove if user is auth from other functions in this file because they are protected at the route level
+  updateSubscriptions(req, res, next){
+    console.log(req.body.subscriptionDetails);
+    UserSchema.findOne({_id: req.session.passport.user}, (err, user) => {
+      if(err || !user){
+        return res.json({success: false, message: config.auth.editError});
+      }
+      console.log(`username: ${user.username}`);
+
+      // needing more validation, but testing for now...
+      user.company.areasServed = req.body.areasServed;
+
+      // CHECK WHERE ELSE YOU NEED TO MENTION MIXED TYPES TO AVOID ISSUES UGH
+      user.markModified('company');
+
+      user.save((err)=>{
+        if(err){
+          return res.json({success: false, message: config.auth.editError});
+        } else{
+          return res.json({success: true, message: config.auth.editSuccess});
+        }
+      });
+
+
+      // user.save((err)=>{
+      //   if(err){
+      //     console.log(err);
+      //     return res.json({success: false, message: config.auth.editError});
+      //   } else{
+      //     console.log("YAAASSS");
+      //     console.log(user.company.areasServed);
+      //     return res.json({success: true, message: config.auth.editSuccess});
+      //   }
+      // });
+      // perform the update
+
+      // PIECES:  actually update the areas served first,
+      // PIECES: then update the quantity in the subscriptions
+    });
+    // console.log('ok here');
+    // res.json({status: true, message: 'Some Status message'});
   }
 
   /*

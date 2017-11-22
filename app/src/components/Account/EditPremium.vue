@@ -19,7 +19,7 @@
           <span v-if="userCurrentFee !== currentFee">Your new monthly fee will be {{currentFee}}</span>
         </p>
         <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('cities')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
-        <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">
+        <button class="m__create__button" @click.prevent="updateAreasServed" v-scroll-to="{element: '.m__header', duration: 1000}">
           <span v-if="userCurrentFee === currentFee || currentFee === 0">Submit</span>
           <span v-else>Continue</span>
         </button>
@@ -69,8 +69,10 @@ export default{
     ...mapGetters(['user', 'editInfo', 'userCurrentFee']),
   },
   methods: {
-    ...mapMutations([types.UPDATE_EDIT_PROGRESS_BAR, types.UPDATE_EDIT_INFO]),
-    ...mapActions(['checkAuth', 'fetchCities', 'generateAccountCities']),
+    ...mapMutations([
+      types.UPDATE_EDIT_PROGRESS_BAR, types.UPDATE_EDIT_INFO, types.UPDATE_USER_AREAS,
+    ]),
+    ...mapActions(['checkAuth', 'fetchCities', 'generateAccountCities', 'updateSubscriptions']),
 
     /*
       checks to see if premium is available for a city/state
@@ -257,7 +259,7 @@ export default{
           });
         });
         // commit directly back to store.
-        this.UPDATE_SIGN_UP_INFO({ type: 'AREAS_SERVED', value: areasServed });
+        this.UPDATE_USER_AREAS(areasServed);
         resolve(areasServed);
       });
 
@@ -271,19 +273,38 @@ export default{
       Submits the form or redirects to pay page
     */
     submit() {
+      console.log('made it 2 submit');
+      /* before redirecting to payment, add new info to store */
+      // regardless of there being new paid subs or not, we will update all 3
+      console.log('yooo');
+      console.log(this.basicPlans);
+      this.UPDATE_EDIT_INFO({ type: 'SUBSCRIPTION_DETAILS',
+        value: { basic: this.basicPlans,
+          pro: this.proPlans,
+          premium: this.premiumPlans,
+        },
+      });
+
+      this.updateSubscriptions().then((success) => {
+        if (success) {
+          console.log('yeah success');
+        } else {
+          console.log('nawh man, just an error ');
+        }
+      });
+
+      // ALSO..add logic for if all plans === current num then we don't need to update stripe
+      // YO, we need this logic, but for now I am just trying with a little bit
       // if (this.proPlans > 0 || this.premiumPlans > 0) {
-      //   /* before redirecting to payment, add new info to store */
-      //   this.UPDATE_SIGN_UP_INFO({ type: 'BASIC_PLANS', value: this.basicPlans });
-      //   this.UPDATE_SIGN_UP_INFO({ type: 'PRO_PLANS', value: this.proPlans });
-      //   this.UPDATE_SIGN_UP_INFO({ type: 'PREMIUM_PLANS', value: this.premiumPlans });
       //   /* redirect to payment */
       //   this.$router.push('/create/pay');
       //   /* otherwise go ahead and sign them up */
       // } else {
-      //   this.UPDATE_SIGN_UP_INFO({ type: 'BASIC_PLANS', value: this.basicPlans });
-      //   this.createProfile().then((success) => {
+      //   this.updateSubscriptions().then((success) => {
       //     if (success) {
       //       this.$router.push('/create/success');
+      //     } else {
+      //       console.log('some error');
       //     }
       //     // todo flash message error
       //   });

@@ -76,6 +76,12 @@ router.put('/editPassword', Auth.checkAuth, (req, res, next) => {
   User.editPassword(req, res, next);
 });
 
+// todo, make these organized again :/
+// todo add Auth.checkAuth back as middleware to this
+router.put('/updateSubscriptions', (req, res, next) => {
+  User.updateSubscriptions(req, res, next);
+});
+
 /*
   CARD ROUTES
   # Add Credit Card

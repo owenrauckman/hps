@@ -11,6 +11,11 @@ const state = {
     states: [],
     cities: [],
     selectedState: '',
+    subscriptionDetails: {
+      basic: 0,
+      pro: 0,
+      premium: 0,
+    },
   },
   user: {},
 };
@@ -25,6 +30,13 @@ const mutations = {
         state.editInfo.cities = info.value; break;
       case 'SELECTED_STATE':
         state.editInfo.selectedState = info.value; break;
+      case 'SUBSCRIPTION_DETAILS':
+        state.editInfo.subscriptionDetails = {
+          basic: info.value.basic,
+          pro: info.value.pro,
+          premium: info.value.premium,
+        };
+        break;
       default:
         break;
     }
@@ -42,6 +54,9 @@ const mutations = {
   // UPDATE PROFILE INFORMATION
   [types.UPDATE_USER_DATA](state, data) {
     state.user = data;
+  },
+  [types.UPDATE_USER_AREAS](state, data) {
+    state.user.company.areasServed = data;
   },
 
   // PROGRESS BAR
@@ -274,6 +289,33 @@ const actions = {
         });
       });
       state.editInfo.cities = selectedCities;
+    });
+  },
+
+
+  /*
+    PUT to update a user's subscriptons/areas served
+  */
+
+  // TODO: so i'm here... I need to post to server (includ approp subscription items)
+  // and route appropriateley based on them. Add flash messages, etc..
+  // add express method in models, and a route to handle this before actually executing.
+  // @param subscription details -- fill this in later
+  updateSubscriptions({ state }) {
+    return new Promise((resolve) => {
+      axios.put(`${config.api}/users/updateSubscriptions`,
+        { areasServed: state.user.company.areasServed,
+          subscriptionDetails: state.editInfo.subscriptionDetails })
+        .then((response) => {
+          if (response.data.success === true) {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        })
+        .catch((err) => {
+          throw new Error(`${err}: Something went wrong, add flash message`);
+        });
     });
   },
 
