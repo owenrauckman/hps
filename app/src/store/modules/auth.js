@@ -300,7 +300,7 @@ const actions = {
   // TODO: so i'm here... I need to post to server (includ approp subscription items)
   // and route appropriateley based on them. Add flash messages, etc..
   // add express method in models, and a route to handle this before actually executing.
-  // @param subscription details -- fill this in later
+  // @param subs cription details -- fill this in later
   updateSubscriptions({ state }) {
     return new Promise((resolve) => {
       axios.put(`${config.api}/users/updateSubscriptions`,
@@ -308,6 +308,8 @@ const actions = {
           subscriptionDetails: state.editInfo.subscriptionDetails })
         .then((response) => {
           if (response.data.success === true) {
+            // set in the local state too...
+            state.user.subscriptionItems = response.data.data;
             resolve(true);
           } else {
             resolve(false);

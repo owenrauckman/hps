@@ -297,9 +297,10 @@ module.exports = class User{
 
       user.save((err)=>{
         if(err){
+          // we have to return the new subscription items to keep UI in sync
           return res.json({success: false, message: config.auth.editError});
         } else{
-          return res.json({success: true, message: config.auth.editSuccess});
+          return res.json({success: true, message: config.auth.editSuccess, data: user.subscriptionItems});
         }
       });
 
