@@ -15,6 +15,3 @@ build
 
 #env
 .env
-
-./server/config/index.js
-./config/index.js

@@ -52,8 +52,16 @@
 <script>
 import axios from 'axios'
 import config from '@/config'
+import { mapActions } from 'vuex'
 
 export default{
+  beforeMount () {
+    this.checkAuth().then((response) => {
+      if (!response.status) {
+        this.$router.push('/login')
+      }
+    })
+  },
   data () {
     return {
       hideNewPassword: true,
@@ -68,6 +76,7 @@ export default{
     }
   },
   methods: {
+    ...mapActions(['checkAuth']),
     /*
       Performs validation before continuing
     */

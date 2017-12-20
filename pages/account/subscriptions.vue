@@ -2,7 +2,7 @@
   <div>
     <!-- nested views -->
     <div class="m__progress-bar" :style="`width: ${this.editProgressBar}%`"></div>
-    <router-view></router-view>
+    <nuxt-child/>
   </div>
   </div>
 </template>
@@ -11,6 +11,9 @@
 import { mapGetters } from 'vuex'
 
 export default{
+  fetch ({ params, redirect }) {
+    redirect(301, '/account/subscriptions/states')
+  },
   data () {
     return {
 

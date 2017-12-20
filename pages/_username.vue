@@ -74,8 +74,7 @@ export default {
       ).then((data) => {
         data.json().then((userInfo) => {
           if (userInfo.status === false) {
-            // todo redirect this to a 404 page
-            this.$router.push('/')
+            window.location.href = '/not-found'
           } else {
             this.user = userInfo.user
             // check to see if user owns premium city or state

@@ -74,6 +74,15 @@
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
+  beforeMount () {
+    this.checkAuth().then((response) => {
+      if (response.status) {
+        this.checkPremium()
+      } else {
+        this.$router.push('/login')
+      }
+    })
+  },
   data () {
     return {
       ownsPremiumCity: false,
@@ -84,15 +93,6 @@ export default {
       snackbarColor: 'pink lighten-1',
       snackbarText: 'success'
     }
-  },
-  beforeMount () {
-    this.checkAuth().then((response) => {
-      if (response.status) {
-        this.checkPremium()
-      } else {
-        this.$router.push('/login')
-      }
-    })
   },
   computed: {
     ...mapGetters(['user'])
@@ -204,7 +204,7 @@ export default {
         &:after{
           position: absolute;
           content: '';
-          background: url('../../static/svg/check.svg'); 
+          background: url('../../static/svg/check.svg');
           height: 15px;
           width: 15px;
           margin-left: 5px;

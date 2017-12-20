@@ -15,6 +15,14 @@ module.exports = {
   },
 
   /*
+  ** Nuxt loader
+  */
+  loading: {
+    color: '#3d4aa6',
+    height: '2px'
+  },
+
+  /*
   ** Add axios globally
   */
   build: {

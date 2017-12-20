@@ -6,15 +6,16 @@
         <router-link to="/account/info/profile" :class="[{'e__nav__link--active': !isAboutRoute}, 'e__nav__link']">Profile</router-link>
         <router-link to="/account/info/about" :class="[{'e__nav__link--active': isAboutRoute}, 'e__nav__link']">About</router-link>
       </nav>
-
-      <!-- nested views -->
-      <nuxt/>
+      <nuxt-child/>
   </div>
   </div>
 </template>
 
 <script>
 export default{
+  fetch ({ params, redirect }) {
+    redirect(301, '/account/info/profile')
+  },
   computed: {
     isAboutRoute () {
       return this.$route.path.includes('about')

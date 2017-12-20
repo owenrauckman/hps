@@ -18,7 +18,7 @@ export default class User {
     return new Promise((resolve, reject) => {
       UserSchema.findOne({'username': username}, exclude, (err, user) => {
         if (err) {
-          throw new Error(err)
+          throw new Error({status: false, message: config.errors.generalError})
         } else if (user == null) {
           resolve({status: false, message: config.errors.userDoesNotExist})
         } else {
