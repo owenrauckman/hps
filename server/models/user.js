@@ -47,7 +47,7 @@ export default class User {
       var query = {emailAddress: emailAddress}
       UserSchema.find(query, (err, user) => {
         if (err) {
-          throw new Error(err, err.message)
+          throw new Error({status: false, message: config.errors.generalError})
         }
         if (user.length > 0) {
           resolve({status: true, userExists: true})
@@ -67,7 +67,7 @@ export default class User {
       var query = {username: username}
       UserSchema.find(query, (err, user) => {
         if (err) {
-          throw new Error(err, err.message)
+          throw new Error({status: false, message: config.errors.generalError})
         }
         if (user.length > 0) {
           resolve({status: true, userExists: true})
@@ -95,11 +95,11 @@ export default class User {
   createUser (newUser, callback) {
     bcrypt.genSalt(10, (err, salt) => {
       if (err) {
-        throw new Error(err)
+        throw new Error({status: false, message: config.errors.generalError})
       }
       bcrypt.hash(newUser.password, salt, (err, hash) => {
         if (err) {
-          throw new Error(err)
+          throw new Error({status: false, message: config.errors.generalError})
         }
         newUser.password = hash
         newUser.save(callback)
@@ -132,22 +132,22 @@ export default class User {
         const findUser = new Promise((resolve, reject) => {
           UserSchema.findOne({_id: req.session.passport.user}, (err, user) => {
             if (err) {
-              throw new Error(err, config.errors.general)
+              throw new Error({status: false, message: config.errors.generalError})
             } else {
               /* bcrypt the password and unset the token/expiration */
               bcrypt.genSalt(10, (err, salt) => {
                 if (err) {
-                  throw new Error(err, err.message)
+                  throw new Error({status: false, message: config.errors.generalError})
                 }
                 bcrypt.hash(req.body.newPassword, salt, (err, hash) => {
                   if (err) {
-                    throw new Error(err, err.message)
+                    throw new Error({status: false, message: config.errors.generalError})
                   }
                   user.password = hash
                   /* save the new user */
                   user.save((error) => {
                     if (error) {
-                      throw new Error(Error, config.errors.general)
+                      throw new Error({status: false, message: config.errors.generalError})
                     }
                     resolve({success: true, message: config.auth.editSuccess})
                   })
@@ -189,7 +189,7 @@ export default class User {
     if (req.isAuthenticated()) {
       UserSchema.findOne({_id: req.session.passport.user}, (err, user) => {
         if (err) {
-          throw new Error(err, err.message)
+          throw new Error({status: false, message: config.errors.generalError})
         }
         /* return errors if the username/email exists (unless it matches the current data) */
         this.checkExistanceByUsername(req.body.username).then((checkUser) => {
@@ -334,7 +334,7 @@ export default class User {
     if (req.user && req.user._id.toString() === req.session.passport.user) {
       UserSchema.findOne({_id: req.session.passport.user}, (err, user) => {
         if (err) {
-          throw new Error(err, config.auth.deleteError)
+          throw new Error({status: false, message: config.errors.generalError})
         }
         user.remove({
           _id: user._id

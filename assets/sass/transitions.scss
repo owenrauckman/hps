@@ -1,0 +1,48 @@
+// PAGE
+.page-enter-active, .page-leave-active {
+  animation: slide-in-mobile 0.5s;
+  @include breakpoint('tablet'){
+    animation: slide-in 0.5s;
+  }
+}
+.page-enter, .page-leave-active {
+  animation: slide-out-mobile 0.5s;
+  @include breakpoint('tablet'){
+    animation: slide-out 0.5s;
+  }
+}
+
+@keyframes slide-in {
+  0% { transform: translateX(-100px); opacity: 0; }
+  100% { transform: translateX(0px); opacity: 1; }
+}
+@keyframes slide-out {
+  0% { transform: translateX(0px); opacity: 1; }
+  100% { transform: translateX(100px); opacity: 0; }
+}
+
+@keyframes slide-in-mobile {
+  0% { transform: translateY(150px); opacity: 0; }
+  100% { transform: translateY(0px); opacity: 1; }
+}
+@keyframes slide-out-mobile {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+// FADE
+.fade-enter-active, .fade-leave-active {
+  animation: fade-in 0.5s;
+}
+.fade-enter, .fade-leave-active {
+  animation: fade-out 0.5s;
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fade-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}

@@ -98,7 +98,6 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-
 .p{
   &__profile{
     max-width: 800px;
