@@ -177,7 +177,7 @@ export const actions = {
   /*
     POST to create a user's proflie
   */
-  createProfile ({ commit }) {
+  createProfile ({ state, commit }) {
     return new Promise((resolve) => {
       axios.post(`${config.api}/users/register`, state.signUpInfo)
         .then((response) => {
