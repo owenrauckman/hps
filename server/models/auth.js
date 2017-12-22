@@ -4,6 +4,14 @@ import UserModel from './user'
 import bcrypt from 'bcrypt'
 import passport from 'passport'
 import config from '../config'
+const cloudinary = require('cloudinary')
+
+// config cloudinary
+cloudinary.config({
+  cloud_name: config.cloudinary.cloud_name,
+  api_key: config.cloudinary.api_key,
+  api_secret: config.cloudinary.api_secret
+})
 
 const User = new UserModel()
 
@@ -81,9 +89,10 @@ export default class Auth {
                 emailAddress: req.body.emailAddress,
                 company: req.body.company,
                 phoneNumber: req.body.phoneNumber,
-                profilePicture: req.body.profilePicture,
+                profilePicture: config.defaultProfileImage,
                 stripeId: customer.id
               })
+
               return customer
             }).then((customer) => {
             // define this stripe object up here so we can conditionally set the source
@@ -115,15 +124,32 @@ export default class Auth {
                 /* real quick add the subscription ID before creating the user */
                 newUser.subscriptionId = subscription.id
 
-                User.createUser(newUser, (err, user) => {
-                /* 1100 handles duplicate keys */
-                  if (err && err.code !== 11000) {
-                    reject(new Error({success: false, message: config.auth.generalError}))
-                  } else if (err && err.code === 11000) {
-                    reject(new Error({success: false, message: config.auth.alreadyInUse}))
+                // ONLY WANTING TO UPLOAD IF WE ARE GOING TO BE SUCCESSFUL
+                // Check to see if we need to process an image , clean up later...
+                const saveCloudinaryPicture = new Promise((resolve, reject) => {
+                  if (req.body.profilePicture === config.defaultProfileImage) {
+                    resolve(true)
                   } else {
-                    resolve({success: true, message: `${config.auth.registerThanks} ${newUser.firstName}`, user: newUser})
+                    cloudinary.uploader.upload(req.body.profilePicture, (result) => {
+                      newUser.profilePicture = result.secure_url
+                      resolve(true)
+                    }, { public_id: newUser.username, invalidate: true }
+                    )
                   }
+                })
+
+                // wait for photo upload before continuing to officially saving the user
+                saveCloudinaryPicture.then((response) => {
+                  User.createUser(newUser, (err, user) => {
+                  /* 1100 handles duplicate keys */
+                    if (err && err.code !== 11000) {
+                      reject(new Error({success: false, message: config.auth.generalError}))
+                    } else if (err && err.code === 11000) {
+                      reject(new Error({success: false, message: config.auth.alreadyInUse}))
+                    } else {
+                      resolve({success: true, message: `${config.auth.registerThanks} ${newUser.firstName}`, user: newUser})
+                    }
+                  })
                 })
               })
             })

@@ -70,27 +70,27 @@ export default {
     },
     website: {
       get () { return this.signUpInfo.company.website },
-      set (website) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_WEBSITE', value: { url: website } }) }
+      set (website) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_WEBSITE', value: website }) }
     },
     facebook: {
       get () { return this.signUpInfo.company.facebook },
-      set (facebook) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_FACEBOOK', value: { url: facebook } }) }
+      set (facebook) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_FACEBOOK', value: facebook }) }
     },
     twitter: {
       get () { return this.signUpInfo.company.twitter },
-      set (twitter) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_TWITTER', value: { url: twitter } }) }
+      set (twitter) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_TWITTER', value: twitter }) }
     },
     instagram: {
       get () { return this.signUpInfo.company.instagram },
-      set (instagram) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_INSTAGRAM', value: { url: instagram } }) }
+      set (instagram) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_INSTAGRAM', value: instagram }) }
     },
     pinterest: {
       get () { return this.signUpInfo.company.pinterest },
-      set (pinterest) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_PINTEREST', value: { url: pinterest } }) }
+      set (pinterest) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_PINTEREST', value: pinterest }) }
     },
     youtube: {
       get () { return this.signUpInfo.company.youtube },
-      set (youtube) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_YOUTUBE', value: { url: youtube } }) }
+      set (youtube) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_YOUTUBE', value: youtube }) }
     }
   },
   methods: {

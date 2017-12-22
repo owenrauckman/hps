@@ -2,6 +2,14 @@ import bcrypt from 'bcrypt'
 import config from '../config'
 import UserSchema from '../schemas/user'
 const stripe = require('stripe')(config.stripeTestKey)
+const cloudinary = require('cloudinary')
+
+// config cloudinary
+cloudinary.config({
+  cloud_name: config.cloudinary.cloud_name,
+  api_key: config.cloudinary.api_key,
+  api_secret: config.cloudinary.api_secret
+})
 
 export default class User {
   /*
@@ -215,6 +223,23 @@ export default class User {
               return res.json(emailExistsError)
             }
 
+            // Check to see if we need to process an image , clean up later...
+            const saveCloudinaryPicture = new Promise((resolve, reject) => {
+              if (user.profilePicture !== req.body.profilePicture) {
+                cloudinary.uploader.upload(req.body.profilePicture, (result) => {
+                  user.profilePicture = result.secure_url
+                  resolve(true)
+                }, { public_id: user.username, invalidate: true }
+                )
+              } else if (req.body.profilePicture === '') {
+                user.profilePicture = config.defaultProfileImage
+                resolve(true)
+              } else {
+                user.profilePicture = req.body.profilePicture
+                resolve(true)
+              }
+            })
+
             /* if we reach this point, it is safe to update a user */
             /* todo: edit full object */
             // Update all of the top level values of a user object
@@ -224,7 +249,6 @@ export default class User {
             user.emailAddress = req.body.emailAddress
             user.phoneNumber = req.body.phoneNumber
             user.company = req.body.company
-            user.profilePicture = req.body.profilePicture
             user.stripeId = req.body.stripeId
             user.subscriptionItems = req.body.subscriptionItems
 
@@ -268,12 +292,14 @@ export default class User {
                 return res.json({success: true, message: config.auth.couponSuccess})
               })
             } else {
-              user.save((err) => {
-                if (err) {
-                  return res.json({success: false, message: config.auth.editError})
-                } else {
-                  return res.json({success: true, message: config.auth.editSuccess})
-                }
+              saveCloudinaryPicture.then((response) => {
+                user.save((err) => {
+                  if (err) {
+                    return res.json({success: false, message: config.auth.editError})
+                  } else {
+                    return res.json({success: true, message: config.auth.editSuccess})
+                  }
+                })
               })
             }
           })

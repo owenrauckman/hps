@@ -5,6 +5,7 @@ export default {
   numRandomResults: 12,
   sessionSecret: 'omgwutisthisgoingtobelater',
   stripeTestKey: 'sk_test_zsassPMquDTMHFtrVv4Id1dd',
+  defaultProfileImage: 'https://res.cloudinary.com/hps/image/upload/v1513970590/default_df26488a3f216bfdef5569b6c73a9338.png',
   auth: {
     loginFailed: 'login failed, please try again.',
     loginSuccess: 'Login Succeeded',
@@ -51,6 +52,11 @@ export default {
     passwordConfirmSubject: 'Your Home Party Shows Password Has Been Updated',
     success: 'successfully sent email',
     resetRootUrl: 'http://directio.herokuapp.com/reset-password'
+  },
+  cloudinary: {
+    cloud_name: 'hps',
+    api_key: '462132641153445',
+    api_secret: 'bMjjDCyB9Y9MmmVET2PJR05M8es'
   },
   stateMappings: [
     {text: 'Alabama', value: 'AL'},
