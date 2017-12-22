@@ -96,7 +96,7 @@ export const actions = {
   */
   loginUser ({ commit }, credentials) {
     return new Promise((resolve) => {
-      axios.post(`${config.api}/users/login`, credentials, { withCredentials: true })
+      axios.post(`${config.api}/auth/login`, credentials, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             commit(types.UPDATE_AUTH_STATUS, true)
@@ -120,7 +120,7 @@ export const actions = {
   */
   logoutUser ({ commit }) {
     return new Promise((resolve) => {
-      axios.get(`${config.api}/users/logout`, { withCredentials: true })
+      axios.get(`${config.api}/auth/logout`, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             commit(types.UPDATE_AUTH_STATUS, false)
@@ -142,7 +142,7 @@ export const actions = {
   */
   sendResetPasswordLink ({ state }, emailAddress) {
     return new Promise((resolve) => {
-      axios.post(`${config.api}/users/forgotPassword`, { emailAddress }, { withCredentials: true })
+      axios.post(`${config.api}/auth/forgotPassword`, { emailAddress }, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             resolve({ showError: false, showCheckEmailMessage: true })
@@ -164,7 +164,7 @@ export const actions = {
   */
   resetPassword ({ state }, credentials) {
     return new Promise((resolve) => {
-      axios.post(`${config.api}/users/resetPassword`, credentials, { withCredentials: true })
+      axios.post(`${config.api}/auth/resetPassword`, credentials, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             resolve({ status: true, showError: false })
@@ -301,7 +301,7 @@ export const actions = {
   // @param subs cription details -- fill this in later
   updateSubscriptions ({ state }) {
     return new Promise((resolve) => {
-      axios.put(`${config.api}/users/updateSubscriptions`,
+      axios.put(`${config.api}/subscriptions/updateSubscriptions`,
         { areasServed: state.user.company.areasServed,
           subscriptionDetails: state.editInfo.subscriptionDetails })
         .then((response) => {

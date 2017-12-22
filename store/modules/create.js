@@ -179,7 +179,7 @@ export const actions = {
   */
   createProfile ({ state, commit }) {
     return new Promise((resolve) => {
-      axios.post(`${config.api}/users/register`, state.signUpInfo)
+      axios.post(`${config.api}/auth/register`, state.signUpInfo)
         .then((response) => {
           if (response.data.success === true) {
             // reset the state back to default values

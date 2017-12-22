@@ -8,19 +8,19 @@
         <a class="m__menu__item" @click="routeTo('about')">
           <li class="m__menu__item__test">About</li>
         </a>
-        <a class="m__menu__item" to="/pricing" @click="routeTo('pricing')">
+        <a class="m__menu__item" @click="routeTo('pricing')">
           <li class="m__menu__item__test">Pricing</li>
         </a>
         <a class="m__menu__item" @click="logout" v-if="authStatus">
           <li class="m__menu__item__test">Log Out</li>
         </a>
-        <router-link class="m__menu__item" :to="{name: 'account'}" v-if="authStatus">
+        <a class="m__menu__item" @click="routeTo('account')"v-if="authStatus">
           <li class="m__menu__item__test">Dashboard</li>
-        </router-link>
-        <router-link class="m__menu__item" :to="{name: 'login'}" v-if="!authStatus">
+        </a>
+        <a class="m__menu__item" @click="routeTo('login')" v-if="!authStatus">
           <li class="m__menu__item__test">Log In</li>
-        </router-link>
-        <a class="m__menu__item" to="/create" v-if="!authStatus" @click="routeTo('create')">
+        </a>
+        <a class="m__menu__item" v-if="!authStatus" @click="routeTo('create')">
           <li class="m__menu__item__test">Sign Up</li>
         </a>
       </ul>

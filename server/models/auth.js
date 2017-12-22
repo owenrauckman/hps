@@ -42,91 +42,95 @@ export default class Auth {
   /*
     Register a user. Check to make sure their username/email doesn't already exist and write to DB.
     Additionally, create a stripe account (at minimum a free/basic) and add additional charges
-    @params {req, res, next} - Request Data contains user info
+    @params {req, next} - Request Data contains user info
   */
-  registerUser (req, res, err) {
-    if (!req.body.emailAddress || !req.body.password || !req.body.firstName || !req.body.lastName || !req.body.username) {
-      return res.json({ sucess: false, message: config.auth.minimumRequirements })
-    }
-    UserSchema.count({$or: [{username: req.body.username}, {emailAddress: req.body.emailAddress}]}, (err, count) => {
-      if (err) throw err
-      if (count > 0) {
-        return res.json({success: false, message: config.auth.alreadyInUse})
-      } else {
-        /* Create Stripe account, subscription, and user account */
-        let newUser = ''
-        let userObject
-
-        /* If the customer signed up with a coupon, add to the initial object */
-        /* use email to create unique stripe user */
-        if (req.body.coupon) {
-          userObject = {email: req.body.emailAddress, coupon: req.body.coupon}
+  registerUser (req, err) {
+    return new Promise((resolve, reject) => {
+      if (!req.body.emailAddress || !req.body.password || !req.body.firstName || !req.body.lastName || !req.body.username) {
+        reject(new Error({ sucess: false, message: config.auth.minimumRequirements }))
+      }
+      UserSchema.count({$or: [{username: req.body.username}, {emailAddress: req.body.emailAddress}]}, (err, count) => {
+        if (err) throw err
+        if (count > 0) {
+          reject(new Error({success: false, message: config.auth.alreadyInUse}))
         } else {
-          userObject = {email: req.body.emailAddress}
-        }
+          /* Create Stripe account, subscription, and user account */
+          let newUser = ''
+          let userObject
 
-        /* eslint-disable */
-        let customer = stripe.customers.create(userObject)
-        /* eslint-enable */
-          .then((customer, err) => {
-            if (err) {
-              return res.json({message: config.errors.stripeError})
-            }
-            newUser = new UserSchema({
-              firstName: req.body.firstName,
-              lastName: req.body.lastName,
-              username: req.body.username.replace(/ /g, ''),
-              password: req.body.password,
-              emailAddress: req.body.emailAddress,
-              company: req.body.company,
-              phoneNumber: req.body.phoneNumber,
-              profilePicture: req.body.profilePicture,
-              stripeId: customer.id
-            })
-            return customer
-          }).then((customer) => {
-          // define this stripe object up here so we can conditionally set the source
-          /* By default sign them up for all plans (quantity 0) */
-            let stripeCustomer = {
-              customer: customer.id,
-              items: [
-                { plan: 'basic', quantity: req.body.basicPlans },
-                { plan: 'pro', quantity: req.body.proPlans },
-                { plan: 'premium', quantity: req.body.premiumPlans }
-              ]
-            }
-            if (req.body.stripeToken) {
-            /* This is Generated from the stripe.js form */
-              stripeCustomer.source = req.body.stripeToken
-            }
+          /* If the customer signed up with a coupon, add to the initial object */
+          /* use email to create unique stripe user */
+          if (req.body.coupon) {
+            userObject = {email: req.body.emailAddress, coupon: req.body.coupon}
+          } else {
+            userObject = {email: req.body.emailAddress}
+          }
 
-            stripe.subscriptions.create(stripeCustomer).then((subscription, err) => {
+          /* eslint-disable */
+          let customer = stripe.customers.create(userObject)
+          /* eslint-enable */
+            .then((customer, err) => {
               if (err) {
-                return res.json({message: config.errors.stripeError})
+                reject(new Error({message: config.errors.stripeError}))
+              }
+              newUser = new UserSchema({
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                username: req.body.username.replace(/ /g, ''),
+                password: req.body.password,
+                emailAddress: req.body.emailAddress,
+                company: req.body.company,
+                phoneNumber: req.body.phoneNumber,
+                profilePicture: req.body.profilePicture,
+                stripeId: customer.id
+              })
+              return customer
+            }).then((customer) => {
+            // define this stripe object up here so we can conditionally set the source
+            /* By default sign them up for all plans (quantity 0) */
+              let stripeCustomer = {
+                customer: customer.id,
+                items: [
+                  { plan: 'basic', quantity: req.body.basicPlans },
+                  { plan: 'pro', quantity: req.body.proPlans },
+                  { plan: 'premium', quantity: req.body.premiumPlans }
+                ]
+              }
+              if (req.body.stripeToken) {
+              /* This is Generated from the stripe.js form */
+                stripeCustomer.source = req.body.stripeToken
               }
 
-              let subscriptionItems = []
-              for (let item of subscription.items.data) {
-                subscriptionItems.push(item)
-              }
-
-              newUser.subscriptionItems = subscriptionItems
-              /* real quick add the subscription ID before creating the user */
-              newUser.subscriptionId = subscription.id
-
-              User.createUser(newUser, (err, user) => {
-              /* 1100 handles duplicate keys */
-                if (err && err.code !== 11000) {
-                  return res.json({success: false, message: config.auth.generalError})
-                } else if (err && err.code === 11000) {
-                  return res.json({success: false, message: config.auth.alreadyInUse})
-                } else {
-                  return res.json({success: true, message: `${config.auth.registerThanks} ${newUser.firstName}`, user: newUser})
+              stripe.subscriptions.create(stripeCustomer).then((subscription, err) => {
+                if (err) {
+                  reject(new Error({message: config.errors.stripeError}))
                 }
+
+                let subscriptionItems = []
+                for (let item of subscription.items.data) {
+                  subscriptionItems.push(item)
+                }
+
+                newUser.subscriptionItems = subscriptionItems
+                /* real quick add the subscription ID before creating the user */
+                newUser.subscriptionId = subscription.id
+
+                User.createUser(newUser, (err, user) => {
+                /* 1100 handles duplicate keys */
+                  if (err && err.code !== 11000) {
+                    reject(new Error({success: false, message: config.auth.generalError}))
+                  } else if (err && err.code === 11000) {
+                    reject(new Error({success: false, message: config.auth.alreadyInUse}))
+                  } else {
+                    resolve({success: true, message: `${config.auth.registerThanks} ${newUser.firstName}`, user: newUser})
+                  }
+                })
               })
             })
-          })
-      }
+        }
+      })
+    }).catch((err) => {
+      return {success: false, message: err}
     })
   }
 

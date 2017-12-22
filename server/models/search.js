@@ -1,5 +1,4 @@
 import config from '../config'
-import zipcodes from 'zipcodes'
 import cities from 'cities'
 import User from '../schemas/user'
 import Company from '../schemas/company'
@@ -7,7 +6,7 @@ import Company from '../schemas/company'
 export default class SearchModel {
   /*
     The main search function that builds the MongoDB query
-    @param {string} - The URL params: zipCode, city, state, company, industry
+    @param {string} - The URL params: city, state, company, industry
   */
   search (params) {
     return new Promise((resolve, reject) => {
@@ -95,6 +94,8 @@ export default class SearchModel {
             })
         })
       }
+    }).catch((err) => {
+      return {success: false, message: err}
     })
   }
 
@@ -171,7 +172,7 @@ export default class SearchModel {
 
   /*
     The main search function that builds the MongoDB query
-    @param {string} - The URL params: zipCode, city, state, company, industry
+    @param {string} - The URL params: city, state, company, industry
   */
   searchPremium () {
     return new Promise((resolve, reject) => {
@@ -190,6 +191,8 @@ export default class SearchModel {
             query: { state: '', city: '', company: '' }
           })
         })
+    }).catch((err) => {
+      return {success: false, message: err}
     })
   }
 
@@ -226,6 +229,8 @@ export default class SearchModel {
             }
           }
         )
+      }).catch((err) => {
+        return {success: false, message: err}
       })
     } else {
       premiumQuery = [
@@ -248,6 +253,8 @@ export default class SearchModel {
             }
           }
         )
+      }).catch((err) => {
+        return {success: false, message: err}
       })
     }
   }
@@ -271,6 +278,8 @@ export default class SearchModel {
           resolve(companyNames)
         }
       })
+    }).catch((err) => {
+      return {success: false, message: err}
     })
   }
 
@@ -291,6 +300,8 @@ export default class SearchModel {
           resolve(companyNames)
         }
       })
+    }).catch((err) => {
+      return {success: false, message: err}
     })
   }
 
@@ -315,6 +326,8 @@ export default class SearchModel {
           resolve(industryNames)
         }
       })
+    }).catch((err) => {
+      return {success: false, message: err}
     })
   }
 
@@ -327,7 +340,6 @@ export default class SearchModel {
     let citiesList = []
     for (let city in citiesInState) {
       let cityName = citiesInState[city].city
-      // make sure the city has a name (some results from npm module have letters in zip)
       if (cityName !== '' && !citiesList.includes(cityName)) {
         citiesList.push(cityName)
       }
@@ -339,70 +351,6 @@ export default class SearchModel {
     Returns a list of the 50 U.S. States
   */
   getStates () {
-    return [
-      {text: 'Alabama', value: 'AL'},
-      {text: 'Alaska', value: 'AK'},
-      {text: 'Arizona', value: 'AZ'},
-      {text: 'Arkansas', value: 'AR'},
-      {text: 'California', value: 'CA'},
-      {text: 'Colorado', value: 'CO'},
-      {text: 'Connecticut', value: 'CT'},
-      {text: 'Delaware', value: 'DE'},
-      {text: 'Florida', value: 'FL'},
-      {text: 'Georgia', value: 'GA'},
-      {text: 'Hawaii', value: 'HI'},
-      {text: 'Idaho', value: 'ID'},
-      {text: 'Illinois', value: 'IL'},
-      {text: 'Indiana', value: 'IN'},
-      {text: 'Iowa', value: 'IA'},
-      {text: 'Kansas', value: 'KS'},
-      {text: 'Kentucky', value: 'KY'},
-      {text: 'Louisiana', value: 'LA'},
-      {text: 'Maine', value: 'ME'},
-      {text: 'Maryland', value: 'MD'},
-      {text: 'Massachusetts', value: 'MA'},
-      {text: 'Michigan', value: 'MI'},
-      {text: 'Minnesota', value: 'MN'},
-      {text: 'Mississippi', value: 'MS'},
-      {text: 'Missouri', value: 'MO'},
-      {text: 'Montana', value: 'MT'},
-      {text: 'Nebraska', value: 'NE'},
-      {text: 'Nevada', value: 'NV'},
-      {text: 'New Hampshire', value: 'NH'},
-      {text: 'New Jersey', value: 'NJ'},
-      {text: 'New Mexico', value: 'NM'},
-      {text: 'New York', value: 'NY'},
-      {text: 'North Carolina', value: 'NC'},
-      {text: 'North Dakota', value: 'ND'},
-      {text: 'Ohio', value: 'OH'},
-      {text: 'Oklahoma', value: 'OK'},
-      {text: 'Oregon', value: 'OR'},
-      {text: 'Pennsylvania', value: 'PA'},
-      {text: 'Rhode Island', value: 'RI'},
-      {text: 'South Carolina', value: 'SC'},
-      {text: 'South Dakota', value: 'SD'},
-      {text: 'Tennessee', value: 'TN'},
-      {text: 'Texas', value: 'TX'},
-      {text: 'Utah', value: 'UT'},
-      {text: 'Vermont', value: 'VT'},
-      {text: 'Virginia', value: 'VA'},
-      {text: 'Washington', value: 'WA'},
-      {text: 'West Virginia', value: 'WV'},
-      {text: 'Wisconsin', value: 'WI'},
-      {text: 'Wyoming', value: 'WY'}
-    ]
-  }
-
-  /*
-    Returns a list of zip codes in a city
-    @params {string} - the URL param of city, state are required
-  */
-  getZipCodesByCity (params) {
-    let getZips = zipcodes.lookupByName(params.city, params.state)
-    let zipsInCity = []
-    for (let city of getZips) {
-      zipsInCity.push(parseInt(city.zip))
-    }
-    return zipsInCity
+    return config.stateMappings
   }
 }
