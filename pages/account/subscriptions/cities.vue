@@ -26,7 +26,7 @@
 
       <div class="m__create__navigation">
         <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('states')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
-        <button class="m__create__button" @click="submit" v-scroll-to="{element: '.m__header', duration: 1000}">Save</button>
+        <button class="m__create__button" @click="updateAreasServed" v-scroll-to="{element: '.m__header', duration: 1000}">Save</button>
       </div>
 
       <!-- snackbar -->
@@ -85,7 +85,7 @@ export default{
     }
   },
   methods: {
-    ...mapMutations([types.UPDATE_EDIT_PROGRESS_BAR, types.UPDATE_EDIT_INFO]),
+    ...mapMutations([types.UPDATE_EDIT_PROGRESS_BAR, types.UPDATE_EDIT_INFO, types.UPDATE_USER_AREAS]),
     ...mapActions(['checkAuth', 'fetchCities', 'generateAccountCities', 'updateUser']),
 
     /*
@@ -93,6 +93,44 @@ export default{
     */
     toggleState (state) {
       this.selectedState = state.abbr
+    },
+
+    /*
+    Updates the global store with all of the cities (selected or not)
+    and redirects to payment page next
+  */
+    updateAreasServed () {
+      const areasServed = []
+      /*
+      perform this inside of a promise to ensure that the
+      object populates before redirect
+    */
+      const setCompanies = new Promise((resolve) => {
+        this.editInfo.states.forEach((state) => {
+          const cities = []
+          this.editInfo.cities.forEach((city) => {
+            if (city.state === state) {
+              cities.push({
+                city: city.city,
+                ownsPremium: false
+              })
+            }
+          })
+          /* Finally, push each new item to the array */
+          areasServed.push({
+            state: state,
+            ownsPremium: false,
+            cities
+          })
+        })
+        // commit directly back to store.
+        this.UPDATE_USER_AREAS(areasServed)
+        resolve(areasServed)
+      })
+      // Update the store with final info before payment.
+      setCompanies.then(() => {
+        this.submit()
+      })
     },
 
     submit () {

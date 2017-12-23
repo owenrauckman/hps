@@ -26,6 +26,7 @@
       ></v-text-field>
 
       <div class="m__create__navigation">
+        <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('/account')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
         <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
       </div>
 

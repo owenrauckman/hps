@@ -252,6 +252,7 @@ export default class User {
             user.company = req.body.company
             user.stripeId = req.body.stripeId
             user.subscriptionItems = req.body.subscriptionItems
+            console.log(req.body.company.areasServed)
 
             /* Only update this section if they are updating their subscriptions */
 
@@ -283,26 +284,15 @@ export default class User {
             //   }
             // }
             /* If The User Applies a discount code, apply it here */
-            if (req.body.coupon) {
-              stripe.customers.update(user.stripeId, {
-                coupon: req.body.coupon
-              }, (err, customer) => {
+            saveCloudinaryPicture.then((response) => {
+              user.save((err) => {
                 if (err) {
-                  return res.json({success: false, message: config.auth.couponFailure})
+                  return res.json({success: false, message: config.auth.editError})
+                } else {
+                  return res.json({success: true, message: config.auth.editSuccess})
                 }
-                return res.json({success: true, message: config.auth.couponSuccess})
               })
-            } else {
-              saveCloudinaryPicture.then((response) => {
-                user.save((err) => {
-                  if (err) {
-                    return res.json({success: false, message: config.auth.editError})
-                  } else {
-                    return res.json({success: true, message: config.auth.editSuccess})
-                  }
-                })
-              })
-            }
+            })
           })
         })
       })

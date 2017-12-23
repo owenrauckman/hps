@@ -186,6 +186,7 @@ export const actions = {
   */
   updateUser ({ state, commit }, user) {
     return new Promise((resolve, reject) => {
+      console.log(user)
       axios.put(`${config.api}/users/edit/${user.username}`, user, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {

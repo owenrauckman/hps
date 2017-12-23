@@ -25,12 +25,9 @@
       ></v-select>
     </div>
 
-    <!-- tood active class based on value of selected chip above -->
-
-
     <div class="m__create__navigation">
       <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('select-company-and-states')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
-      <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
+      <button class="m__create__button" @click="updateAreasServed()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
     </div>
 
   </div>
@@ -70,6 +67,44 @@ export default {
     */
     toggleState (state) {
       this.selectedState = state.value
+    },
+
+    /*
+    Updates the global store with all of the cities (selected or not)
+    and redirects to payment page next
+  */
+    updateAreasServed () {
+      const areasServed = []
+      /*
+      perform this inside of a promise to ensure that the
+      object populates before redirect
+    */
+      const setCompanies = new Promise((resolve) => {
+        this.selectedStates.forEach((state) => {
+          const cities = []
+          this.selectedCities.forEach((city) => {
+            if (city.state === state.value) {
+              cities.push({
+                city: city.city,
+                ownsPremium: false
+              })
+            }
+          })
+          /* Finally, push each new item to the array */
+          areasServed.push({
+            state: state.value,
+            ownsPremium: false,
+            cities
+          })
+        })
+        // commit directly back to store.
+        this.UPDATE_SIGN_UP_INFO({ type: 'AREAS_SERVED', value: areasServed })
+        resolve(areasServed)
+      })
+      // Update the store with final info before payment.
+      setCompanies.then(() => {
+        this.submit()
+      })
     },
 
     /*

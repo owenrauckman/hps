@@ -23,12 +23,8 @@
           <p class="d__options__card__copy">Edit your basic information such as name, email address, phone number, about, and links</p>
         </router-link>
         <router-link class="d__options__card" to="/account/subscriptions">
-          <h2 class="d__options__card__heading">Locations/Subscriptions</h2>
-          <p class="d__options__card__copy">Update the cities and states that you are listed in. Add or remove your premium status for listings.</p>
-        </router-link>
-        <router-link class="d__options__card" to="/account/billing">
-          <h2 class="d__options__card__heading">Billing</h2>
-          <p class="d__options__card__copy">View your billing history, current payment information, update your payment information, or apply a coupon code.</p>
+          <h2 class="d__options__card__heading">Locations</h2>
+          <p class="d__options__card__copy">Update the cities and states that you are listed in.</p>
         </router-link>
         <router-link class="d__options__card" to="/account/password">
           <h2 class="d__options__card__heading">Password</h2>
