@@ -26,7 +26,6 @@
       ></v-text-field>
 
       <div class="m__create__navigation">
-        <p class="m__create__navigation__rate">Your current monthly fee is {{userCurrentFee}}</p>
         <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
       </div>
 
@@ -41,7 +40,7 @@ import { mapMutations, mapActions, mapGetters } from 'vuex'
 export default{
   beforeMount () {
     // update the progress bar
-    this.UPDATE_EDIT_PROGRESS_BAR(25 * 1)
+    this.UPDATE_EDIT_PROGRESS_BAR(50 * 1)
 
     // Grab the user
     this.checkAuth().then((response) => {
@@ -54,7 +53,7 @@ export default{
     })
   },
   computed: {
-    ...mapGetters(['userCurrentFee', 'user', 'possibleEditStates', 'editInfo']),
+    ...mapGetters(['user', 'possibleEditStates', 'editInfo']),
     selectedStates: {
       get () { return this.editInfo.states },
       set (states) { this.UPDATE_EDIT_INFO({ type: 'STATES', value: states }) }

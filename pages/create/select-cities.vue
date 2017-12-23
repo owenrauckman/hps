@@ -29,7 +29,6 @@
 
 
     <div class="m__create__navigation">
-      <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p>
       <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('select-company-and-states')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
       <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
     </div>
@@ -47,7 +46,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentFee', 'signUpInfo', 'signUpCities', 'signUpSelectedState']),
+    ...mapGetters(['signUpInfo', 'signUpCities', 'signUpSelectedState']),
     selectedStates () {
       return this.signUpInfo.states
     },
@@ -84,7 +83,7 @@ export default {
     this.generateCities()
   },
   mounted () {
-    this.UPDATE_PROGRESS_BAR(16.667 * 2)
+    this.UPDATE_PROGRESS_BAR(20 * 2)
   }
 }
 </script>

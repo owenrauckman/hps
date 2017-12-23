@@ -6,17 +6,20 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
+import * as types from '@/store/mutationTypes'
 
 export default {
-  data () {
-    return {
-    }
+  mounted () {
+    this.UPDATE_PROGRESS_BAR(100)
   },
   computed: {
     ...mapGetters({
       progressBar: 'progressBar'
     })
+  },
+  methods: {
+    ...mapMutations([types.UPDATE_PROGRESS_BAR])
   }
 }
 </script>

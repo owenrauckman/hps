@@ -47,7 +47,6 @@
     ></v-text-field>
 
     <div class="m__create__navigation">
-      <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p>
       <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
     </div>
 
@@ -64,7 +63,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentFee', 'signUpInfo', 'companies', 'signUpStates']),
+    ...mapGetters(['signUpInfo', 'companies', 'signUpStates']),
     selectedCompany: {
       get () { return this.signUpInfo.company.name },
       set (company) { this.UPDATE_SIGN_UP_INFO({ type: 'COMPANY_NAME', value: company }) }
@@ -93,7 +92,7 @@ export default {
     this.fetchCompanies()
   },
   mounted () {
-    this.UPDATE_PROGRESS_BAR(16.667)
+    this.UPDATE_PROGRESS_BAR(20)
   }
 }
 </script>

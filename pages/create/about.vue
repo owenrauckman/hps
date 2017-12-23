@@ -40,9 +40,8 @@
 
 
     <div class="m__create__navigation">
-      <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p>
       <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('account')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
-      <button class="m__create__button" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
+      <button class="m__create__button m__create__about__create" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Create Profile</button>
     </div>
 
   </div>
@@ -50,7 +49,7 @@
 
 <script>
 import * as types from '@/store/mutationTypes'
-import { mapMutations, mapGetters } from 'vuex'
+import { mapMutations, mapGetters, mapActions } from 'vuex'
 
 export default {
   data () {
@@ -58,7 +57,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentFee', 'signUpInfo']),
+    ...mapGetters(['signUpInfo']),
 
     aboutMe: {
       get () { return this.signUpInfo.company.aboutMe },
@@ -95,15 +94,20 @@ export default {
   },
   methods: {
     ...mapMutations([types.UPDATE_PROGRESS_BAR, types.UPDATE_SIGN_UP_INFO]),
-    /*
-      Performs validation before continuing
-    */
+    ...mapActions(['createProfile']),
     submit () {
-      this.$router.push('/create/premium')
+      this.createProfile().then((success) => {
+        if (success) {
+          this.$router.push('/create/success')
+        }
+        // todo flash message error
+      }).catch(() => {
+        this.showError = true
+      })
     }
   },
   mounted () {
-    this.UPDATE_PROGRESS_BAR(16.667 * 4)
+    this.UPDATE_PROGRESS_BAR(20 * 4)
   }
 }
 </script>
@@ -123,6 +127,9 @@ export default {
   &--full{
     margin: 0 1rem;
     width: calc(100% - 2rem);
+  }
+  &__create{
+    max-width: 180px;
   }
 }
 </style>

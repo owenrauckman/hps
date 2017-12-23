@@ -25,10 +25,20 @@
       </div>
 
       <div class="m__create__navigation">
-        <p class="m__create__navigation__rate">Your current monthly fee is {{userCurrentFee}}</p>
         <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('states')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
-        <button class="m__create__button" @click="()=>{$router.push('premium')}" v-scroll-to="{element: '.m__header', duration: 1000}">Continue</button>
+        <button class="m__create__button" @click="submit" v-scroll-to="{element: '.m__header', duration: 1000}">Save</button>
       </div>
+
+      <!-- snackbar -->
+      <v-snackbar
+        :timeout="snackbarTimeout"
+        :color="snackbarColor"
+        :multi-line="true"
+        v-model="showSnackbar"
+      >
+        {{ snackbarText }}
+        <v-btn dark flat @click.native="showSnackbar = false">Close</v-btn>
+      </v-snackbar>
 
     </div>
   </div>
@@ -42,7 +52,7 @@ import { mapMutations, mapActions, mapGetters } from 'vuex'
 export default{
   beforeMount () {
     // update the progress bar
-    this.UPDATE_EDIT_PROGRESS_BAR(25 * 2)
+    this.UPDATE_EDIT_PROGRESS_BAR(50 * 2)
 
     // Grab the user
     this.checkAuth().then((response) => {
@@ -55,11 +65,16 @@ export default{
   },
   data () {
     return {
-      config
+      config,
+      showSnackbar: false,
+      snackbarTimeout: 6000,
+      snackbarColor: 'pink lighten-1',
+      snackbarText: 'success',
+      snackbarSuccess: false
     }
   },
   computed: {
-    ...mapGetters(['user', 'signUpCities', 'editInfo', 'possibleEditCities', 'userCurrentFee']),
+    ...mapGetters(['user', 'signUpCities', 'editInfo', 'possibleEditCities']),
     selectedCities: {
       get () { return this.editInfo.cities },
       set (cities) { this.UPDATE_EDIT_INFO({ type: 'CITIES', value: cities }) }
@@ -71,7 +86,7 @@ export default{
   },
   methods: {
     ...mapMutations([types.UPDATE_EDIT_PROGRESS_BAR, types.UPDATE_EDIT_INFO]),
-    ...mapActions(['checkAuth', 'fetchCities', 'generateAccountCities']),
+    ...mapActions(['checkAuth', 'fetchCities', 'generateAccountCities', 'updateUser']),
 
     /*
       Toggles the cities for a given state
@@ -80,14 +95,19 @@ export default{
       this.selectedState = state.abbr
     },
 
-    /*
-      Performs validation before continuing
-    */
     submit () {
-      this.$validator.validateAll().then((isValid) => {
-        if (isValid) {
-          this.$router.push('/account/subscriptions/cities')
+      this.updateUser(this.user).then((success) => {
+        if (success) {
+          this.showSnackbar = true
+          this.snackbarSuccess = success.status
+          this.snackbarText = success.message
+          this.snackbarColor = 'success'
         }
+      }).catch((err) => {
+        this.showSnackbar = true
+        this.snackbarSuccess = err.status
+        this.snackbarText = err.message
+        this.snackbarColor = 'pink lighten-1'
       })
     }
   }

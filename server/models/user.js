@@ -226,6 +226,7 @@ export default class User {
             // Check to see if we need to process an image , clean up later...
             const saveCloudinaryPicture = new Promise((resolve, reject) => {
               if (user.profilePicture !== req.body.profilePicture) {
+                console.log('saving to cloudinary')
                 cloudinary.uploader.upload(req.body.profilePicture, (result) => {
                   user.profilePicture = result.secure_url
                   resolve(true)

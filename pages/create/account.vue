@@ -112,7 +112,6 @@
 
 
     <div class="m__create__navigation">
-      <p class="m__create__navigation__rate">Your monthly fee is {{currentFee}}</p>
 
       <!-- these validations are only for this page -->
       <p class="m__create__account__error" v-if="usernameTaken">The username you selected is already in use. Please choose another one.</p>
@@ -141,7 +140,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentFee', 'signUpInfo']),
+    ...mapGetters(['signUpInfo']),
     firstName: {
       get () { return this.signUpInfo.firstName },
       set (firstName) { this.UPDATE_SIGN_UP_INFO({ type: 'FIRST_NAME', value: firstName }) }
@@ -263,7 +262,7 @@ export default {
     }
   },
   mounted () {
-    this.UPDATE_PROGRESS_BAR(16.667 * 3)
+    this.UPDATE_PROGRESS_BAR(20 * 3)
   }
 }
 </script>
