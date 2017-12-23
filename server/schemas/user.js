@@ -20,12 +20,6 @@ var UserSchema = mongoose.Schema({
   phoneNumber: {
     type: String
   },
-  stripeId: {
-    type: String
-  },
-  subscriptionItems: {
-    type: Array
-  },
   profilePicture: {
     type: String
   },

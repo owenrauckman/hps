@@ -4,7 +4,6 @@ export default {
   sessionLength: 1800,
   numRandomResults: 12,
   sessionSecret: 'omgwutisthisgoingtobelater',
-  stripeTestKey: 'sk_test_zsassPMquDTMHFtrVv4Id1dd',
   defaultProfileImage: 'https://res.cloudinary.com/hps/image/upload/v1513970590/default_df26488a3f216bfdef5569b6c73a9338.png',
   auth: {
     loginFailed: 'login failed, please try again.',
@@ -36,7 +35,6 @@ export default {
   errors: {
     userDoesNotExist: 'That user does not exist',
     invalidPassword: 'Invalid password',
-    stripeError: 'Something went wrong when processing your payment. Please try again.',
     general: 'Whoops, something went wrong. Please try reloading the page.'
   },
   search: {

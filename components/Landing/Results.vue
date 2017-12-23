@@ -1,9 +1,7 @@
 <template>
   <div class="m__results">
-    <div v-if="isResults && results.data && ( results.data.users.premiumStates.length > 0 || results.data.users.premiumCities.length > 0 || results.data.users.basic.length > 0)" class="m__results-container">
-      <Card v-for="card in results.data.users.premiumStates" :key="card.plan" :options="card"/>
-      <Card v-for="card in results.data.users.premiumCities" :key="card.plan" :options="card"/>
-      <Card v-for="card in results.data.users.basic" :key="card.plan" :options="card" :class="[{ 'm__results__basic-cards--hidden': hideBasicCards }, 'm__results__basic-cards']"/>
+    <div v-if="isResults && results.data && results.data.users.length > 0" class="m__results-container">
+      <Card v-for="card in results.data.users" :key="card.plan" :options="card"/>
     </div>
     <div v-else class="results__no-results-container g__container">
       <div v-if="!loadingResults">
@@ -20,11 +18,6 @@
       <div class='m__results__loading__dot m__results__loading__dot__2'></div>
       <div class='m__results__loading__dot m__results__loading__dot__3'></div>
       <div class='m__results__loading__dot m__results__loading__dot__4'></div>
-    </div>
-
-    <!-- button to show non-premium results -->
-    <div class="m__results-container m__results-container--toggle-cards" v-if="results.data && results.data.users.basic && results.data.users.basic.length > 0">
-      <button @click="showBasic()" class="m__results-container__button">{{showCardsText}}</button>
     </div>
 
   </div>
@@ -53,7 +46,7 @@ export default {
       set () { this.$store.state.search.hideBasicCards = !this.$store.state.search.hideBasicCards }
     },
     showCardsText () {
-      return `${this.hideBasicCards ? 'View' : 'Hide'} Non-Premium Users`
+      return `${this.hideBasicCards ? 'View' : 'Hide'} More Results`
     }
   },
   methods: {

@@ -10,9 +10,7 @@
           <h1 class="p__info__name">{{user.firstName}} {{user.lastName}}</h1>
           <h2 class="p__info__company" v-if="user.company">{{user.company.name}}</h2>
         </div>
-        <div class="p__info__image" :style="{ 'background-image': `url('${user.profilePicture}')` }">
-          <div class="p__info__image--badge" v-if="ownsPremiumCity || ownsPremiumState">Premium</div>
-        </div>
+        <div class="p__info__image" :style="{ 'background-image': `url('${user.profilePicture}')` }"></div>
       </div>
     </div>
 
@@ -72,17 +70,13 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
   beforeMount () {
     this.checkAuth().then((response) => {
-      if (response.status) {
-        this.checkPremium()
-      } else {
+      if (!response.status) {
         this.$router.push('/login')
       }
     })
   },
   data () {
     return {
-      ownsPremiumCity: false,
-      ownsPremiumState: false,
       showDeleteDialog: false,
       showSnackbar: false,
       snackbarTimeout: 6000,
@@ -95,23 +89,6 @@ export default {
   },
   methods: {
     ...mapActions({ checkAuth: 'checkAuth', deleteUser: 'deleteUser' }),
-
-    /*
-      Checks to see if the premium badge should be displayed for a user.
-    */
-    checkPremium () {
-      // check to see if user owns premium city or state
-      this.user.company.areasServed.forEach((area) => {
-        if (area.ownsPremium === true) {
-          this.ownsPremiumState = true
-        }
-        area.cities.forEach((city) => {
-          if (city.ownsPremium === true) {
-            this.ownsPremiumCity = true
-          }
-        })
-      })
-    },
 
     /*
       Deletes a user's account

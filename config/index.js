@@ -19,9 +19,6 @@ export default {
     password: '',
     phoneNumber: '',
     profilePicture: defaultProfileImage,
-    basicPlans: 0,
-    proPlans: 0,
-    premiumPlans: 0,
     // company info
     company: {
       name: '',
@@ -36,8 +33,7 @@ export default {
         pinterest: '',
         youtube: ''
       }
-    },
-    stripeToken: null // will be retrieved from front end
+    }
   },
   // for mapping. if API updates, this will need to also.
   states: {

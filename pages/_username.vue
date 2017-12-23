@@ -5,9 +5,7 @@
         <h1 class="p__info__name">{{user.firstName}} {{user.lastName}}</h1>
         <h2 class="p__info__company">{{user.company.name}}</h2>
       </div>
-      <div class="p__info__image" :style="{ 'background-image': `url('${user.profilePicture}')` }">
-        <div class="p__info__image--badge" v-if="ownsPremiumCity || ownsPremiumState">Premium</div>
-      </div>
+      <div class="p__info__image" :style="{ 'background-image': `url('${user.profilePicture}')` }"></div>
     </div>
     <div class="p__connect">
       <div class="p__connect__social">
@@ -58,9 +56,7 @@ import config from '@/config'
 export default {
   data () {
     return {
-      user: {},
-      ownsPremiumCity: false,
-      ownsPremiumState: false
+      user: {}
     }
   },
   beforeMount () {
@@ -77,19 +73,8 @@ export default {
             window.location.href = '/not-found'
           } else {
             this.user = userInfo.user
-            // check to see if user owns premium city or state
-            this.user.company.areasServed.forEach((area) => {
-              if (area.ownsPremium === true) {
-                this.ownsPremiumState = true
-              }
-              area.cities.forEach((city) => {
-                if (city.ownsPremium === true) {
-                  this.ownsPremiumCity = true
-                }
-              })
-            })
             // set the title of the page to the user's name
-            document.title = `Home Party Shows | ${this.user.firstName} ${this.user.lastName}`
+            document.title = `Directio | ${this.user.firstName} ${this.user.lastName}`
           }
         })
       })

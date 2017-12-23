@@ -51,18 +51,8 @@ export const mutations = {
         state.signUpInfo.company.links.pinterest = info.value; break
       case 'COMPANY_YOUTUBE':
         state.signUpInfo.company.links.youtube = info.value; break
-      case 'CURRENT_FEE':
-        state.signUpInfo.currentFee = info.value; break
       case 'AREAS_SERVED':
         state.signUpInfo.company.areasServed = info.value; break
-      case 'BASIC_PLANS':
-        state.signUpInfo.basicPlans = info.value; break
-      case 'PRO_PLANS':
-        state.signUpInfo.proPlans = info.value; break
-      case 'PREMIUM_PLANS':
-        state.signUpInfo.premiumPlans = info.value; break
-      case 'STRIPE_TOKEN':
-        state.signUpInfo.stripeToken = info.value; break
       case 'RESET':
         state.signUpInfo = info.value; break
       default:

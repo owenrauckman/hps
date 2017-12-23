@@ -1,11 +1,10 @@
 <template>
-  <router-link :to="options.username" :class="['card', { 'card--purple': ownsPremiumState }]">
+  <router-link :to="options.username" class="card">
     <div class="card__image" :style="{ 'background-image': `url('${options.profilePicture}')` }"></div>
     <div class="card__info">
       <h2 class="card__info__name">{{options.firstName}} {{options.lastName}}</h2>
       <h3 class="card__info__company">{{options.company.name}}</h3>
     </div>
-    <div v-if="ownsPremiumState || ownsPremiumCity" class="card__verified"></div>
   </router-link>
 </template>
 
@@ -14,46 +13,14 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'card',
-  data () {
-    return {
-      ownsPremiumState: false,
-      ownsPremiumCity: false
-    }
-  },
   props: ['options'],
   computed: {
     ...mapGetters(['loadingResults', 'results', 'isResults', 'hideBasicCards'])
   },
   methods: {
-    /*
-      Checks for premium/premium type before mount and sets accordingly.
-    */
-    checkForPremium () {
-      this.options.company.areasServed.forEach((area) => {
-        /*
-          checks for premium states
-          (checks for === '' for the home page since only premium shows)
-        */
-        if ((this.results.data.query.state === area.state && area.ownsPremium) || (this.results.data.query.state === '')) {
-          this.ownsPremiumState = true
-        }
-        /* checks for premium cities */
-        area.cities.forEach((city) => {
-          if (this.results.data.query.city === city.city &&
-            this.results.data.query.state === area.state &&
-            city.ownsPremium) {
-            this.ownsPremiumCity = true
-          } else if (city.ownsPremium && this.results.data.query.city === '' && area.state === this.results.data.query.state) {
-            /* if they only search for state, we at least want the badge ^^ and city in state? */
-            this.ownsPremiumCity = true
-          }
-        })
-      })
-    }
-  },
-  beforeMount () {
-    this.checkForPremium()
+
   }
+
 }
 </script>
 

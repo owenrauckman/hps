@@ -111,9 +111,7 @@ export const actions = {
       /* check if there are users returned */
       if (users.data.users === undefined) {
         throw new Error('whoops, no users were returned')
-      } else if (users.data.users.premiumStates.length > 0 ||
-           users.data.users.premiumCities.length > 0 ||
-           users.data.users.basic.length > 0) {
+      } else if (users.data.users.length > 0) {
         state.isResults = true
       }
       state.loadingResults = false

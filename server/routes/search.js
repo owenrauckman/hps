@@ -30,8 +30,4 @@ router.get('/premium', async (req, res) => {
   res.send(await Search.searchPremium())
 })
 
-router.get('/checkPremium', async (req, res) => {
-  res.send(await Search.checkForPremium(req.query))
-})
-
 export default router

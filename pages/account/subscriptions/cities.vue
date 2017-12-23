@@ -25,7 +25,7 @@
       </div>
 
       <div class="m__create__navigation">
-        <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('states')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
+        <button class="m__create__button m__create__button--ghost" style="align-self: flex-start;" @click="()=>{$router.push('/account')}" v-scroll-to="{element: '.m__header', duration: 1000}">Dashboard</button>
         <button class="m__create__button" @click="updateAreasServed" v-scroll-to="{element: '.m__header', duration: 1000}">Save</button>
       </div>
 

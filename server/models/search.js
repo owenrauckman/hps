@@ -10,75 +10,30 @@ export default class SearchModel {
   */
   search (params) {
     return new Promise((resolve, reject) => {
-      let searchParameters = [] // add the mongo query to this array
+      this.checkCompanyOrIndustry(params, [], []).then((response) => {
+        let searchParameters = response.searchParameters
+        let companyList = response.companyList
 
-      if (params.city && params.state) {
-        searchParameters.push({ 'company.areasServed.cities': { $elemMatch: { city: { $regex: params.city, $options: 'i' } } } })
-      } else if (params.state) {
-        searchParameters.push({ 'company.areasServed': { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } })
-      } else if (params.city) {
-        resolve({err: config.defineCity})
-      } else {
-        resolve({err: config.defineLocation})
-      }
-      if (params.company) { searchParameters.push({ 'company.name': { $regex: params.company, $options: 'i' } }) }
-
-      /*
-        If the user searches by industry we will need to relate the company back to the industry doc
-        (aggregate) is a duplicate of the one below, will need to refactor late to be DRY
-      */
-      if (params.industry) {
-        let companyList = [] // define up here first
-        this.getCompaniesByIndustry(params.industry).then((companies) => {
-          searchParameters.push({ 'company.name': {$in: companies} })
-          companyList = companies
-        }).then((companies) => {
-          /* Set a number of users, and get the count to use in aggregate for random sorting */
-          User.count({ $or: [{ $and: searchParameters }, {$and: [{'company.areasServed.ownsPremium': true}, { 'company.areasServed': { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }, { 'company.name': {$in: companyList} }]}] }, (err, users, userCount) => {
-            if (err) {
-              throw new Error(err, err.message)
-            }
-          }).then((userCount, companies) => {
-            User.aggregate(
-              { $match: { $or: [{ $and: searchParameters }, {$and: [{'company.areasServed.ownsPremium': true}, { 'company.areasServed': { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }, { 'company.name': {$in: companyList} }]}] } },
-              { $sample: { size: userCount } },
-              { $sort: { 'company.areasServed.ownsPremium': -1 } },
-              { $sort: { 'company.areasServed.cities.ownsPremium': -1 } },
-              (err, users) => {
-                if (err) {
-                  throw new Error(err, err.message)
-                }
-                resolve({
-                  users: this.sortUsers(users, params),
-                  query: {
-                    state: params.state,
-                    city: params.city,
-                    company: companies
-                  }
-                })
-              })
-          })
-        })
-      } else {
-        /* Else, no promise to check for companies, just execute the query, todo: refactor DRY */
-        /* FYI this whole query thing is disgusting, will need to refactor in the future */
-        let finalQuery = { $or: [{ $and: searchParameters }, {$and: [{'company.areasServed.ownsPremium': true}, { 'company.areasServed': { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }]}] }
-        /* double check for company if chosen */
-        if (params.company) {
-          finalQuery = { $or: [{ $and: searchParameters }, {$and: [{'company.areasServed.ownsPremium': true}, { 'company.areasServed': { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }, { 'company.name': { $regex: params.company, $options: 'i' } }]}] }
+        if (params.city && params.state) {
+          searchParameters.push({ 'company.areasServed.cities': { $elemMatch: { city: { $regex: params.city, $options: 'i' } } } })
+        } else if (params.state) {
+          searchParameters.push({ 'company.areasServed': { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } })
+        } else if (params.city) {
+          resolve({err: config.defineCity})
+        } else {
+          resolve({err: config.defineLocation})
         }
+        if (params.company) { searchParameters.push({ 'company.name': { $regex: params.company, $options: 'i' } }) }
+
         /* Set a number of users, and get the count to use in aggregate for random sorting */
-        /* We are checking for the search params ***OR just premium state owners with no company/industry */
-        User.count(finalQuery, (err, users, userCount) => {
+        User.count({ $or: [{ $and: searchParameters }, {$and: [{ 'company.areasServed': { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }, { 'company.name': {$in: companyList} }]}] }, (err, users, userCount) => {
           if (err) {
             throw new Error(err, err.message)
           }
-        }).then((userCount) => {
+        }).then((userCount, companies) => {
           User.aggregate(
-            { $match: finalQuery },
+            { $match: { $or: [{ $and: searchParameters }, {$and: [{ 'company.areasServed': { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }, { 'company.name': {$in: companyList} }]}] } },
             { $sample: { size: userCount } },
-            { $sort: { 'company.areasServed.ownsPremium': -1 } },
-            { $sort: { 'company.areasServed.cities.ownsPremium': -1 } },
             (err, users) => {
               if (err) {
                 throw new Error(err, err.message)
@@ -88,14 +43,40 @@ export default class SearchModel {
                 query: {
                   state: params.state,
                   city: params.city,
-                  company: params.company
+                  company: companies
                 }
               })
             })
         })
-      }
+      })
     }).catch((err) => {
       return {success: false, message: err}
+    })
+  }
+
+  /*
+    Checks to see if we need to add company or industry to the query.
+    This has to be in a promise since getCompaniesByInudstry requires API request
+    @param params {object} - request params from the search query
+    @param {array} searchParameters (empty)
+    @param {array} companyList (empty)
+  */
+  checkCompanyOrIndustry (params, searchParameters, companyList) {
+    return new Promise((resolve, reject) => {
+      if (params.industry) {
+        this.getCompaniesByIndustry(params.industry).then((companies) => {
+          searchParameters.push({ 'company.name': {$in: companies} })
+          companyList = companies
+          resolve({searchParameters, companyList})
+        })
+      } else if (params.company) {
+        searchParameters.push({ 'company.name': { $regex: params.company, $options: 'i' } })
+        resolve({searchParameters, companyList})
+      } else {
+        resolve({searchParameters, companyList})
+      }
+    }).catch((err) => {
+      throw new Error(err)
     })
   }
 
@@ -125,49 +106,12 @@ export default class SearchModel {
   }
 
   /*
-    Breaks apart the returned data from the mongo query and sorts based on membership type
+    Shuffles users and returns them
     @param {array} - list of users from mongo query
     @param {array} - the params from the request
   */
   sortUsers (users, params) {
-    let states = []
-    let cities = []
-    let base = []
-
-    users.forEach((user) => {
-      /* check states first */
-      user.company.areasServed.forEach((area) => {
-        if (area.ownsPremium === true && area.state === params.state) {
-          if (!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)) {
-            states.push(user)
-          }
-        }
-        /* check cities next */
-        area.cities.forEach((city) => {
-          if (city.ownsPremium === true && city.city === params.city) {
-            if (!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user)) {
-              cities.push(user)
-            }
-          }
-
-          /* otherwise, after the loops finish push into the base array (assuming the city matches) */
-          if (!this.userExists(states, user) && !this.userExists(cities, user) && !this.userExists(base, user) && city.city === params.city) {
-            base.push(user)
-          }
-        })
-      })
-    })
-
-    /* Shuffle the arrays */
-    states = this.shuffleArray(states)
-    cities = this.shuffleArray(cities)
-    base = this.shuffleArray(base)
-
-    return {
-      premiumStates: states,
-      premiumCities: cities,
-      basic: base
-    }
+    return this.shuffleArray(users)
   }
 
   /*
@@ -177,7 +121,6 @@ export default class SearchModel {
   searchPremium () {
     return new Promise((resolve, reject) => {
       User.aggregate(
-        { $match: { 'company.areasServed.ownsPremium': true } },
         { $sample: { size: config.numRandomResults } },
         (err, users) => {
           if (err) {
@@ -185,78 +128,13 @@ export default class SearchModel {
           }
 
           resolve({
-            users: {
-              premiumStates: users
-            },
+            users,
             query: { state: '', city: '', company: '' }
           })
         })
     }).catch((err) => {
       return {success: false, message: err}
     })
-  }
-
-  /*
-    Checks to see if premium city/state listings are taken for a given company based on the following criteria.
-    Mongo Aggregate unpacks each item in array to get the exact truthy value
-    @params {string} - company
-    @params {string} - state
-    @params {string} - city
-  */
-  checkForPremium (params) {
-    let premiumQuery
-    /* run a different query and unwind an extra array if searching by city */
-    if (params.city) {
-      // todo ON BOTH QUERIES remove regex for cities, companies, states to ensure no faulty listings
-      premiumQuery = [
-        { 'company.areasServed.state': params.state },
-        { 'company.areasServed.cities': { $elemMatch: { city: { $regex: params.city, $options: 'i' }, ownsPremium: true } } },
-        { 'company.name': { $regex: params.company, $options: 'i' } }
-      ]
-      return new Promise((resolve, reject) => {
-        User.aggregate(
-          { $match: { $and: premiumQuery } },
-          { $unwind: '$company.areasServed' },
-          { $unwind: '$company.areasServed.cities' },
-          (err, users) => {
-            if (err) {
-              throw new Error(err, err.message)
-            }
-            if (users && users.length > 0) {
-              resolve({premiumAvailable: false})
-            } else {
-              resolve({premiumAvailable: true})
-            }
-          }
-        )
-      }).catch((err) => {
-        return {success: false, message: err}
-      })
-    } else {
-      premiumQuery = [
-        {'company.areasServed.ownsPremium': true},
-        { 'company.areasServed.state': params.state },
-        { 'company.name': { $regex: params.company, $options: 'i' } }
-      ]
-      return new Promise((resolve, reject) => {
-        User.aggregate(
-          { $unwind: '$company.areasServed' },
-          { $match: { $and: premiumQuery } },
-          (err, users) => {
-            if (err) {
-              throw new Error(err, err.message)
-            }
-            if (users && users.length > 0) {
-              resolve({premiumAvailable: false})
-            } else {
-              resolve({premiumAvailable: true})
-            }
-          }
-        )
-      }).catch((err) => {
-        return {success: false, message: err}
-      })
-    }
   }
 
   /*

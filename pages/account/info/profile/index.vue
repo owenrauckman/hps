@@ -225,7 +225,6 @@ export default{
     margin: 0 0 1rem 0;
   }
 }
-// todo remove this after cloudinary
 .signup__section{
   &__upload{
     display: flex;
@@ -258,3 +257,4 @@ export default{
     }
   }
 }
+</style>

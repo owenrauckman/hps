@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt'
 import config from '../config'
 import UserSchema from '../schemas/user'
-const stripe = require('stripe')(config.stripeTestKey)
 const cloudinary = require('cloudinary')
 
 // config cloudinary
@@ -19,7 +18,7 @@ export default class User {
   */
   getProfile (username, privateData) {
     /* Decide which items to exclude */
-    let exclude = {_id: 0, password: 0, stripeId: 0, subscriptionItems: 0, __v: 0}
+    let exclude = {_id: 0, password: 0, __v: 0}
     if (privateData) {
       exclude = {__v: 0}
     }
@@ -191,7 +190,7 @@ export default class User {
   /*
     Edit a user. Test against the API with the user session info
     @param {req, res, next} - data to compare user with
-    @param {req} - username, password, profile info, plan to edit, and quantity (for stripe ) -- in request include all 3 plans
+    @param {req} - username, password, profile info to edit
   */
 
   // todo: refactor this so that it is only iplied that we are editing a user's personal info
@@ -246,43 +245,11 @@ export default class User {
             // Update all of the top level values of a user object
             user.firstName = req.body.firstName
             user.lastName = req.body.lastName
-            user.username = req.body.username
+            user.username = req.body.username.replace(/ /g, '').toLowerCase()
             user.emailAddress = req.body.emailAddress
             user.phoneNumber = req.body.phoneNumber
             user.company = req.body.company
-            user.stripeId = req.body.stripeId
-            user.subscriptionItems = req.body.subscriptionItems
-            console.log(req.body.company.areasServed)
 
-            /* Only update this section if they are updating their subscriptions */
-
-            // if(req.body.subscriptions){
-            //   for(let plan of user.subscriptionItems){
-            //     for(let [index, subscription] of req.body.subscriptions.entries()){
-            //       if(plan.plan.id == subscription.plan && subscription.update == true){
-            //         stripe.subscriptionItems.update(
-            //           plan.id,
-            //           {
-            //             quantity: parseInt(subscription.quantity),
-            //           },
-            //           (err, transfer) => {
-            //             if(err){
-            //               return res.json({success: false, message: config.auth.editError});
-            //             }
-            //             else{
-            //               user.subscriptionItems.set(index, transfer);
-            //               user.save((err)=>{
-            //                 if(err){
-            //                   return res.json({success: false, message: config.auth.editError});
-            //                 }
-            //               });
-            //             }
-            //           }
-            //         )
-            //       }
-            //     }
-            //   }
-            // }
             /* If The User Applies a discount code, apply it here */
             saveCloudinaryPicture.then((response) => {
               user.save((err) => {
@@ -319,16 +286,22 @@ export default class User {
           if (err) {
             return res.status(500).json({err: err.message})
           }
-          /* delete the user's stripe info also */
-          stripe.customers.del(
-            user.stripeId,
-            (err, confirmation) => {
-              if (err) {
-                return res.json({success: false, message: config.auth.deleteError})
-              }
+          // Call cloudinary to delete the profile image
+          const deleteCloudinaryPicture = new Promise((resolve, reject) => {
+            if (req.body.profilePicture === config.defaultProfileImage) {
+              resolve(true)
+            } else {
+              cloudinary.uploader.destroy(user.username, (result) => {
+                resolve(true)
+              }, { public_id: user.username, invalidate: true }
+              )
             }
-          )
-          return res.json({success: true, message: config.auth.userDeleted})
+          })
+
+          // after cloudinary is complete, let the user know they have been deleted
+          deleteCloudinaryPicture.then(() => {
+            return res.json({success: true, message: config.auth.userDeleted})
+          })
         })
       })
     } else {
