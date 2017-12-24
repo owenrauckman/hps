@@ -7,7 +7,7 @@
       <div v-if="!loadingResults">
         <div class="m__results-container m__results-container--no-results">
           <p class="m__results-container__text">It looks like there are no consultants in this area. Want to secure your spot?</p>
-          <router-link to="signup" class="m__results-container__button">Sign up today</router-link>
+          <router-link to="create" class="m__results-container__button">Sign up today</router-link>
         </div>
       </div>
     </div>

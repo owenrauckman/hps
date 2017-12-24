@@ -23,7 +23,6 @@ export default class SearchModel {
         } else {
           resolve({err: config.defineLocation})
         }
-        if (params.company) { searchParameters.push({ 'company.name': { $regex: params.company, $options: 'i' } }) }
 
         /* Set a number of users, and get the count to use in aggregate for random sorting */
         User.count({ $or: [{ $and: searchParameters }, {$and: [{ 'company.areasServed': { $elemMatch: { state: { $regex: params.state, $options: 'i' } } } }, { 'company.name': {$in: companyList} }]}] }, (err, users, userCount) => {
