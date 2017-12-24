@@ -41,7 +41,7 @@
     <v-dialog v-model="showDeleteDialog">
       <v-card>
         <v-card-title class="headline">Are you sure you want to delete your account?</v-card-title>
-        <v-card-text>This action cannot be undone. You will immediately lose all of your subscriptions and data. Your credit card will stop being billed starting on your next cycle.</v-card-text>
+        <v-card-text>This action cannot be undone. You will immediately lose all of your subscriptions and data.</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey darken-1" flat="flat" @click.native="showDeleteDialog = false">Cancel</v-btn>

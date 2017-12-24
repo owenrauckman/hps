@@ -41,8 +41,27 @@
 
     <div class="m__create__navigation">
       <button class="m__create__button m__create__button--ghost" @click="()=>{$router.push('account')}" v-scroll-to="{element: '.m__header', duration: 1000}">Back</button>
-      <button class="m__create__button m__create__about__create" @click="submit()" v-scroll-to="{element: '.m__header', duration: 1000}">Create Profile</button>
+      <button class="m__create__button m__create__about__create" @click="submit()" v-scroll-to="{element: '.m__header', duration: 100}">Create Profile</button>
     </div>
+
+    <!-- loading state -->
+    <div :class="[{ 'm__create__loading--active': creatingAccount }, 'm__create__loading']">
+      <div class='m__create__loading__dot m__create__loading__dot__1'></div>
+      <div class='m__create__loading__dot m__create__loading__dot__2'></div>
+      <div class='m__create__loading__dot m__create__loading__dot__3'></div>
+      <div class='m__create__loading__dot m__create__loading__dot__4'></div>
+    </div>
+
+    <!-- snackbar (for failed creates)-->
+    <v-snackbar
+      :timeout="snackbarTimeout"
+      :color="snackbarColor"
+      :multi-line="true"
+      v-model="showSnackbar"
+    >
+      {{ snackbarText }}
+      <v-btn dark flat @click.native="showSnackbar = false">Close</v-btn>
+    </v-snackbar>
 
   </div>
 </template>
@@ -54,6 +73,11 @@ import { mapMutations, mapGetters, mapActions } from 'vuex'
 export default {
   data () {
     return {
+      creatingAccount: false,
+      showSnackbar: false,
+      snackbarTimeout: 6000,
+      snackbarColor: 'pink lighten-1',
+      snackbarText: 'Something went wrong when creating your profile. Please try again.'
     }
   },
   computed: {
@@ -96,13 +120,20 @@ export default {
     ...mapMutations([types.UPDATE_PROGRESS_BAR, types.UPDATE_SIGN_UP_INFO]),
     ...mapActions(['createProfile']),
     submit () {
+      this.creatingAccount = true
       this.createProfile().then((success) => {
         if (success) {
+          this.creatingAccount = false
           this.$router.push('/create/success')
+        } else {
+          this.creatingAccount = false
+          this.showSnackbar = true
+          this.snackbarSuccess = false
         }
-        // todo flash message error
       }).catch(() => {
-        this.showError = true
+        this.creatingAccount = false
+        this.showSnackbar = true
+        this.snackbarSuccess = false
       })
     }
   },
@@ -131,5 +162,36 @@ export default {
   &__create{
     max-width: 180px;
   }
+}
+
+
+// load, refactor later
+.m__create__loading{
+ background: rgba(61, 74, 166, 0.9);
+ z-index: +5;
+ display: none;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ overflow: hidden;
+ position: absolute;
+ &--active{
+   display: block;
+ }
+ &__dot{
+   width: 10px;
+   height: 10px;
+   background: $pink;
+   border-radius: 5px;
+   position: absolute;
+   top: 50%;
+   transform: translateY(-50%);
+   left: -10%;
+   &__1{ animation: dotslide 2s infinite cubic-bezier(0.2,.8,.8,0.2); }
+   &__2{ animation: dotslide 2s .2s infinite cubic-bezier(0.2,.8,.8,0.2); }
+   &__3{ animation: dotslide 2s .4s infinite cubic-bezier(0.2,.8,.8,0.2); }
+   &__4{ animation: dotslide 2s .6s infinite cubic-bezier(0.2,.8,.8,0.2); }
+ }
 }
 </style>

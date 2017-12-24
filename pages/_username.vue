@@ -1,51 +1,55 @@
 <template>
   <div class="p__profile" v-if="user.company">
-    <div class="p__info">
-      <div>
-        <h1 class="p__info__name">{{user.firstName}} {{user.lastName}}</h1>
-        <h2 class="p__info__company">{{user.company.name}}</h2>
+    <div class="p__profile-container">
+      <div class="p__info">
+        <div>
+          <h1 class="p__info__name">{{user.firstName}} {{user.lastName}}</h1>
+          <h2 class="p__info__company">{{user.company.name}}</h2>
+        </div>
+        <div class="p__info__image" :style="{ 'background-image': `url('${user.profilePicture}')` }"></div>
       </div>
-      <div class="p__info__image" :style="{ 'background-image': `url('${user.profilePicture}')` }"></div>
-    </div>
-    <div class="p__connect">
-      <div class="p__connect__social">
-        <a v-if="user.company.links.facebook" class="p__connect__social__icon" :href="user.company.links.facebook.startsWith('http') ? user.company.links.facebook : `https://${user.company.links.facebook}`">
-          <img src="../static/svg/facebook.svg"/>
-        </a>
-        <a v-if="user.company.links.instagram" class="p__connect__social__icon" :href="user.company.links.instagram.startsWith('http') ? user.company.links.instagram : `https://${user.company.links.instagram}`">
-          <img src="../static/svg/instagram.svg"/>
-        </a>
-        <a v-if="user.company.links.twitter" class="p__connect__social__icon" :href="user.company.links.twitter.startsWith('http') ? user.company.links.twitter : `https://${user.company.links.twitter}`">
-          <img src="../static/svg/twitter.svg"/>
-        </a>
-        <a v-if="user.company.links.pinterest" class="p__connect__social__icon" :href="user.company.links.pinterest.startsWith('http') ? user.company.links.pinterest : `https://${user.company.links.pinterest}`">
-          <img src="../static/svg/pinterest.svg"/>
-        </a>
-        <a v-if="user.company.links.youtube" class="p__connect__social__icon" :href="user.company.links.youtube.startsWith('http') ? user.company.links.youtube : `https://${user.company.links.youtube}`">
-          <img src="../static/svg/youtube.svg"/>
-        </a>
-        <a v-if="user.company.links.website" class="p__connect__social__icon" :href="user.company.links.website.startsWith('http') ? user.company.links.website : `https://${user.company.links.website}`">
-          <img src="../static/svg/website.svg"/>
-        </a>
+      <div class="p__connect">
+        <div class="p__connect__social">
+          <a v-if="user.company.links.facebook" class="p__connect__social__icon" :href="user.company.links.facebook.startsWith('http') ? user.company.links.facebook : `https://${user.company.links.facebook}`">
+            <img src="../static/svg/facebook.svg"/>
+          </a>
+          <a v-if="user.company.links.instagram" class="p__connect__social__icon" :href="user.company.links.instagram.startsWith('http') ? user.company.links.instagram : `https://${user.company.links.instagram}`">
+            <img src="../static/svg/instagram.svg"/>
+          </a>
+          <a v-if="user.company.links.twitter" class="p__connect__social__icon" :href="user.company.links.twitter.startsWith('http') ? user.company.links.twitter : `https://${user.company.links.twitter}`">
+            <img src="../static/svg/twitter.svg"/>
+          </a>
+          <a v-if="user.company.links.pinterest" class="p__connect__social__icon" :href="user.company.links.pinterest.startsWith('http') ? user.company.links.pinterest : `https://${user.company.links.pinterest}`">
+            <img src="../static/svg/pinterest.svg"/>
+          </a>
+          <a v-if="user.company.links.youtube" class="p__connect__social__icon" :href="user.company.links.youtube.startsWith('http') ? user.company.links.youtube : `https://${user.company.links.youtube}`">
+            <img src="../static/svg/youtube.svg"/>
+          </a>
+          <a v-if="user.company.links.website" class="p__connect__social__icon" :href="user.company.links.website.startsWith('http') ? user.company.links.website : `https://${user.company.links.website}`">
+            <img src="../static/svg/website.svg"/>
+          </a>
+        </div>
+        <div class="p__connect__contact">
+          <a class="p__connect__contact--link" v-if="user.phoneNumber" :href="'tel:'+user.phoneNumber">{{user.phoneNumber}}</a>
+          <a class="p__connect__contact--link" v-if="user.emailAddress" :href="'mailto:'+user.emailAddress">{{user.emailAddress}}</a>
+        </div>
       </div>
-      <div class="p__connect__contact">
-        <a class="p__connect__contact--link" v-if="user.phoneNumber" :href="'tel:'+user.phoneNumber">{{user.phoneNumber}}</a>
-        <a class="p__connect__contact--link" v-if="user.emailAddress" :href="'mailto:'+user.emailAddress">{{user.emailAddress}}</a>
+    </div>
+    <div class="p__about-container">
+      <div class="p__about" v-if="user.company.aboutMe">
+        <h3 class="p__about__heading">About {{user.firstName}}</h3>
+        <p class="p__about__copy">{{user.company.aboutMe}}</p>
       </div>
-    </div>
-    <div class="p__about" v-if="user.company.aboutMe">
-      <h3 class="p__about__heading">About {{user.firstName}}</h3>
-      <p class="p__about__copy">{{user.company.aboutMe}}</p>
-    </div>
-    <div class="p__about" v-if="user.company.aboutCompany">
-      <h3 class="p__about__heading">About {{user.company.name}}</h3>
-      <p class="p__about__copy">{{user.company.aboutCompany}}</p>
-    </div>
-    <div class="p__about" >
-      <h3 class="p__about__heading">Areas Served</h3>
-      <div class="p__about__areas" v-for="area in user.company.areasServed">
-        <v-chip class="p__about__areas__chip">{{area.state}}</v-chip>
-        <v-chip v-for="city in area.cities" :key="city.city">{{city.city}}</v-chip>
+      <div class="p__about" v-if="user.company.aboutCompany">
+        <h3 class="p__about__heading">About {{user.company.name}}</h3>
+        <p class="p__about__copy">{{user.company.aboutCompany}}</p>
+      </div>
+      <div class="p__about" >
+        <h3 class="p__about__heading">Areas Served</h3>
+        <div class="p__about__areas" v-for="area in user.company.areasServed">
+          <v-chip class="p__about__areas__chip">{{config.states[area.state]}}</v-chip>
+          <v-chip class="p__about__areas__chip--grey" v-for="city in area.cities" :key="city.city">{{city.city}}</v-chip>
+        </div>
       </div>
     </div>
   </div>
@@ -56,7 +60,8 @@ import config from '@/config'
 export default {
   data () {
     return {
-      user: {}
+      user: {},
+      config
     }
   },
   beforeMount () {
@@ -85,12 +90,14 @@ export default {
 <style scoped lang="scss">
 .p{
   &__profile{
-    max-width: 800px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 2rem;
-    @include breakpoint('phone'){
-      padding: 4rem 2rem;
+    &-container{
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 2rem 0 2rem;
+      @include breakpoint('phone'){
+        padding: 4rem 2rem 2rem 2rem;
+      }
     }
   }
   &__info{
@@ -196,10 +203,17 @@ export default {
     }
   }
   &__about{
-    margin: 2rem 0 4rem 0;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    &-container{
+      background: $off-white;
+    }
+    padding: 2rem;
+    margin: 0 auto;
     text-align: center;
     @include breakpoint('phone'){
-      margin: 4rem 0;
+      padding: 2rem;
       text-align: left;
     }
     &__heading{
@@ -219,12 +233,26 @@ export default {
     &__areas{
       display: flex;
       justify-content: center;
+      flex-wrap: wrap;
+      margin: 0.5rem 0;
       @include breakpoint('phone'){
         justify-content: flex-start;
       }
       &__chip{
         background: $purple !important; // vuetify override
         color: $white !important; // vuetify override
+        width: 100%;
+        margin: 1rem 2rem;
+        text-align: center;
+        display: inline-block;
+        padding-top: 0.5rem;
+        @include breakpoint('phone'){
+          margin: inherit;
+          width: auto;
+        }
+        &--grey{
+          margin: 0.5rem;
+        }
       }
     }
   }

@@ -1,10 +1,8 @@
-const defaultProfileImage = 'https://res.cloudinary.com/hps/image/upload/v1513970590/default_df26488a3f216bfdef5569b6c73a9338.png'
-
 export default {
   api: 'http://localhost:3000/api',
   cityPrice: 5,
   statePrice: 50,
-  defaultProfileImage,
+  defaultProfileImage: 'https://res.cloudinary.com/hps/image/upload/v1513970590/default_df26488a3f216bfdef5569b6c73a9338.png',
   genericLoginErrorMessage: 'Whoops, something went wrong. Please try agian.',
   genericLogoutErrorMessage: 'Something went wrong when logging out. Please try again.',
   signUpInfo: {
@@ -18,7 +16,7 @@ export default {
     username: '',
     password: '',
     phoneNumber: '',
-    profilePicture: defaultProfileImage,
+    profilePicture: 'https://res.cloudinary.com/hps/image/upload/v1513970590/default_df26488a3f216bfdef5569b6c73a9338.png',
     // company info
     company: {
       name: '',
