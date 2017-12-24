@@ -1,5 +1,4 @@
 import * as types from '@/store/mutationTypes'
-import config from '@/config'
 import axios from 'axios'
 
 export const state = {
@@ -55,7 +54,7 @@ export const actions = {
     Fetches a list of states from the API. Dispatches fetchCities upon completion.
   */
   fetchStates ({ commit, dispatch }) {
-    axios.get(`${config.api}/search/states`).then((response) => {
+    axios.get(`${window.location.origin}/api/search/states`).then((response) => {
       commit(types.UPDATE_STATES, response.data)
       dispatch('fetchCities')
     }).catch((err) => {
@@ -67,7 +66,7 @@ export const actions = {
     Given a state, fetches a list of states for that city
   */
   fetchCities ({ commit, state }) {
-    axios.get(`${config.api}/search/cities?state=${state.searchQuery.state}`).then((response) => {
+    axios.get(`${window.location.origin}/api/search/cities?state=${state.searchQuery.state}`).then((response) => {
       commit(types.UPDATE_CITIES, response.data)
     }).catch((err) => {
       throw new Error(`${err}: Something went wrong, add flash message`)
@@ -79,12 +78,12 @@ export const actions = {
   */
   fetchCompanyIndustry ({ commit }) {
     const companyIndustryList = []
-    axios.get(`${config.api}/search/companies`).then((response) => {
+    axios.get(`${window.location.origin}/api/search/companies`).then((response) => {
       response.data.forEach((company) => {
         companyIndustryList.push({ type: 'COMPANY', name: company })
       })
     }).then(() => {
-      axios.get(`${config.api}/search/industries`).then((response) => {
+      axios.get(`${window.location.origin}/api/search/industries`).then((response) => {
         response.data.forEach((industry) => {
           companyIndustryList.push({ type: 'INDUSTRY', name: industry })
         })
@@ -103,7 +102,7 @@ export const actions = {
     state.hideBasicCards = true
     state.results = []
     state.loadingResults = true
-    axios.get(`${config.api}/search` +
+    axios.get(`${window.location.origin}/api/search` +
       `?state=${encodeURIComponent(state.searchQuery.state)}` +
       `&city=${encodeURIComponent(state.searchQuery.city)}` +
       `&company=${encodeURIComponent(state.searchQuery.companyIndustry && state.searchQuery.companyIndustry.type === 'COMPANY' ? state.searchQuery.companyIndustry.name : '')}` +
@@ -128,7 +127,7 @@ export const actions = {
     state.hideBasicCards = true
     state.results = []
     state.loadingResults = true
-    axios.get(`${config.api}/search/premium`).then((users) => {
+    axios.get(`${window.location.origin}/api/search/premium`).then((users) => {
       /* check if there are users returned */
       if (users.data.users) {
         state.isResults = true

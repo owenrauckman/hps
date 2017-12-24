@@ -82,7 +82,7 @@ export const actions = {
   */
   fetchCompanies ({ commit }) {
     const companyList = []
-    axios.get(`${config.api}/search/companies`).then((response) => {
+    axios.get(`${window.location.origin}/api/search/companies`).then((response) => {
       response.data.forEach((company) => {
         companyList.push(company)
       })
@@ -95,7 +95,7 @@ export const actions = {
     Fetches a list of states for the sign up process
   */
   fetchStates ({ commit }) {
-    axios.get(`${config.api}/search/states`).then((response) => {
+    axios.get(`${window.location.origin}/api/search/states`).then((response) => {
       commit(types.UPDATE_SIGN_UP_STATES, response.data)
     }).catch((err) => {
       throw new Error(`${err}: Something went wrong, add flash message`)
@@ -108,7 +108,7 @@ export const actions = {
   generateCities ({ commit, state }) {
     const possibleCities = []
     state.signUpInfo.states.forEach((state) => {
-      axios.get(`${config.api}/search/cities?state=${state.value}`).then((response) => {
+      axios.get(`${window.location.origin}/api/search/cities?state=${state.value}`).then((response) => {
         const stateObj = {
           abbr: state.value,
           name: state.text,
@@ -136,7 +136,7 @@ export const actions = {
   */
   isUsernameAvailable ({ state }, username) {
     return new Promise((resolve) => {
-      axios.get(`${config.api}/users/u/u/${encodeURIComponent(username)}`)
+      axios.get(`${window.location.origin}/api/users/u/u/${encodeURIComponent(username)}`)
         .then((response) => {
           if (response.data.userExists) {
             resolve(false)
@@ -153,7 +153,7 @@ export const actions = {
   */
   isEmailAvailable ({ state }, emailAddress) {
     return new Promise((resolve) => {
-      axios.get(`${config.api}/users/u/e/${encodeURIComponent(emailAddress)}`)
+      axios.get(`${window.location.origin}/api/users/u/e/${encodeURIComponent(emailAddress)}`)
         .then((response) => {
           if (response.data.userExists) {
             resolve(false)
@@ -169,7 +169,7 @@ export const actions = {
   */
   createProfile ({ state, commit }) {
     return new Promise((resolve) => {
-      axios.post(`${config.api}/auth/register`, state.signUpInfo)
+      axios.post(`${window.location.origin}/api/auth/register`, state.signUpInfo)
         .then((response) => {
           if (response.data.success === true) {
             // reset the state back to default values

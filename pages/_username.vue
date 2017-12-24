@@ -71,7 +71,7 @@ export default {
     // This stays in the component since it alters the local state
     getUser (username) {
       fetch(
-        `${config.api}/users/u/${username}`
+        `${window.location.origin}/api/users/u/${username}`
       ).then((data) => {
         data.json().then((userInfo) => {
           if (userInfo.status === false) {

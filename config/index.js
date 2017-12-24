@@ -1,5 +1,5 @@
 export default {
-  api: 'http://localhost:3000/api',
+  api: 'http://localhost/api',
   cityPrice: 5,
   statePrice: 50,
   defaultProfileImage: 'https://res.cloudinary.com/hps/image/upload/v1513970590/default_df26488a3f216bfdef5569b6c73a9338.png',

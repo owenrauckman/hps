@@ -51,7 +51,6 @@
 
 <script>
 import axios from 'axios'
-import config from '@/config'
 import { mapActions } from 'vuex'
 
 export default{
@@ -112,7 +111,7 @@ export default{
     */
     editPassword (newPassword) {
       return new Promise((resolve, reject) => {
-        axios.put(`${config.api}/users/editPassword`, newPassword, { withCredentials: true })
+        axios.put(`${window.location.origin}/api/users/editPassword`, newPassword, { withCredentials: true })
           .then((response) => {
             if (response.data.success) {
               resolve({ success: true, message: 'Password successfully updated' })

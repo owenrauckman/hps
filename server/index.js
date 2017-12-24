@@ -12,7 +12,7 @@ const MongoStore = require('connect-mongo')(session)
 // Create app
 const app = express()
 const host = process.env.HOST || '127.0.0.1'
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3002
 
 // Set up DB connection
 mongoose.connect(serverConfig.db, { useMongoClient: true })

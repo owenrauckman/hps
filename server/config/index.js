@@ -1,5 +1,5 @@
 export default {
-  port: 3000,
+  port: 3002,
   db: 'mongodb://orauckman:jayhawks@ds023613.mlab.com:23613/hps',
   sessionLength: 1800,
   numRandomResults: 12,

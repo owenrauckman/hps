@@ -15,7 +15,7 @@ export default {
 <style scoped lang="scss">
 .m__hero{
   font-family: $montserrat;
-  font-weight: 700;
+  font-weight: 600;
   text-align: right;
   letter-spacing: 0.1rem;
   color: $dark-grey;

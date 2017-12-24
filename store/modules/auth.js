@@ -59,7 +59,7 @@ export const actions = {
   */
   checkAuth ({ commit }) {
     return new Promise((resolve) => {
-      axios.get(`${config.api}/users/dashboard`, { withCredentials: true })
+      axios.get(`${window.location.origin}/api/users/dashboard`, { withCredentials: true })
         .then((response) => {
           if (response.data.status) {
             commit(types.UPDATE_AUTH_STATUS, true)
@@ -84,7 +84,7 @@ export const actions = {
   */
   loginUser ({ commit }, credentials) {
     return new Promise((resolve) => {
-      axios.post(`${config.api}/auth/login`, credentials, { withCredentials: true })
+      axios.post(`${window.location.origin}/api/auth/login`, credentials, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             commit(types.UPDATE_AUTH_STATUS, true)
@@ -108,7 +108,7 @@ export const actions = {
   */
   logoutUser ({ commit }) {
     return new Promise((resolve) => {
-      axios.get(`${config.api}/auth/logout`, { withCredentials: true })
+      axios.get(`${window.location.origin}/api/auth/logout`, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             commit(types.UPDATE_AUTH_STATUS, false)
@@ -130,7 +130,7 @@ export const actions = {
   */
   sendResetPasswordLink ({ state }, emailAddress) {
     return new Promise((resolve) => {
-      axios.post(`${config.api}/auth/forgotPassword`, { emailAddress }, { withCredentials: true })
+      axios.post(`${window.location.origin}/api/auth/forgotPassword`, { emailAddress }, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             resolve({ showError: false, showCheckEmailMessage: true })
@@ -152,7 +152,7 @@ export const actions = {
   */
   resetPassword ({ state }, credentials) {
     return new Promise((resolve) => {
-      axios.post(`${config.api}/auth/resetPassword`, credentials, { withCredentials: true })
+      axios.post(`${window.location.origin}/api/auth/resetPassword`, credentials, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             resolve({ status: true, showError: false })
@@ -175,7 +175,7 @@ export const actions = {
   updateUser ({ state, commit }, user) {
     return new Promise((resolve, reject) => {
       console.log(user)
-      axios.put(`${config.api}/users/edit/${user.username}`, user, { withCredentials: true })
+      axios.put(`${window.location.origin}/api/users/edit/${user.username}`, user, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             commit(types.UPDATE_USER_DATA, user)
@@ -194,7 +194,7 @@ export const actions = {
   */
   deleteUser () {
     return new Promise((resolve, reject) => {
-      axios.delete(`${config.api}/users/delete`, { withCredentials: true })
+      axios.delete(`${window.location.origin}/api/users/delete`, { withCredentials: true })
         .then((response) => {
           if (response.data.success === true) {
             resolve({ status: true, message: 'Your account has been deleted.' })
@@ -211,7 +211,7 @@ export const actions = {
     Fetches a list of states for the sign up process
   */
   fetchEditStates ({ commit }) {
-    axios.get(`${config.api}/search/states`).then((response) => {
+    axios.get(`${window.location.origin}/api/search/states`).then((response) => {
       commit(types.UPDATE_EDIT_STATES, response.data)
     }).catch((err) => {
       throw new Error(`${err}: Something went wrong, add flash message`)
@@ -237,7 +237,7 @@ export const actions = {
     const cityPromises = []
     state.editInfo.states.forEach((stateToSearch) => {
       const cityPromise = new Promise((resolve) => {
-        axios.get(`${config.api}/search/cities?state=${stateToSearch}`).then((response) => {
+        axios.get(`${window.location.origin}/api/search/cities?state=${stateToSearch}`).then((response) => {
           // before resolving, add the associated state with the city
           const cities = []
           response.data.forEach((city) => {
