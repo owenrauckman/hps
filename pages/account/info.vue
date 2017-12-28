@@ -28,7 +28,7 @@ export default{
 .e{
   &__nav{
     font-family: $montserrat;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 1.5rem;
     letter-spacing: 0.05rem;
     display: flex;

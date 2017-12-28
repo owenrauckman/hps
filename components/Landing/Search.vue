@@ -118,7 +118,7 @@ export default {
       border-radius: $border-radius;
       font-family: $montserrat;
       text-transform: uppercase;
-      font-weight: 600;
+      font-weight: 500;
       padding: 1rem;
       width: 100%;
       font-size: 1rem;
